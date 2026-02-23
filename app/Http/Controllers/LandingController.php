@@ -57,6 +57,21 @@ class LandingController extends Controller
             $galleryItems = $galleryItems->where('event_name', $activeEvent)->values();
         }
 
+        $liveSection = $sections->get('livestream');
+        $liveTitle = $liveSection?->title ?: 'Live Streaming Ibadah Anak';
+        $liveDescription = $liveSection?->content ?: 'Saksikan ibadah dan kegiatan DSCMKids secara langsung melalui YouTube.';
+        $youtubeRawUrl = $liveSection?->meta['youtube_url']
+            ?? $liveSection?->meta['url']
+            ?? $liveSection?->content;
+        $youtubeEmbedUrl = $this->youtubeEmbedUrl(is_string($youtubeRawUrl) ? $youtubeRawUrl : null);
+
+        $liveStream = [
+            'title' => $liveTitle,
+            'description' => $liveDescription,
+            'youtube_url' => is_string($youtubeRawUrl) ? $youtubeRawUrl : null,
+            'embed_url' => $youtubeEmbedUrl,
+        ];
+
         return view('landing', [
             'sections' => $sections,
             'news' => $news,
@@ -67,6 +82,7 @@ class LandingController extends Controller
             'schoolData' => $schoolData,
             'slides' => $slides,
             'teachers' => $teachers,
+            'liveStream' => $liveStream,
         ]);
     }
 
@@ -186,5 +202,52 @@ class LandingController extends Controller
         $candidate = trim((string) ($parts[0] ?? ''));
 
         return $candidate !== '' ? $candidate : 'Kegiatan Umum';
+    }
+
+    private function youtubeEmbedUrl(?string $url): ?string
+    {
+        if (!$url) {
+            return null;
+        }
+
+        $trimmed = trim($url);
+
+        if ($trimmed === '') {
+            return null;
+        }
+
+        if (preg_match('~youtube\.com/embed/([A-Za-z0-9_-]{6,})~i', $trimmed, $matches)) {
+            return 'https://www.youtube.com/embed/'.$matches[1].'?autoplay=0&rel=0';
+        }
+
+        $parts = parse_url($trimmed);
+        if (!$parts || empty($parts['host'])) {
+            return null;
+        }
+
+        $host = strtolower((string) $parts['host']);
+        $path = trim((string) ($parts['path'] ?? ''), '/');
+        $videoId = null;
+
+        if (str_contains($host, 'youtu.be')) {
+            $videoId = strtok($path, '/');
+        } elseif (str_contains($host, 'youtube.com')) {
+            if (str_starts_with($path, 'watch')) {
+                parse_str((string) ($parts['query'] ?? ''), $query);
+                $videoId = $query['v'] ?? null;
+            } elseif (str_starts_with($path, 'shorts/')) {
+                $videoId = explode('/', $path)[1] ?? null;
+            } elseif (str_starts_with($path, 'live/')) {
+                $videoId = explode('/', $path)[1] ?? null;
+            } elseif (str_starts_with($path, 'embed/')) {
+                $videoId = explode('/', $path)[1] ?? null;
+            }
+        }
+
+        if (!$videoId || !preg_match('/^[A-Za-z0-9_-]{6,}$/', (string) $videoId)) {
+            return null;
+        }
+
+        return 'https://www.youtube.com/embed/'.$videoId.'?autoplay=0&rel=0';
     }
 }

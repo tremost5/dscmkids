@@ -49,6 +49,64 @@
         .title { margin:0 0 10px; font-family:'Baloo 2',sans-serif; font-size:1.7rem; line-height:1.1; }
         .muted { color:var(--muted); }
         .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+        .theater {
+            margin-top: 16px;
+            border-radius: 24px;
+            border: 1px solid #1f355b;
+            padding: 18px;
+            background:
+                radial-gradient(circle at 12% 0%, rgba(59,130,246,.2), transparent 40%),
+                radial-gradient(circle at 88% 10%, rgba(20,184,166,.18), transparent 35%),
+                linear-gradient(145deg, #020617, #111827 40%, #1e293b 100%);
+            color: #f8fafc;
+            box-shadow: 0 20px 42px rgba(2, 6, 23, .45);
+        }
+        .theater-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+        .live-badge {
+            background:#ef4444;
+            color:#fff;
+            border-radius:999px;
+            padding:6px 10px;
+            font-size:.75rem;
+            font-weight:900;
+            letter-spacing:.3px;
+            animation: pulseLive 1.4s ease-in-out infinite;
+        }
+        @keyframes pulseLive { 0% { opacity:1; } 50% { opacity:.55; } 100% { opacity:1; } }
+        .theater p { color: rgba(248,250,252,.84); margin-top:6px; }
+        .theater-screen {
+            margin-top: 12px;
+            border-radius: 18px;
+            border: 1px solid rgba(148,163,184,.3);
+            overflow: hidden;
+            background: #020617;
+            position: relative;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), 0 18px 36px rgba(0,0,0,.45);
+        }
+        .theater-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 28px;
+            background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,0));
+            pointer-events: none;
+            z-index: 2;
+        }
+        .theater-iframe { display:block; width:100%; aspect-ratio:16/9; border:0; }
+        .theater-empty {
+            width:100%;
+            aspect-ratio:16/9;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            text-align:center;
+            padding:16px;
+            color:#cbd5e1;
+            background: radial-gradient(circle at center, #1e293b, #020617);
+            font-weight:700;
+        }
 
         .circle-wrap { display:grid; grid-template-columns:.9fr 1.1fr; gap:12px; align-items:center; }
         .donut-box { position:relative; min-height:270px; }
@@ -218,6 +276,23 @@
         <article class="stat"><div class="s-label">Hadir Hari Ini</div><div class="s-value" id="rolledPresent">{{ number_format((int) ($metrics['attendance_today'] ?? 0)) }}</div></article>
         <article class="stat"><div class="s-label">Persentase Hadir</div><div class="s-value">{{ number_format((float) ($metrics['attendance_rate'] ?? 0), 1) }}%</div></article>
         <article class="stat"><div class="s-label">Kelas Aktif</div><div class="s-value">{{ number_format((int) ($metrics['active_classes'] ?? 0)) }}</div></article>
+    </section>
+
+    <section class="theater" id="live">
+        <div class="theater-head">
+            <div>
+                <h2 class="title" style="color:#fff;margin-bottom:0;">{{ $liveStream['title'] ?? 'Live Streaming Ibadah Anak' }}</h2>
+                <p>{{ $liveStream['description'] ?? 'Saksikan siaran langsung DSCMKids.' }}</p>
+            </div>
+            <span class="live-badge">LIVE STREAM</span>
+        </div>
+        <div class="theater-screen">
+            @if(!empty($liveStream['embed_url']))
+                <iframe class="theater-iframe" src="{{ $liveStream['embed_url'] }}" title="Live Streaming DSCMKids" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            @else
+                <div class="theater-empty">Link YouTube live belum diatur.<br>Isi di Admin &gt; Konten (`section_key: livestream`, `meta.youtube_url`).</div>
+            @endif
+        </div>
     </section>
 
     <section class="section panel" id="analytics">

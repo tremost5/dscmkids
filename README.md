@@ -85,3 +85,18 @@ SCHOOL_GALLERY_EVENT_COLUMN=event_name
 - Highlight keyword otomatis pada hasil pencarian berita
 - Galeri lightbox fullscreen dengan navigasi keyboard (`Esc`, `←`, `→`)
 - Statistik event di halaman detail event galeri (jumlah foto, tanggal awal/terbaru)
+- Layar theater live streaming YouTube di landing page
+
+## Setup Live Streaming (Admin)
+
+1. Buka admin: `Konten`.
+2. Edit section dengan `section_key = livestream`.
+3. Isi `meta` JSON:
+
+```json
+{
+  "youtube_url": "https://www.youtube.com/watch?v=YOUR_VIDEO_ID"
+}
+```
+
+Mendukung format URL: `watch?v=...`, `youtu.be/...`, `shorts/...`, `live/...`, atau `embed/...`.

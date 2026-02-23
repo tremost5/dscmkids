@@ -40,6 +40,14 @@ class DatabaseSeeder extends Seeder
                 'title' => 'Ayo Terlibat!',
                 'content' => 'Hubungi admin sekolah minggu untuk pendaftaran anak, informasi kelas, atau kolaborasi pelayanan.',
             ],
+            [
+                'section_key' => 'livestream',
+                'title' => 'Live Streaming Ibadah Anak',
+                'content' => 'Saksikan ibadah dan kegiatan DSCMKids secara langsung melalui YouTube.',
+                'meta' => [
+                    'youtube_url' => '',
+                ],
+            ],
         ];
 
         foreach ($sections as $section) {
