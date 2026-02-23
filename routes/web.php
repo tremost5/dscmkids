@@ -12,6 +12,8 @@ use App\Http\Controllers\LandingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/berita', [LandingController::class, 'newsIndex'])->name('news.index');
+Route::get('/berita/{slug}', [LandingController::class, 'newsShow'])->name('news.show');
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest')->group(function () {

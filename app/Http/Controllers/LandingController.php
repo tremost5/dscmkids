@@ -46,6 +46,81 @@ class LandingController extends Controller
             ? $schoolData['gallery']
             : Media::query()->latest()->take(8)->get();
 
-        return view('landing', compact('sections', 'news', 'announcements', 'gallery', 'schoolData', 'slides', 'teachers'));
+        $galleryItems = collect(is_iterable($gallery) ? $gallery : [])
+            ->map(function ($photo) {
+                if (is_array($photo)) {
+                    $title = $photo['title'] ?? 'Kegiatan DSCMKids';
+                    $event = $photo['event_name'] ?? $this->eventNameFromTitle($title);
+                    return array_merge($photo, ['title' => $title, 'event_name' => $event]);
+                }
+
+                $title = $photo->title ?? 'Kegiatan DSCMKids';
+                return [
+                    'title' => $title,
+                    'path' => asset('storage/'.$photo->file_path),
+                    'date' => optional($photo->created_at)->format('d M Y'),
+                    'event_name' => $this->eventNameFromTitle($title),
+                    'external' => false,
+                ];
+            });
+
+        $activeEvent = request()->query('event');
+        $galleryEvents = $galleryItems
+            ->pluck('event_name')
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($activeEvent) {
+            $galleryItems = $galleryItems->where('event_name', $activeEvent)->values();
+        }
+
+        return view('landing', [
+            'sections' => $sections,
+            'news' => $news,
+            'announcements' => $announcements,
+            'gallery' => $galleryItems,
+            'galleryEvents' => $galleryEvents,
+            'activeEvent' => $activeEvent,
+            'schoolData' => $schoolData,
+            'slides' => $slides,
+            'teachers' => $teachers,
+        ]);
+    }
+
+    public function newsIndex()
+    {
+        $latestNews = News::query()
+            ->where('is_published', true)
+            ->latest('published_at')
+            ->latest('id')
+            ->paginate(9);
+
+        return view('news.index', compact('latestNews'));
+    }
+
+    public function newsShow(string $slug)
+    {
+        $article = News::query()
+            ->where('is_published', true)
+            ->where('slug', $slug)
+            ->firstOrFail();
+
+        $relatedNews = News::query()
+            ->where('is_published', true)
+            ->where('id', '!=', $article->id)
+            ->latest('published_at')
+            ->take(4)
+            ->get();
+
+        return view('news.show', compact('article', 'relatedNews'));
+    }
+
+    private function eventNameFromTitle(string $title): string
+    {
+        $parts = preg_split('/[-:|]/', $title);
+        $candidate = trim((string) ($parts[0] ?? ''));
+
+        return $candidate !== '' ? $candidate : 'Kegiatan Umum';
     }
 }

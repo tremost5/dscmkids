@@ -9,169 +9,105 @@
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --ink: #11213f;
-            --muted: #5b6987;
-            --bg: #f4f9ff;
-            --card: #ffffff;
-            --line: #d9e5f6;
-            --blue: #2563eb;
-            --teal: #0d9488;
-            --orange: #f59e0b;
-            --pink: #ec4899;
-            --radius: 20px;
-        }
-        * { box-sizing: border-box; }
-        html, body { margin: 0; }
-        body {
-            font-family: 'Nunito', sans-serif;
-            color: var(--ink);
-            background:
-                radial-gradient(circle at 0% 0%, #dbeafe, transparent 35%),
-                radial-gradient(circle at 100% 10%, #cffafe, transparent 35%),
-                var(--bg);
-        }
-        .container { width: min(1160px, 92vw); margin: 0 auto; }
-        .top {
-            position: relative;
-            height: min(66vh, 560px);
-            border-radius: 0 0 30px 30px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(13, 27, 52, 0.25);
-        }
-        .slide { position: absolute; inset: 0; opacity: 0; transition: opacity .7s ease; }
-        .slide.active { opacity: 1; }
-        .slide img { width: 100%; height: 100%; object-fit: cover; }
-        .overlay {
-            position: absolute; inset: 0;
-            background: linear-gradient(105deg, rgba(7, 15, 31, .72), rgba(7, 15, 31, .35) 48%, rgba(7, 15, 31, .15));
-            display: flex; align-items: center;
-        }
-        .hero-content { width: min(1160px, 92vw); margin: 0 auto; color: #fff; }
-        .badge {
-            display: inline-block; padding: 6px 12px; border-radius: 999px;
-            background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.35);
-            font-weight: 800; font-size: .78rem; letter-spacing: .2px;
-        }
-        .hero-title {
-            font-family: 'Baloo 2', sans-serif;
-            font-size: clamp(2rem, 4.1vw, 3.9rem);
-            line-height: 1.04;
-            margin: 14px 0 0;
-            max-width: 760px;
-        }
-        .hero-sub { margin-top: 10px; max-width: 720px; color: rgba(255,255,255,.92); font-size: 1.05rem; }
-        .hero-actions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
-        .btn {
-            border: 0; text-decoration: none; padding: 11px 15px; border-radius: 12px;
-            font-weight: 800; display: inline-flex; align-items: center; cursor: pointer;
-        }
-        .btn-light { background: #fff; color: #0f172a; }
-        .btn-ghost { background: rgba(255,255,255,.16); color: #fff; border: 1px solid rgba(255,255,255,.35); }
+        :root { --ink:#11213f; --muted:#5b6987; --bg:#f4f9ff; --card:#fff; --line:#d9e5f6; --radius:20px; }
+        * { box-sizing:border-box; }
+        html, body { margin:0; }
+        body { font-family:'Nunito',sans-serif; color:var(--ink); background:radial-gradient(circle at 0% 0%, #dbeafe, transparent 35%),radial-gradient(circle at 100% 10%, #cffafe, transparent 35%),var(--bg); }
+        .container { width:min(1160px,92vw); margin:0 auto; }
 
-        .stats {
-            margin-top: -44px; position: relative; z-index: 2;
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
-        }
-        .stat {
-            background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-            padding: 16px; box-shadow: 0 12px 30px rgba(13, 29, 58, .09);
-        }
-        .s-label { color: var(--muted); font-weight: 700; font-size: .83rem; text-transform: uppercase; }
-        .s-value { font-size: clamp(1.45rem, 3vw, 2.2rem); font-weight: 900; margin-top: 4px; }
+        .top { position:relative; height:min(68vh,580px); border-radius:0 0 30px 30px; overflow:hidden; box-shadow:0 22px 44px rgba(13,27,52,.25); }
+        .slide { position:absolute; inset:0; opacity:0; transform:scale(1.06); transition:opacity 1.4s ease, transform 6s ease; will-change:opacity,transform; }
+        .slide.active { opacity:1; transform:scale(1); }
+        .slide img { width:100%; height:100%; object-fit:cover; }
+        .slide.active img { animation:kenBurns 8s ease forwards; }
+        @keyframes kenBurns { from { transform:scale(1.05) translateX(0); } to { transform:scale(1.14) translateX(-1.8%); } }
 
-        .section { margin-top: 16px; }
-        .panel {
-            background: var(--card); border: 1px solid var(--line);
-            border-radius: var(--radius); padding: 18px;
-            box-shadow: 0 12px 30px rgba(13, 29, 58, .07);
-        }
-        .title {
-            margin: 0 0 10px; font-family: 'Baloo 2', sans-serif;
-            font-size: 1.7rem; line-height: 1.1;
-        }
-        .muted { color: var(--muted); }
+        .overlay { position:absolute; inset:0; background:linear-gradient(115deg, rgba(4,9,22,.76), rgba(4,9,22,.42) 48%, rgba(4,9,22,.2)); display:flex; align-items:center; }
+        .hero-content { width:min(1160px,92vw); margin:0 auto; color:#fff; transform:translateY(8px); opacity:0; transition:all .65s ease; }
+        .hero-content.enter { transform:translateY(0); opacity:1; }
+        .badge { display:inline-block; padding:6px 12px; border-radius:999px; background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.35); font-weight:800; font-size:.78rem; }
+        .hero-title { font-family:'Baloo 2',sans-serif; font-size:clamp(2rem,4.1vw,3.9rem); line-height:1.04; margin:14px 0 0; max-width:760px; }
+        .hero-sub { margin-top:10px; max-width:720px; color:rgba(255,255,255,.92); font-size:1.05rem; }
+        .hero-actions { margin-top:20px; display:flex; gap:10px; flex-wrap:wrap; }
+        .btn { border:0; text-decoration:none; padding:11px 15px; border-radius:12px; font-weight:800; display:inline-flex; align-items:center; cursor:pointer; }
+        .btn-light { background:#fff; color:#0f172a; }
+        .btn-ghost { background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.35); }
 
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .hero-nav { position:absolute; left:50%; transform:translateX(-50%); bottom:14px; display:flex; gap:8px; z-index:3; }
+        .dot { width:34px; height:4px; border-radius:999px; background:rgba(255,255,255,.34); overflow:hidden; }
+        .dot span { display:block; width:0; height:100%; background:#fff; }
+        .dot.active span { animation:fillLine 4.6s linear forwards; }
+        @keyframes fillLine { from { width:0; } to { width:100%; } }
 
-        .circle-wrap { display: grid; grid-template-columns: .9fr 1.1fr; gap: 12px; align-items: center; }
-        .donut-box { position: relative; min-height: 270px; }
-        .donut-center {
-            position: absolute; inset: 0; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; pointer-events: none;
-        }
-        .big-roll { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 900; color: #0f172a; line-height: 1; }
-        .small-roll { color: var(--muted); font-weight: 700; margin-top: 6px; }
+        .stats { margin-top:-44px; position:relative; z-index:2; display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+        .stat { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px; box-shadow:0 12px 30px rgba(13,29,58,.09); }
+        .s-label { color:var(--muted); font-weight:700; font-size:.83rem; text-transform:uppercase; }
+        .s-value { font-size:clamp(1.45rem,3vw,2.2rem); font-weight:900; margin-top:4px; }
 
-        .class-list { display: grid; gap: 8px; }
-        .class-row {
-            border: 1px solid #e3ebf8; border-radius: 12px; padding: 9px 11px;
-            display: flex; justify-content: space-between; align-items: center;
-            background: linear-gradient(120deg, #fff, #f9fbff);
-        }
-        .chip {
-            width: 11px; height: 11px; border-radius: 999px; display: inline-block; margin-right: 7px;
-        }
+        .section { margin-top:16px; }
+        .panel { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:18px; box-shadow:0 12px 30px rgba(13,29,58,.07); }
+        .title { margin:0 0 10px; font-family:'Baloo 2',sans-serif; font-size:1.7rem; line-height:1.1; }
+        .muted { color:var(--muted); }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 
-        .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .info-card {
-            border-radius: 16px; color: #fff; padding: 16px; min-height: 150px;
-        }
-        .info-card h3 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.25rem; }
-        .info-card p { margin: 8px 0 0; color: rgba(255,255,255,.92); }
-        .c1 { background: linear-gradient(140deg, #0ea5e9, #2563eb); }
-        .c2 { background: linear-gradient(140deg, #0d9488, #14b8a6); }
-        .c3 { background: linear-gradient(140deg, #f97316, #ef4444); }
+        .circle-wrap { display:grid; grid-template-columns:.9fr 1.1fr; gap:12px; align-items:center; }
+        .donut-box { position:relative; min-height:270px; }
+        .donut-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
+        .big-roll { font-size:clamp(2rem,4vw,2.8rem); font-weight:900; color:#0f172a; line-height:1; }
+        .small-roll { color:var(--muted); font-weight:700; margin-top:6px; }
 
-        .news-list, .ann-list { display: grid; gap: 10px; }
-        .item {
-            border: 1px solid #e1e9f8; border-radius: 14px; padding: 12px;
-            background: linear-gradient(120deg, #fff, #f8fbff);
-        }
-        .item h3 { margin: 0; font-size: 1.05rem; }
-        .item p { margin: 7px 0 0; color: #3f4e6a; }
-        .meta { color: #677791; font-size: .83rem; margin-top: 6px; }
+        .class-list { display:grid; gap:8px; }
+        .class-row { border:1px solid #e3ebf8; border-radius:12px; padding:9px 11px; display:flex; justify-content:space-between; align-items:center; background:linear-gradient(120deg,#fff,#f9fbff); }
+        .chip { width:11px; height:11px; border-radius:999px; display:inline-block; margin-right:7px; }
 
-        .teacher-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-        .teacher {
-            border: 1px solid #dde7f8; border-radius: 16px; padding: 12px;
-            background: #fff;
-        }
-        .teacher img {
-            width: 100%; height: 170px; object-fit: cover;
-            border-radius: 12px; border: 1px solid #d7e4f6;
-        }
-        .teacher h4 { margin: 10px 0 0; font-size: 1rem; }
-        .teacher p { margin: 4px 0 0; color: #52617d; font-size: .9rem; }
+        .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+        .info-card { border-radius:16px; color:#fff; padding:16px; min-height:150px; }
+        .info-card h3 { margin:0; font-family:'Baloo 2',sans-serif; font-size:1.25rem; }
+        .info-card p { margin:8px 0 0; color:rgba(255,255,255,.92); }
+        .c1 { background:linear-gradient(140deg,#0ea5e9,#2563eb); }
+        .c2 { background:linear-gradient(140deg,#0d9488,#14b8a6); }
+        .c3 { background:linear-gradient(140deg,#f97316,#ef4444); }
 
-        .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-        .photo { position: relative; overflow: hidden; border-radius: 15px; min-height: 210px; border: 1px solid #d8e4f6; }
-        .photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
-        .photo:hover img { transform: scale(1.05); }
-        .caption {
-            position: absolute; left: 0; right: 0; bottom: 0; padding: 9px 10px; color: #fff;
-            background: linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.78)); font-size: .8rem;
-        }
+        .news-list, .ann-list { display:grid; gap:10px; }
+        .item { border:1px solid #e1e9f8; border-radius:14px; padding:12px; background:linear-gradient(120deg,#fff,#f8fbff); }
+        .item h3 { margin:0; font-size:1.05rem; }
+        .item p { margin:7px 0 0; color:#3f4e6a; }
+        .meta { color:#677791; font-size:.83rem; margin-top:6px; }
 
-        .footer { text-align: center; color: #6b7a92; padding: 20px 0 30px; font-size: .85rem; }
+        .teacher-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+        .teacher { border:1px solid #dde7f8; border-radius:16px; padding:12px; background:#fff; }
+        .teacher img { width:100%; height:170px; object-fit:cover; border-radius:12px; border:1px solid #d7e4f6; }
+        .teacher h4 { margin:10px 0 0; font-size:1rem; }
+        .teacher p { margin:4px 0 0; color:#52617d; font-size:.9rem; }
 
-        @media (max-width: 980px) {
-            .stats { grid-template-columns: repeat(2, 1fr); }
-            .grid-2 { grid-template-columns: 1fr; }
-            .cards { grid-template-columns: 1fr; }
-            .teacher-grid, .gallery-grid { grid-template-columns: repeat(2, 1fr); }
-            .circle-wrap { grid-template-columns: 1fr; }
+        .filter-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+        .filter-pill { border:1px solid #d1def4; background:#fff; color:#334155; font-weight:700; border-radius:999px; padding:8px 12px; text-decoration:none; }
+        .filter-pill.active { background:#1d4ed8; border-color:#1d4ed8; color:#fff; }
+
+        .gallery-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+        .photo { position:relative; overflow:hidden; border-radius:15px; min-height:210px; border:1px solid #d8e4f6; }
+        .photo img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .35s ease; }
+        .photo:hover img { transform:scale(1.05); }
+        .caption { position:absolute; left:0; right:0; bottom:0; padding:9px 10px; color:#fff; background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.78)); font-size:.8rem; }
+
+        .footer { text-align:center; color:#6b7a92; padding:20px 0 30px; font-size:.85rem; }
+
+        @media (max-width:980px) {
+            .stats { grid-template-columns:repeat(2,1fr); }
+            .grid-2 { grid-template-columns:1fr; }
+            .cards { grid-template-columns:1fr; }
+            .teacher-grid, .gallery-grid { grid-template-columns:repeat(2,1fr); }
+            .circle-wrap { grid-template-columns:1fr; }
         }
-        @media (max-width: 640px) {
-            .top { height: 72vh; border-radius: 0 0 18px 18px; }
-            .teacher-grid, .gallery-grid, .stats { grid-template-columns: 1fr; }
+        @media (max-width:640px) {
+            .top { height:72vh; border-radius:0 0 18px 18px; }
+            .teacher-grid, .gallery-grid, .stats { grid-template-columns:1fr; }
         }
     </style>
 </head>
 <body>
 @php
     $metrics = $schoolData['metrics'] ?? [];
-    $series = $schoolData['attendance_series'] ?? [];
     $classAttendance = $schoolData['attendance_by_class'] ?? [];
     $attendanceTotals = $schoolData['attendance_totals'] ?? ['present' => 0, 'absent' => 0];
 
@@ -201,7 +137,7 @@
         </div>
     @endforeach
     <div class="overlay">
-        <div class="hero-content">
+        <div class="hero-content enter" id="heroContent">
             <span class="badge">Sekolah Minggu DSCMKids</span>
             <h1 class="hero-title" id="heroTitle">{{ $slidesData[0]['title'] ?? ($sections['hero']->title ?? 'Selamat Datang') }}</h1>
             <p class="hero-sub" id="heroSubtitle">{{ $slidesData[0]['subtitle'] ?? ($sections['hero']->content ?? '') }}</p>
@@ -209,9 +145,15 @@
                 <a href="#analytics" class="btn btn-light">Lihat Kehadiran</a>
                 <a href="#teachers" class="btn btn-ghost">Portfolio Guru</a>
                 <a href="#gallery" class="btn btn-ghost">Galeri</a>
+                <a href="{{ route('news.index') }}" class="btn btn-ghost">Semua Berita</a>
                 <a href="{{ route('admin.login') }}" class="btn btn-ghost">Admin</a>
             </div>
         </div>
+    </div>
+    <div class="hero-nav" id="heroNav">
+        @foreach($slidesData as $i => $slide)
+            <div class="dot {{ $i === 0 ? 'active' : '' }}" data-dot="{{ $i }}"><span></span></div>
+        @endforeach
     </div>
 </header>
 
@@ -253,18 +195,9 @@
         <article class="panel">
             <h2 class="title">Konten Umum Informatif & Edukatif</h2>
             <div class="cards">
-                <div class="info-card c1">
-                    <h3>Kelas Kreatif Alkitab</h3>
-                    <p>Anak belajar firman Tuhan lewat aktivitas visual, musik, dan permainan edukatif.</p>
-                </div>
-                <div class="info-card c2">
-                    <h3>Parent Insight</h3>
-                    <p>Ringkasan perkembangan rohani anak dan komunikasi rutin untuk orang tua.</p>
-                </div>
-                <div class="info-card c3">
-                    <h3>Growth Journey</h3>
-                    <p>Pemantauan keterlibatan, kehadiran, dan partisipasi per kelas secara berkala.</p>
-                </div>
+                <div class="info-card c1"><h3>Kelas Kreatif Alkitab</h3><p>Anak belajar firman Tuhan lewat aktivitas visual, musik, dan permainan edukatif.</p></div>
+                <div class="info-card c2"><h3>Parent Insight</h3><p>Ringkasan perkembangan rohani anak dan komunikasi rutin untuk orang tua.</p></div>
+                <div class="info-card c3"><h3>Growth Journey</h3><p>Pemantauan keterlibatan, kehadiran, dan partisipasi per kelas secara berkala.</p></div>
             </div>
         </article>
         <article class="panel">
@@ -312,9 +245,10 @@
         <div class="news-list">
             @forelse($news as $item)
                 <article class="item">
-                    <h3>{{ $item->title }}</h3>
+                    <h3><a href="{{ route('news.show', $item->slug) }}" style="text-decoration:none;color:inherit;">{{ $item->title }}</a></h3>
                     <div class="meta">{{ optional($item->published_at)->format('d M Y H:i') ?? '-' }}</div>
                     <p>{{ $item->excerpt ?? \Illuminate\Support\Str::limit(strip_tags($item->body), 160) }}</p>
+                    <a href="{{ route('news.show', $item->slug) }}" style="display:inline-block;margin-top:8px;font-weight:800;color:#1d4ed8;text-decoration:none;">Baca Selengkapnya</a>
                 </article>
             @empty
                 <article class="item">Belum ada berita.</article>
@@ -324,24 +258,29 @@
 
     <section class="section panel" id="gallery">
         <h2 class="title">Galeri Kegiatan</h2>
+        <div class="filter-bar">
+            <a href="{{ route('landing') }}#gallery" class="filter-pill {{ empty($activeEvent) ? 'active' : '' }}">Semua Event</a>
+            @foreach($galleryEvents as $event)
+                <a href="{{ route('landing', ['event' => $event]) }}#gallery" class="filter-pill {{ $activeEvent === $event ? 'active' : '' }}">{{ $event }}</a>
+            @endforeach
+        </div>
         <div class="gallery-grid">
             @forelse($galleryItems as $photo)
                 @php
                     $title = is_array($photo) ? ($photo['title'] ?? 'Kegiatan DSCMKids') : $photo->title;
                     $date = is_array($photo) ? ($photo['date'] ?? null) : optional($photo->created_at)->format('d M Y');
+                    $eventName = is_array($photo) ? ($photo['event_name'] ?? 'Kegiatan Umum') : 'Kegiatan Umum';
                     $pathValue = is_array($photo) ? ($photo['path'] ?? null) : asset('storage/'.$photo->file_path);
-                    $src = is_string($pathValue) && (str_starts_with($pathValue, 'http://') || str_starts_with($pathValue, 'https://'))
-                        ? $pathValue
-                        : (is_string($pathValue) ? asset(ltrim($pathValue, '/')) : null);
+                    $src = is_string($pathValue) && (str_starts_with($pathValue, 'http://') || str_starts_with($pathValue, 'https://')) ? $pathValue : (is_string($pathValue) ? asset(ltrim($pathValue, '/')) : null);
                 @endphp
                 <figure class="photo">
                     @if($src)
                         <img src="{{ $src }}" alt="{{ $title }}">
                     @endif
-                    <figcaption class="caption"><strong>{{ $title }}</strong><br>{{ $date ?? 'Kegiatan Pelayanan' }}</figcaption>
+                    <figcaption class="caption"><strong>{{ $title }}</strong><br>{{ $eventName }}{{ $date ? ' - '.$date : '' }}</figcaption>
                 </figure>
             @empty
-                <figure class="photo"><figcaption class="caption"><strong>Belum ada foto</strong></figcaption></figure>
+                <figure class="photo"><figcaption class="caption"><strong>Tidak ada foto untuk event ini</strong></figcaption></figure>
             @endforelse
         </div>
     </section>
@@ -350,79 +289,106 @@
 </main>
 
 <script>
-    (function () {
-        const slides = @json($slidesData);
-        const slideEls = Array.from(document.querySelectorAll('[data-slide]'));
-        const titleEl = document.getElementById('heroTitle');
-        const subtitleEl = document.getElementById('heroSubtitle');
+(function () {
+    const slides = @json($slidesData);
+    const slideEls = Array.from(document.querySelectorAll('[data-slide]'));
+    const dots = Array.from(document.querySelectorAll('[data-dot]'));
+    const titleEl = document.getElementById('heroTitle');
+    const subtitleEl = document.getElementById('heroSubtitle');
+    const heroContent = document.getElementById('heroContent');
 
-        let index = 0;
-        if (slideEls.length > 1) {
-            setInterval(() => {
-                slideEls[index].classList.remove('active');
-                index = (index + 1) % slideEls.length;
-                slideEls[index].classList.add('active');
-                titleEl.textContent = slides[index].title || 'Sekolah Minggu DSCMKids';
-                subtitleEl.textContent = slides[index].subtitle || '';
-            }, 4200);
+    const slideDuration = 4600;
+    let index = 0;
+
+    function animateText(newTitle, newSubtitle) {
+        heroContent.classList.remove('enter');
+        setTimeout(() => {
+            titleEl.textContent = newTitle || 'Sekolah Minggu DSCMKids';
+            subtitleEl.textContent = newSubtitle || '';
+            heroContent.classList.add('enter');
+        }, 220);
+    }
+
+    function goToSlide(nextIndex) {
+        if (nextIndex === index) {
+            return;
         }
 
-        const classData = @json($classAttendance);
-        const presentTotal = Number(@json((int) ($attendanceTotals['present'] ?? 0)));
-        const absentTotal = Number(@json((int) ($attendanceTotals['absent'] ?? 0)));
+        slideEls[index].classList.remove('active');
+        dots[index]?.classList.remove('active');
 
-        const labels = classData.map((x) => x.class).concat(['Tidak Hadir']);
-        const values = classData.map((x) => Number(x.present)).concat([absentTotal]);
-        const colors = ['#2563eb','#0ea5e9','#0d9488','#14b8a6','#f59e0b','#f97316','#ec4899','#a855f7','#6366f1','#94a3b8'];
+        index = nextIndex;
 
-        document.querySelectorAll('[data-chip]').forEach((el) => {
-            const i = Number(el.getAttribute('data-chip'));
-            el.style.background = colors[i % colors.length];
+        slideEls[index].classList.add('active');
+        dots[index]?.classList.add('active');
+        animateText(slides[index].title, slides[index].subtitle);
+    }
+
+    dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => {
+            goToSlide(i);
+            resetAutoRotate();
         });
+    });
 
-        const donutCanvas = document.getElementById('attendanceDonut');
-        if (donutCanvas && labels.length > 0) {
-            new Chart(donutCanvas.getContext('2d'), {
-                type: 'doughnut',
-                data: {
-                    labels,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: labels.map((_, i) => colors[i % colors.length]),
-                        borderWidth: 0,
-                        hoverOffset: 8,
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    cutout: '68%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#0f172a',
-                            titleColor: '#fff',
-                            bodyColor: '#e2e8f0',
-                        }
-                    }
-                }
-            });
+    let timer;
+    function startAutoRotate() {
+        if (slideEls.length <= 1) {
+            return;
         }
 
-        const rollEl = document.getElementById('centerRoll');
-        let current = 0;
-        const steps = 36;
-        const increment = presentTotal / steps;
-        let tick = 0;
-        const timer = setInterval(() => {
-            tick += 1;
-            current += increment;
-            rollEl.textContent = Math.round(current).toLocaleString('id-ID');
-            if (tick >= steps) {
-                rollEl.textContent = presentTotal.toLocaleString('id-ID');
-                clearInterval(timer);
-            }
-        }, 32);
-    })();
+        timer = setInterval(() => {
+            goToSlide((index + 1) % slideEls.length);
+        }, slideDuration);
+    }
+
+    function resetAutoRotate() {
+        clearInterval(timer);
+        startAutoRotate();
+    }
+
+    startAutoRotate();
+
+    const classData = @json($classAttendance);
+    const presentTotal = Number(@json((int) ($attendanceTotals['present'] ?? 0)));
+    const absentTotal = Number(@json((int) ($attendanceTotals['absent'] ?? 0)));
+
+    const labels = classData.map((x) => x.class).concat(['Tidak Hadir']);
+    const values = classData.map((x) => Number(x.present)).concat([absentTotal]);
+    const colors = ['#2563eb','#0ea5e9','#0d9488','#14b8a6','#f59e0b','#f97316','#ec4899','#a855f7','#6366f1','#94a3b8'];
+
+    document.querySelectorAll('[data-chip]').forEach((el) => {
+        const i = Number(el.getAttribute('data-chip'));
+        el.style.background = colors[i % colors.length];
+    });
+
+    const donutCanvas = document.getElementById('attendanceDonut');
+    if (donutCanvas && labels.length > 0) {
+        new Chart(donutCanvas.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{ data: values, backgroundColor: labels.map((_, i) => colors[i % colors.length]), borderWidth: 0, hoverOffset: 8 }],
+            },
+            options: { responsive: true, cutout: '68%', plugins: { legend: { display: false }, tooltip: { backgroundColor: '#0f172a', titleColor: '#fff', bodyColor: '#e2e8f0' } } }
+        });
+    }
+
+    const rollEl = document.getElementById('centerRoll');
+    let current = 0;
+    const steps = 36;
+    const increment = presentTotal / steps;
+    let tick = 0;
+    const timerRoll = setInterval(() => {
+        tick += 1;
+        current += increment;
+        rollEl.textContent = Math.round(current).toLocaleString('id-ID');
+        if (tick >= steps) {
+            rollEl.textContent = presentTotal.toLocaleString('id-ID');
+            clearInterval(timerRoll);
+        }
+    }, 32);
+})();
 </script>
 </body>
 </html>

@@ -223,13 +223,14 @@ class SchoolDataService
         $titleColumn = config('school_data.gallery.title_column');
         $pathColumn = config('school_data.gallery.path_column');
         $dateColumn = config('school_data.gallery.date_column');
+        $eventColumn = config('school_data.gallery.event_column');
         $schema = Schema::connection($connection);
 
         if (!$schema->hasColumn($table, $pathColumn)) {
             return $this->localGallery();
         }
 
-        $columns = array_values(array_unique(array_filter([$titleColumn, $pathColumn, $dateColumn])));
+        $columns = array_values(array_unique(array_filter([$titleColumn, $pathColumn, $dateColumn, $eventColumn])));
 
         if (empty($columns)) {
             return $this->localGallery();
@@ -252,6 +253,7 @@ class SchoolDataService
                 'title' => $row->{$titleColumn} ?? 'Kegiatan DSCMKids',
                 'path' => $row->{$pathColumn} ?? null,
                 'date' => isset($row->{$dateColumn}) ? Carbon::parse($row->{$dateColumn})->format('d M Y') : null,
+                'event_name' => ($eventColumn && isset($row->{$eventColumn})) ? (string) $row->{$eventColumn} : null,
                 'external' => true,
             ];
         }
@@ -279,6 +281,7 @@ class SchoolDataService
                 'title' => $media->title,
                 'path' => asset('storage/'.$media->file_path),
                 'date' => optional($media->created_at)->format('d M Y'),
+                'event_name' => null,
                 'external' => false,
             ])
             ->toArray();

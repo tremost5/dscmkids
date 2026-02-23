@@ -59,6 +59,7 @@ SCHOOL_GALLERY_TABLE=activity_photos
 SCHOOL_GALLERY_TITLE_COLUMN=title
 SCHOOL_GALLERY_PATH_COLUMN=file_path
 SCHOOL_GALLERY_DATE_COLUMN=activity_date
+SCHOOL_GALLERY_EVENT_COLUMN=event_name
 ```
 
 ## Catatan Integrasi Galeri External
@@ -74,3 +75,5 @@ SCHOOL_GALLERY_DATE_COLUMN=activity_date
 - Admin CRUD Routes: `routes/web.php`
 - Admin Hero Slide: `/admin/slides`
 - Admin Portfolio Guru: `/admin/teachers`
+- Public List Berita: `/berita`
+- Public Detail Berita: `/berita/{slug}`
