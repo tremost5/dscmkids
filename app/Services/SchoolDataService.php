@@ -24,9 +24,10 @@ class SchoolDataService
 
             $studentTotal = $this->fetchStudentTotal($connection);
             $attendanceSeries = $this->fetchAttendanceSeries($connection, 14);
+            $classAttendance = $this->fetchTodayClassAttendance($connection, $studentTotal);
             $todayRate = $attendanceSeries[count($attendanceSeries) - 1]['value'] ?? 0;
             $weeklyAverage = round(collect($attendanceSeries)->avg('value'), 1);
-            $todayAttendance = (int) round(($todayRate / 100) * max($studentTotal, 1));
+            $todayAttendance = (int) ($classAttendance['present_total'] ?? 0);
             $activeClasses = $this->fetchActiveClasses($connection);
 
             return [
@@ -39,6 +40,11 @@ class SchoolDataService
                     'active_classes' => $activeClasses,
                 ],
                 'attendance_series' => $attendanceSeries,
+                'attendance_by_class' => $classAttendance['classes'] ?? [],
+                'attendance_totals' => [
+                    'present' => $todayAttendance,
+                    'absent' => max(0, $studentTotal - $todayAttendance),
+                ],
                 'gallery' => $this->fetchGallery($connection, $galleryTable),
             ];
         } catch (Throwable) {
@@ -66,7 +72,7 @@ class SchoolDataService
         $classColumn = config('school_data.students.class_column');
 
         if (!$classColumn || !Schema::connection($connection)->hasColumn($table, $classColumn)) {
-            return 0;
+            return count(config('school_data.class_rollup', []));
         }
 
         return (int) DB::connection($connection)
@@ -126,6 +132,86 @@ class SchoolDataService
         }
 
         return $series;
+    }
+
+    private function fetchTodayClassAttendance(string $connection, int $studentTotal): array
+    {
+        $classRollup = collect(config('school_data.class_rollup', []))
+            ->map(fn ($item) => trim((string) $item))
+            ->filter()
+            ->values();
+
+        $table = config('school_data.attendance.table');
+        $dateColumn = config('school_data.attendance.date_column');
+        $statusColumn = config('school_data.attendance.status_column');
+        $attendanceClassColumn = config('school_data.attendance.class_column');
+        $attendanceStudentColumn = config('school_data.attendance.student_id_column');
+
+        $studentsTable = config('school_data.students.table');
+        $studentIdColumn = 'id';
+        $studentClassColumn = config('school_data.students.class_column');
+        $schema = Schema::connection($connection);
+
+        if (!$schema->hasColumn($table, $dateColumn) || !$schema->hasColumn($table, $statusColumn)) {
+            return $this->fallbackClassAttendance($studentTotal);
+        }
+
+        $today = Carbon::today()->toDateString();
+
+        $query = DB::connection($connection)
+            ->table($table)
+            ->whereDate($dateColumn, $today)
+            ->whereIn($statusColumn, config('school_data.attendance.present_values', []));
+
+        if ($attendanceClassColumn && $schema->hasColumn($table, $attendanceClassColumn)) {
+            $rows = $query->select([$attendanceClassColumn, DB::raw('COUNT(*) as total')])
+                ->groupBy($attendanceClassColumn)
+                ->get();
+
+            $counts = [];
+            foreach ($rows as $row) {
+                $key = strtoupper(trim((string) $row->{$attendanceClassColumn}));
+                $counts[$key] = (int) $row->total;
+            }
+        } elseif (
+            $attendanceStudentColumn
+            && $schema->hasColumn($table, $attendanceStudentColumn)
+            && Schema::connection($connection)->hasColumn($studentsTable, $studentIdColumn)
+            && Schema::connection($connection)->hasColumn($studentsTable, $studentClassColumn)
+        ) {
+            $rows = $query
+                ->join($studentsTable, $studentsTable.'.'.$studentIdColumn, '=', $table.'.'.$attendanceStudentColumn)
+                ->select([$studentsTable.'.'.$studentClassColumn.' as class_name', DB::raw('COUNT(*) as total')])
+                ->groupBy($studentsTable.'.'.$studentClassColumn)
+                ->get();
+
+            $counts = [];
+            foreach ($rows as $row) {
+                $key = strtoupper(trim((string) $row->class_name));
+                $counts[$key] = (int) $row->total;
+            }
+        } else {
+            return $this->fallbackClassAttendance($studentTotal);
+        }
+
+        $classes = [];
+        $presentTotal = 0;
+
+        foreach ($classRollup as $className) {
+            $normalized = strtoupper(trim($className));
+            $value = (int) ($counts[$normalized] ?? 0);
+            $classes[] = ['class' => $className, 'present' => $value];
+            $presentTotal += $value;
+        }
+
+        if (empty($classes)) {
+            return $this->fallbackClassAttendance($studentTotal);
+        }
+
+        return [
+            'classes' => $classes,
+            'present_total' => $presentTotal,
+        ];
     }
 
     private function fetchGallery(string $connection, string $table): array
@@ -203,19 +289,26 @@ class SchoolDataService
         $daySeed = now()->dayOfYear;
         $studentTotal = 190 + ($daySeed % 35);
         $series = $this->generateFallbackSeries();
+        $class = $this->fallbackClassAttendance($studentTotal);
 
         $todayRate = $series[count($series) - 1]['value'];
+        $todayAttendance = $class['present_total'];
 
         return [
             'source' => 'local-fallback',
             'metrics' => [
                 'students_total' => $studentTotal,
-                'attendance_today' => (int) round(($todayRate / 100) * $studentTotal),
+                'attendance_today' => $todayAttendance,
                 'attendance_rate' => round($todayRate, 1),
                 'weekly_average' => round(collect($series)->avg('value'), 1),
-                'active_classes' => 9,
+                'active_classes' => count(config('school_data.class_rollup', [])),
             ],
             'attendance_series' => $series,
+            'attendance_by_class' => $class['classes'],
+            'attendance_totals' => [
+                'present' => $todayAttendance,
+                'absent' => max(0, $studentTotal - $todayAttendance),
+            ],
             'gallery' => $this->localGallery(),
         ];
     }
@@ -236,5 +329,36 @@ class SchoolDataService
         }
 
         return $series;
+    }
+
+    private function fallbackClassAttendance(int $studentTotal): array
+    {
+        $classes = collect(config('school_data.class_rollup', ['PG', 'TKA', 'TKB', '1', '2', '3', '4', '5', '6']))
+            ->values();
+
+        $counts = [];
+        $presentTotal = 0;
+        $seed = now()->dayOfYear;
+
+        foreach ($classes as $index => $class) {
+            $value = 12 + ((($seed + $index) * 5) % 13);
+            $counts[] = ['class' => (string) $class, 'present' => $value];
+            $presentTotal += $value;
+        }
+
+        if ($presentTotal > $studentTotal && $studentTotal > 0) {
+            $ratio = $studentTotal / $presentTotal;
+            $presentTotal = 0;
+            foreach ($counts as &$row) {
+                $row['present'] = max(0, (int) floor($row['present'] * $ratio));
+                $presentTotal += $row['present'];
+            }
+            unset($row);
+        }
+
+        return [
+            'classes' => $counts,
+            'present_total' => $presentTotal,
+        ];
     }
 }

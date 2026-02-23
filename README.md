@@ -2,8 +2,9 @@
 
 Website sistem informasi Sekolah Minggu DSCMKids berbasis Laravel 11, dengan:
 
-- Landing page premium (analytics, grafik kehadiran, galeri kegiatan).
+- Landing page premium (hero slider, grafik kehadiran bulat per kelas, galeri kegiatan).
 - Admin panel CRUD untuk berita, informasi, konten section, dan media.
+- Admin panel CRUD untuk slide header dan portfolio guru.
 - Integrasi database eksternal untuk metrik siswa, kehadiran, dan foto kegiatan.
 
 ## Requirement
@@ -49,7 +50,10 @@ SCHOOL_STUDENTS_CLASS_COLUMN=class_name
 SCHOOL_ATTENDANCE_TABLE=attendances
 SCHOOL_ATTENDANCE_DATE_COLUMN=attendance_date
 SCHOOL_ATTENDANCE_STATUS_COLUMN=status
+SCHOOL_ATTENDANCE_STUDENT_ID_COLUMN=student_id
+SCHOOL_ATTENDANCE_CLASS_COLUMN=class_name
 SCHOOL_ATTENDANCE_PRESENT_VALUES=1,true,present,hadir
+SCHOOL_CLASS_ROLLUP=PG,TKA,TKB,1,2,3,4,5,6
 
 SCHOOL_GALLERY_TABLE=activity_photos
 SCHOOL_GALLERY_TITLE_COLUMN=title
@@ -68,3 +72,5 @@ SCHOOL_GALLERY_DATE_COLUMN=activity_date
 - Service Analytics External: `app/Services/SchoolDataService.php`
 - Landing View Premium: `resources/views/landing.blade.php`
 - Admin CRUD Routes: `routes/web.php`
+- Admin Hero Slide: `/admin/slides`
+- Admin Portfolio Guru: `/admin/teachers`

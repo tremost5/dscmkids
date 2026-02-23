@@ -3,317 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DSCMKids | Sistem Informasi Sekolah Minggu Premium</title>
+    <title>DSCMKids | Sekolah Minggu Modern</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg: #f3f9ff;
-            --ink: #0e1729;
-            --muted: #5f6b85;
+            --ink: #11213f;
+            --muted: #5b6987;
+            --bg: #f4f9ff;
             --card: #ffffff;
-            --line: #dbe5f4;
-            --brand-a: #0f766e;
-            --brand-b: #0284c7;
-            --accent-a: #f59e0b;
-            --accent-b: #ef4444;
-            --radius: 18px;
+            --line: #d9e5f6;
+            --blue: #2563eb;
+            --teal: #0d9488;
+            --orange: #f59e0b;
+            --pink: #ec4899;
+            --radius: 20px;
         }
-
         * { box-sizing: border-box; }
-
-        html, body { margin: 0; padding: 0; }
-
+        html, body { margin: 0; }
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Nunito', sans-serif;
             color: var(--ink);
             background:
-                radial-gradient(1200px 400px at -10% -5%, #99f6e4 0%, transparent 40%),
-                radial-gradient(900px 400px at 110% 10%, #bfdbfe 0%, transparent 45%),
+                radial-gradient(circle at 0% 0%, #dbeafe, transparent 35%),
+                radial-gradient(circle at 100% 10%, #cffafe, transparent 35%),
                 var(--bg);
         }
-
-        .container { width: min(1180px, 92vw); margin: 0 auto; }
-
-        .nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 22px 0 8px;
-        }
-
-        .brand {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            letter-spacing: 0.4px;
-        }
-
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid #b7f3e4;
-            background: #ecfeff;
-            color: #0f766e;
-            padding: 7px 11px;
-            border-radius: 999px;
-            font-size: 0.82rem;
-            font-weight: 700;
-        }
-
-        .hero {
-            display: grid;
-            grid-template-columns: 1.15fr 0.85fr;
-            gap: 16px;
-            padding: 26px 0 18px;
-        }
-
-        .hero-main {
-            background: linear-gradient(130deg, #0f766e 0%, #0369a1 45%, #1d4ed8 100%);
-            color: #fff;
-            border-radius: 28px;
-            padding: 34px;
+        .container { width: min(1160px, 92vw); margin: 0 auto; }
+        .top {
             position: relative;
+            height: min(66vh, 560px);
+            border-radius: 0 0 30px 30px;
             overflow: hidden;
-            min-height: 360px;
-            box-shadow: 0 24px 54px rgba(3, 24, 58, 0.25);
+            box-shadow: 0 20px 40px rgba(13, 27, 52, 0.25);
         }
-
-        .hero-main::before {
-            content: '';
-            position: absolute;
-            width: 320px;
-            height: 320px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,0.28), rgba(255,255,255,0));
-            top: -120px;
-            right: -90px;
+        .slide { position: absolute; inset: 0; opacity: 0; transition: opacity .7s ease; }
+        .slide.active { opacity: 1; }
+        .slide img { width: 100%; height: 100%; object-fit: cover; }
+        .overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(105deg, rgba(7, 15, 31, .72), rgba(7, 15, 31, .35) 48%, rgba(7, 15, 31, .15));
+            display: flex; align-items: center;
         }
-
-        .hero-main h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(2rem, 4vw, 3.5rem);
-            line-height: 1.06;
-            margin: 0;
-            max-width: 700px;
+        .hero-content { width: min(1160px, 92vw); margin: 0 auto; color: #fff; }
+        .badge {
+            display: inline-block; padding: 6px 12px; border-radius: 999px;
+            background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.35);
+            font-weight: 800; font-size: .78rem; letter-spacing: .2px;
         }
-
-        .hero-main p {
-            margin: 18px 0 0;
-            max-width: 680px;
-            color: rgba(255,255,255,0.9);
-            line-height: 1.6;
-            font-size: 1.05rem;
+        .hero-title {
+            font-family: 'Baloo 2', sans-serif;
+            font-size: clamp(2rem, 4.1vw, 3.9rem);
+            line-height: 1.04;
+            margin: 14px 0 0;
+            max-width: 760px;
         }
-
-        .hero-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 24px;
-        }
-
+        .hero-sub { margin-top: 10px; max-width: 720px; color: rgba(255,255,255,.92); font-size: 1.05rem; }
+        .hero-actions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
         .btn {
-            text-decoration: none;
-            border: 0;
-            cursor: pointer;
-            font-weight: 700;
-            border-radius: 12px;
-            padding: 11px 15px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            border: 0; text-decoration: none; padding: 11px 15px; border-radius: 12px;
+            font-weight: 800; display: inline-flex; align-items: center; cursor: pointer;
         }
+        .btn-light { background: #fff; color: #0f172a; }
+        .btn-ghost { background: rgba(255,255,255,.16); color: #fff; border: 1px solid rgba(255,255,255,.35); }
 
-        .btn-white { background: #fff; color: #0f172a; }
-        .btn-soft { background: rgba(255,255,255,0.16); color: #fff; border: 1px solid rgba(255,255,255,0.28); }
-
-        .mini-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 14px;
+        .stats {
+            margin-top: -44px; position: relative; z-index: 2;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
         }
-
-        .mini-card {
-            background: var(--card);
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            padding: 18px;
-            box-shadow: 0 10px 30px rgba(2, 20, 47, 0.08);
+        .stat {
+            background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+            padding: 16px; box-shadow: 0 12px 30px rgba(13, 29, 58, .09);
         }
+        .s-label { color: var(--muted); font-weight: 700; font-size: .83rem; text-transform: uppercase; }
+        .s-value { font-size: clamp(1.45rem, 3vw, 2.2rem); font-weight: 900; margin-top: 4px; }
 
-        .mini-title { margin: 0; font-weight: 700; font-size: 0.93rem; color: #334155; }
-        .mini-value { margin: 8px 0 0; font-size: 2rem; font-weight: 800; }
-        .mini-note { margin-top: 6px; color: var(--muted); font-size: 0.9rem; }
-
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-            margin-top: 14px;
-        }
-
-        .stat-card {
-            background: var(--card);
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            padding: 18px;
-            box-shadow: 0 10px 30px rgba(2, 20, 47, 0.08);
-            transform: translateY(18px);
-            opacity: 0;
-            animation: rise .8s ease forwards;
-        }
-
-        .stat-card:nth-child(2) { animation-delay: .1s; }
-        .stat-card:nth-child(3) { animation-delay: .2s; }
-        .stat-card:nth-child(4) { animation-delay: .3s; }
-
-        .k-label { color: #64748b; font-size: 0.86rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
-        .k-value { font-size: clamp(1.6rem, 3vw, 2.25rem); font-weight: 800; margin-top: 6px; }
-
-        .section { margin-top: 18px; }
-
+        .section { margin-top: 16px; }
         .panel {
-            background: var(--card);
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            padding: 18px;
-            box-shadow: 0 12px 34px rgba(8, 28, 59, 0.08);
+            background: var(--card); border: 1px solid var(--line);
+            border-radius: var(--radius); padding: 18px;
+            box-shadow: 0 12px 30px rgba(13, 29, 58, .07);
         }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1.25fr 0.75fr;
-            gap: 14px;
+        .title {
+            margin: 0 0 10px; font-family: 'Baloo 2', sans-serif;
+            font-size: 1.7rem; line-height: 1.1;
         }
-
-        .section-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.4rem;
-            margin: 0 0 12px;
-        }
-
         .muted { color: var(--muted); }
 
-        .list {
-            display: grid;
-            gap: 10px;
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        .circle-wrap { display: grid; grid-template-columns: .9fr 1.1fr; gap: 12px; align-items: center; }
+        .donut-box { position: relative; min-height: 270px; }
+        .donut-center {
+            position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; pointer-events: none;
+        }
+        .big-roll { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 900; color: #0f172a; line-height: 1; }
+        .small-roll { color: var(--muted); font-weight: 700; margin-top: 6px; }
+
+        .class-list { display: grid; gap: 8px; }
+        .class-row {
+            border: 1px solid #e3ebf8; border-radius: 12px; padding: 9px 11px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(120deg, #fff, #f9fbff);
+        }
+        .chip {
+            width: 11px; height: 11px; border-radius: 999px; display: inline-block; margin-right: 7px;
         }
 
-        .list-item {
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 12px;
-            background: linear-gradient(120deg, #ffffff, #f8fbff);
+        .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .info-card {
+            border-radius: 16px; color: #fff; padding: 16px; min-height: 150px;
         }
+        .info-card h3 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.25rem; }
+        .info-card p { margin: 8px 0 0; color: rgba(255,255,255,.92); }
+        .c1 { background: linear-gradient(140deg, #0ea5e9, #2563eb); }
+        .c2 { background: linear-gradient(140deg, #0d9488, #14b8a6); }
+        .c3 { background: linear-gradient(140deg, #f97316, #ef4444); }
 
-        .list-item h3 {
-            margin: 0;
-            font-size: 1.02rem;
-            font-weight: 800;
+        .news-list, .ann-list { display: grid; gap: 10px; }
+        .item {
+            border: 1px solid #e1e9f8; border-radius: 14px; padding: 12px;
+            background: linear-gradient(120deg, #fff, #f8fbff);
         }
+        .item h3 { margin: 0; font-size: 1.05rem; }
+        .item p { margin: 7px 0 0; color: #3f4e6a; }
+        .meta { color: #677791; font-size: .83rem; margin-top: 6px; }
 
-        .list-item p { margin: 8px 0 0; color: #45556f; }
-        .meta { color: #64748b; font-size: 0.82rem; margin-top: 6px; }
-
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+        .teacher-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .teacher {
+            border: 1px solid #dde7f8; border-radius: 16px; padding: 12px;
+            background: #fff;
         }
-
-        .photo {
-            position: relative;
-            overflow: hidden;
-            border-radius: 16px;
-            min-height: 210px;
-            border: 1px solid #d7e2f1;
-            background: linear-gradient(145deg, #dbeafe, #f0fdfa);
+        .teacher img {
+            width: 100%; height: 170px; object-fit: cover;
+            border-radius: 12px; border: 1px solid #d7e4f6;
         }
+        .teacher h4 { margin: 10px 0 0; font-size: 1rem; }
+        .teacher p { margin: 4px 0 0; color: #52617d; font-size: .9rem; }
 
-        .photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.35s ease;
-        }
-
+        .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .photo { position: relative; overflow: hidden; border-radius: 15px; min-height: 210px; border: 1px solid #d8e4f6; }
+        .photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
         .photo:hover img { transform: scale(1.05); }
-
-        .photo-caption {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            color: #fff;
-            font-size: 0.82rem;
-            padding: 9px 10px;
-            background: linear-gradient(180deg, rgba(3,12,30,0), rgba(3,12,30,0.85));
+        .caption {
+            position: absolute; left: 0; right: 0; bottom: 0; padding: 9px 10px; color: #fff;
+            background: linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.78)); font-size: .8rem;
         }
 
-        .programs {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
+        .footer { text-align: center; color: #6b7a92; padding: 20px 0 30px; font-size: .85rem; }
 
-        .program {
-            padding: 16px;
-            border-radius: 16px;
-            color: #fff;
-            min-height: 152px;
-        }
-
-        .program h3 { margin: 0; font-family: 'Space Grotesk', sans-serif; }
-        .program p { margin: 8px 0 0; color: rgba(255,255,255,0.9); }
-        .p-a { background: linear-gradient(135deg, #0369a1, #2563eb); }
-        .p-b { background: linear-gradient(135deg, #0f766e, #14b8a6); }
-        .p-c { background: linear-gradient(135deg, #be123c, #ef4444); }
-
-        .cta {
-            margin: 18px 0 30px;
-            border-radius: 22px;
-            padding: 24px;
-            background: linear-gradient(120deg, #111827, #1e293b 35%, #0f766e 100%);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .cta h2 { margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 1.65rem; }
-        .cta p { margin: 8px 0 0; color: rgba(255,255,255,0.85); max-width: 700px; }
-
-        .footer {
-            text-align: center;
-            font-size: 0.86rem;
-            color: #64748b;
-            padding: 6px 0 26px;
-        }
-
-        @keyframes rise {
-            from { opacity: 0; transform: translateY(18px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 1080px) {
-            .hero { grid-template-columns: 1fr; }
+        @media (max-width: 980px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
             .grid-2 { grid-template-columns: 1fr; }
-            .stat-grid { grid-template-columns: repeat(2, 1fr); }
-            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
-            .programs { grid-template-columns: 1fr; }
+            .cards { grid-template-columns: 1fr; }
+            .teacher-grid, .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+            .circle-wrap { grid-template-columns: 1fr; }
         }
-
         @media (max-width: 640px) {
-            .hero-main { padding: 22px; border-radius: 20px; }
-            .stat-grid { grid-template-columns: 1fr; }
-            .gallery-grid { grid-template-columns: 1fr; }
+            .top { height: 72vh; border-radius: 0 0 18px 18px; }
+            .teacher-grid, .gallery-grid, .stats { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -321,105 +172,158 @@
 @php
     $metrics = $schoolData['metrics'] ?? [];
     $series = $schoolData['attendance_series'] ?? [];
-    $source = $schoolData['source'] ?? 'local-fallback';
+    $classAttendance = $schoolData['attendance_by_class'] ?? [];
+    $attendanceTotals = $schoolData['attendance_totals'] ?? ['present' => 0, 'absent' => 0];
+
+    $slidesData = $slides->count() > 0
+        ? $slides->map(fn ($item) => [
+            'title' => $item->title,
+            'subtitle' => $item->subtitle,
+            'image' => asset('storage/'.$item->image_path),
+            'button_text' => $item->button_text,
+            'button_url' => $item->button_url,
+        ])->values()->all()
+        : [[
+            'title' => $sections['hero']->title ?? 'System Informasi Sekolah Minggu DSCMKids',
+            'subtitle' => $sections['hero']->content ?? 'Platform digital untuk siswa dan orang tua.',
+            'image' => 'https://images.unsplash.com/photo-1491841573634-28140fc7ced7?q=80&w=1600&auto=format&fit=crop',
+            'button_text' => 'Info Kelas',
+            'button_url' => '#informasi',
+        ]];
+
     $galleryItems = is_iterable($gallery) ? collect($gallery)->all() : [];
 @endphp
 
-<div class="container">
-    <nav class="nav">
-        <div class="brand">DSCMKids Digital Ministry</div>
-        <div class="pill">Data Source: {{ strtoupper($source) }}</div>
-    </nav>
-
-    <section class="hero">
-        <div class="hero-main">
-            <h1>{{ $sections['hero']->title ?? 'Landing Page Premium Sekolah Minggu DSCMKids' }}</h1>
-            <p>{{ $sections['hero']->content ?? 'Dashboard pelayanan anak yang menggabungkan informasi terkini, statistik siswa dan kehadiran real-time, serta dokumentasi kegiatan dari database terintegrasi.' }}</p>
+<header class="top" id="home">
+    @foreach($slidesData as $i => $slide)
+        <div class="slide {{ $i === 0 ? 'active' : '' }}" data-slide>
+            <img src="{{ $slide['image'] }}" alt="slide {{ $i + 1 }}">
+        </div>
+    @endforeach
+    <div class="overlay">
+        <div class="hero-content">
+            <span class="badge">Sekolah Minggu DSCMKids</span>
+            <h1 class="hero-title" id="heroTitle">{{ $slidesData[0]['title'] ?? ($sections['hero']->title ?? 'Selamat Datang') }}</h1>
+            <p class="hero-sub" id="heroSubtitle">{{ $slidesData[0]['subtitle'] ?? ($sections['hero']->content ?? '') }}</p>
             <div class="hero-actions">
-                <a class="btn btn-white" href="#analytics">Lihat Analytics</a>
-                <a class="btn btn-soft" href="#gallery">Eksplor Galeri</a>
-                <a class="btn btn-soft" href="{{ route('admin.login') }}">Admin Login</a>
+                <a href="#analytics" class="btn btn-light">Lihat Kehadiran</a>
+                <a href="#teachers" class="btn btn-ghost">Portfolio Guru</a>
+                <a href="#gallery" class="btn btn-ghost">Galeri</a>
+                <a href="{{ route('admin.login') }}" class="btn btn-ghost">Admin</a>
             </div>
         </div>
+    </div>
+</header>
 
-        <div class="mini-grid">
-            <article class="mini-card">
-                <h3 class="mini-title">Total Murid Aktif</h3>
-                <div class="mini-value">{{ number_format((int) ($metrics['students_total'] ?? 0)) }}</div>
-                <div class="mini-note">Terverifikasi dari data sekolah minggu</div>
-            </article>
-            <article class="mini-card">
-                <h3 class="mini-title">Kehadiran Hari Ini</h3>
-                <div class="mini-value">{{ number_format((int) ($metrics['attendance_today'] ?? 0)) }}</div>
-                <div class="mini-note">Rate {{ number_format((float) ($metrics['attendance_rate'] ?? 0), 1) }}%</div>
-            </article>
-            <article class="mini-card">
-                <h3 class="mini-title">Rata-Rata Kehadiran</h3>
-                <div class="mini-value">{{ number_format((float) ($metrics['weekly_average'] ?? 0), 1) }}%</div>
-                <div class="mini-note">Performa 14 hari terakhir</div>
-            </article>
+<main class="container">
+    <section class="stats">
+        <article class="stat"><div class="s-label">Jumlah Siswa</div><div class="s-value">{{ number_format((int) ($metrics['students_total'] ?? 0)) }}</div></article>
+        <article class="stat"><div class="s-label">Hadir Hari Ini</div><div class="s-value" id="rolledPresent">{{ number_format((int) ($metrics['attendance_today'] ?? 0)) }}</div></article>
+        <article class="stat"><div class="s-label">Persentase Hadir</div><div class="s-value">{{ number_format((float) ($metrics['attendance_rate'] ?? 0), 1) }}%</div></article>
+        <article class="stat"><div class="s-label">Kelas Aktif</div><div class="s-value">{{ number_format((int) ($metrics['active_classes'] ?? 0)) }}</div></article>
+    </section>
+
+    <section class="section panel" id="analytics">
+        <h2 class="title">Kehadiran Hari Ini (PG, TKA, TKB, 1-6)</h2>
+        <p class="muted">Grafik bulat menampilkan komposisi kehadiran per kelas, terhubung ke database presensi.</p>
+        <div class="circle-wrap">
+            <div class="donut-box">
+                <canvas id="attendanceDonut" height="260"></canvas>
+                <div class="donut-center">
+                    <div class="big-roll" id="centerRoll">0</div>
+                    <div class="small-roll">Murid Hadir</div>
+                </div>
+            </div>
+            <div class="class-list">
+                @foreach($classAttendance as $index => $entry)
+                    <div class="class-row">
+                        <div><span class="chip" data-chip="{{ $index }}"></span>{{ $entry['class'] }}</div>
+                        <strong>{{ $entry['present'] }} murid</strong>
+                    </div>
+                @endforeach
+                <div class="class-row" style="background:#f8fafc;">
+                    <div>Total Tidak Hadir</div>
+                    <strong>{{ $attendanceTotals['absent'] ?? 0 }} murid</strong>
+                </div>
+            </div>
         </div>
     </section>
 
-    <section class="stat-grid" id="analytics">
-        <article class="stat-card">
-            <div class="k-label">Jumlah Siswa</div>
-            <div class="k-value">{{ number_format((int) ($metrics['students_total'] ?? 0)) }}</div>
-        </article>
-        <article class="stat-card">
-            <div class="k-label">Hadir Hari Ini</div>
-            <div class="k-value">{{ number_format((int) ($metrics['attendance_today'] ?? 0)) }}</div>
-        </article>
-        <article class="stat-card">
-            <div class="k-label">Rate Kehadiran</div>
-            <div class="k-value">{{ number_format((float) ($metrics['attendance_rate'] ?? 0), 1) }}%</div>
-        </article>
-        <article class="stat-card">
-            <div class="k-label">Kelas Aktif</div>
-            <div class="k-value">{{ number_format((int) ($metrics['active_classes'] ?? 0)) }}</div>
-        </article>
-    </section>
-
-    <section class="section grid-2">
+    <section class="section grid-2" id="informasi">
         <article class="panel">
-            <h2 class="section-title">Grafik Kehadiran Berwarna</h2>
-            <p class="muted" style="margin-top:0;">Visual trend kehadiran siswa 14 hari terakhir.</p>
-            <canvas id="attendanceChart" height="120"></canvas>
+            <h2 class="title">Konten Umum Informatif & Edukatif</h2>
+            <div class="cards">
+                <div class="info-card c1">
+                    <h3>Kelas Kreatif Alkitab</h3>
+                    <p>Anak belajar firman Tuhan lewat aktivitas visual, musik, dan permainan edukatif.</p>
+                </div>
+                <div class="info-card c2">
+                    <h3>Parent Insight</h3>
+                    <p>Ringkasan perkembangan rohani anak dan komunikasi rutin untuk orang tua.</p>
+                </div>
+                <div class="info-card c3">
+                    <h3>Growth Journey</h3>
+                    <p>Pemantauan keterlibatan, kehadiran, dan partisipasi per kelas secara berkala.</p>
+                </div>
+            </div>
         </article>
         <article class="panel">
-            <h2 class="section-title">Informasi & Jadwal</h2>
-            <div class="list">
+            <h2 class="title">Informasi Pelayanan</h2>
+            <div class="ann-list">
                 @forelse($announcements as $item)
-                    <div class="list-item">
+                    <div class="item">
                         <h3>{{ $item->title }}</h3>
                         <div class="meta">{{ optional($item->event_date)->format('d M Y') ?? 'Tanggal menyusul' }} {{ $item->location ? '- '.$item->location : '' }}</div>
                         <p>{{ $item->body }}</p>
                     </div>
                 @empty
-                    <div class="list-item">Belum ada pengumuman aktif.</div>
+                    <div class="item">Belum ada informasi.</div>
                 @endforelse
             </div>
         </article>
     </section>
 
+    <section class="section panel" id="teachers">
+        <h2 class="title">Portfolio Singkat Guru</h2>
+        <p class="muted">Profil guru diinput dari admin panel.</p>
+        <div class="teacher-grid">
+            @forelse($teachers as $teacher)
+                <article class="teacher">
+                    @if($teacher->photo_path)
+                        <img src="{{ asset('storage/'.$teacher->photo_path) }}" alt="{{ $teacher->name }}">
+                    @else
+                        <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?q=80&w=900&auto=format&fit=crop" alt="{{ $teacher->name }}">
+                    @endif
+                    <h4>{{ $teacher->name }}</h4>
+                    <p>{{ $teacher->role ?? 'Pengajar Sekolah Minggu' }}</p>
+                    <p><strong>Kelas:</strong> {{ $teacher->class_group ?? '-' }}</p>
+                    @if($teacher->bio)
+                        <p>{{ \Illuminate\Support\Str::limit($teacher->bio, 88) }}</p>
+                    @endif
+                </article>
+            @empty
+                <article class="teacher"><h4>Belum ada data guru</h4><p>Tambah dari admin panel.</p></article>
+            @endforelse
+        </div>
+    </section>
+
     <section class="section panel">
-        <h2 class="section-title">Berita Terbaru</h2>
-        <div class="list">
+        <h2 class="title">Berita Terbaru</h2>
+        <div class="news-list">
             @forelse($news as $item)
-                <div class="list-item">
+                <article class="item">
                     <h3>{{ $item->title }}</h3>
                     <div class="meta">{{ optional($item->published_at)->format('d M Y H:i') ?? '-' }}</div>
-                    <p>{{ $item->excerpt ?? \Illuminate\Support\Str::limit(strip_tags($item->body), 180) }}</p>
-                </div>
+                    <p>{{ $item->excerpt ?? \Illuminate\Support\Str::limit(strip_tags($item->body), 160) }}</p>
+                </article>
             @empty
-                <div class="list-item">Belum ada berita tersedia.</div>
+                <article class="item">Belum ada berita.</article>
             @endforelse
         </div>
     </section>
 
     <section class="section panel" id="gallery">
-        <h2 class="section-title">Foto Kegiatan</h2>
-        <p class="muted" style="margin-top:0;">Dokumentasi pelayanan yang ditarik dari database terintegrasi.</p>
+        <h2 class="title">Galeri Kegiatan</h2>
         <div class="gallery-grid">
             @forelse($galleryItems as $photo)
                 @php
@@ -434,116 +338,90 @@
                     @if($src)
                         <img src="{{ $src }}" alt="{{ $title }}">
                     @endif
-                    <figcaption class="photo-caption">
-                        <strong>{{ $title }}</strong><br>
-                        {{ $date ?? 'DSCMKids Event' }}
-                    </figcaption>
+                    <figcaption class="caption"><strong>{{ $title }}</strong><br>{{ $date ?? 'Kegiatan Pelayanan' }}</figcaption>
                 </figure>
             @empty
-                <figure class="photo">
-                    <figcaption class="photo-caption"><strong>Belum ada foto kegiatan</strong></figcaption>
-                </figure>
+                <figure class="photo"><figcaption class="caption"><strong>Belum ada foto</strong></figcaption></figure>
             @endforelse
         </div>
     </section>
 
-    <section class="section programs">
-        <article class="program p-a">
-            <h3>Kid Worship</h3>
-            <p>Ibadah interaktif berbasis kreativitas, lagu, dan pembelajaran alkitabiah kontekstual.</p>
-        </article>
-        <article class="program p-b">
-            <h3>Family Engagement</h3>
-            <p>Kolaborasi orang tua dan guru untuk pendampingan rohani anak yang berkelanjutan.</p>
-        </article>
-        <article class="program p-c">
-            <h3>Growth Tracking</h3>
-            <p>Monitoring perkembangan, kehadiran, dan keterlibatan siswa dengan data visual real-time.</p>
-        </article>
-    </section>
-
-    <section class="cta">
-        <div>
-            <h2>{{ $sections['cta']->title ?? 'Ayo Terhubung Dengan DSCMKids' }}</h2>
-            <p>{{ $sections['cta']->content ?? 'Landing page ini dirancang sebagai pusat informasi sekolah minggu modern yang menarik, informatif, dan siap ditingkatkan ke skala besar.' }}</p>
-        </div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <a href="{{ route('admin.login') }}" class="btn btn-white">Kelola Konten</a>
-            <a href="#analytics" class="btn btn-soft">Lihat Data</a>
-        </div>
-    </section>
-
-    <footer class="footer">&copy; {{ date('Y') }} DSCMKids. Crafted for premium digital ministry experience.</footer>
-</div>
+    <footer class="footer">&copy; {{ date('Y') }} DSCMKids - Dirancang untuk anak sekolah minggu dan orang tua murid.</footer>
+</main>
 
 <script>
     (function () {
-        const labels = @json(array_column($series, 'label'));
-        const values = @json(array_map(fn ($item) => (float) ($item['value'] ?? 0), $series));
+        const slides = @json($slidesData);
+        const slideEls = Array.from(document.querySelectorAll('[data-slide]'));
+        const titleEl = document.getElementById('heroTitle');
+        const subtitleEl = document.getElementById('heroSubtitle');
 
-        const canvas = document.getElementById('attendanceChart');
-        if (!canvas || !labels.length) {
-            return;
+        let index = 0;
+        if (slideEls.length > 1) {
+            setInterval(() => {
+                slideEls[index].classList.remove('active');
+                index = (index + 1) % slideEls.length;
+                slideEls[index].classList.add('active');
+                titleEl.textContent = slides[index].title || 'Sekolah Minggu DSCMKids';
+                subtitleEl.textContent = slides[index].subtitle || '';
+            }, 4200);
         }
 
-        const ctx = canvas.getContext('2d');
-        const gradient = ctx.createLinearGradient(0, 0, 0, 220);
-        gradient.addColorStop(0, 'rgba(14, 165, 233, 0.40)');
-        gradient.addColorStop(0.55, 'rgba(16, 185, 129, 0.20)');
-        gradient.addColorStop(1, 'rgba(239, 68, 68, 0.05)');
+        const classData = @json($classAttendance);
+        const presentTotal = Number(@json((int) ($attendanceTotals['present'] ?? 0)));
+        const absentTotal = Number(@json((int) ($attendanceTotals['absent'] ?? 0)));
 
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels,
-                datasets: [{
-                    label: 'Persentase Kehadiran',
-                    data: values,
-                    borderWidth: 3,
-                    borderColor: '#0284c7',
-                    pointRadius: 4,
-                    pointHoverRadius: 5,
-                    pointBackgroundColor: '#0f766e',
-                    pointBorderColor: '#ffffff',
-                    fill: true,
-                    backgroundColor: gradient,
-                    tension: 0.36
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#0f172a',
-                        titleColor: '#ffffff',
-                        bodyColor: '#e2e8f0',
-                        displayColors: false,
-                        callbacks: {
-                            label: function (context) {
-                                return context.parsed.y.toFixed(1) + '% hadir';
-                            }
-                        }
-                    }
+        const labels = classData.map((x) => x.class).concat(['Tidak Hadir']);
+        const values = classData.map((x) => Number(x.present)).concat([absentTotal]);
+        const colors = ['#2563eb','#0ea5e9','#0d9488','#14b8a6','#f59e0b','#f97316','#ec4899','#a855f7','#6366f1','#94a3b8'];
+
+        document.querySelectorAll('[data-chip]').forEach((el) => {
+            const i = Number(el.getAttribute('data-chip'));
+            el.style.background = colors[i % colors.length];
+        });
+
+        const donutCanvas = document.getElementById('attendanceDonut');
+        if (donutCanvas && labels.length > 0) {
+            new Chart(donutCanvas.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: labels.map((_, i) => colors[i % colors.length]),
+                        borderWidth: 0,
+                        hoverOffset: 8,
+                    }],
                 },
-                scales: {
-                    y: {
-                        suggestedMin: 0,
-                        suggestedMax: 100,
-                        grid: { color: 'rgba(148, 163, 184, 0.2)' },
-                        ticks: {
-                            callback: function (v) {
-                                return v + '%';
-                            }
+                options: {
+                    responsive: true,
+                    cutout: '68%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            titleColor: '#fff',
+                            bodyColor: '#e2e8f0',
                         }
-                    },
-                    x: {
-                        grid: { display: false }
                     }
                 }
+            });
+        }
+
+        const rollEl = document.getElementById('centerRoll');
+        let current = 0;
+        const steps = 36;
+        const increment = presentTotal / steps;
+        let tick = 0;
+        const timer = setInterval(() => {
+            tick += 1;
+            current += increment;
+            rollEl.textContent = Math.round(current).toLocaleString('id-ID');
+            if (tick >= steps) {
+                rollEl.textContent = presentTotal.toLocaleString('id-ID');
+                clearInterval(timer);
             }
-        });
+        }, 32);
     })();
 </script>
 </body>

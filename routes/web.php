@@ -3,9 +3,11 @@
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PageSectionController;
+use App\Http\Controllers\Admin\TeacherProfileController;
 use App\Http\Controllers\LandingController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,5 +27,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('announcements', AnnouncementController::class);
         Route::resource('sections', PageSectionController::class);
         Route::resource('media', MediaController::class);
+        Route::resource('slides', HeroSlideController::class)->parameters(['slides' => 'slide']);
+        Route::resource('teachers', TeacherProfileController::class)->parameters(['teachers' => 'teacher']);
     });
 });

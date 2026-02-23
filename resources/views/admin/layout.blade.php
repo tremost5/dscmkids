@@ -114,6 +114,8 @@
             <a href="{{ route('admin.announcements.index') }}">Informasi</a>
             <a href="{{ route('admin.sections.index') }}">Konten</a>
             <a href="{{ route('admin.media.index') }}">Media</a>
+            <a href="{{ route('admin.slides.index') }}">Slide Header</a>
+            <a href="{{ route('admin.teachers.index') }}">Portfolio Guru</a>
             <a href="{{ route('landing') }}" target="_blank">Lihat Situs</a>
             <form action="{{ route('admin.logout') }}" method="POST" style="display:inline;">
                 @csrf

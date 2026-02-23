@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Announcement;
 use App\Models\News;
 use App\Models\PageSection;
+use App\Models\TeacherProfile;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -68,5 +69,39 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+
+        TeacherProfile::updateOrCreate(
+            ['name' => 'Kak Rina'],
+            [
+                'role' => 'Koordinator Sekolah Minggu',
+                'class_group' => 'PG - TKA',
+                'bio' => 'Melayani anak-anak dengan pendekatan kreatif dan penuh kasih.',
+                'sort_order' => 1,
+                'is_active' => true,
+            ]
+        );
+
+        TeacherProfile::updateOrCreate(
+            ['name' => 'Kak Daniel'],
+            [
+                'role' => 'Pengajar',
+                'class_group' => 'TKB - 2',
+                'bio' => 'Fokus pada pengembangan karakter dan disiplin rohani anak.',
+                'sort_order' => 2,
+                'is_active' => true,
+            ]
+        );
+
+        TeacherProfile::updateOrCreate(
+            ['name' => 'Kak Lydia'],
+            [
+                'role' => 'Pengajar',
+                'class_group' => '3 - 6',
+                'bio' => 'Mendorong anak mengenal firman Tuhan lewat dialog interaktif.',
+                'sort_order' => 3,
+                'is_active' => true,
+            ]
+        );
+
     }
 }

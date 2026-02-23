@@ -11,6 +11,8 @@
     <div class="card"><strong>{{ $announcementCount }}</strong><br><span class="muted">Total Informasi</span></div>
     <div class="card"><strong>{{ $sectionCount }}</strong><br><span class="muted">Konten Section</span></div>
     <div class="card"><strong>{{ $mediaCount }}</strong><br><span class="muted">File Media</span></div>
+    <div class="card"><strong>{{ $slideCount }}</strong><br><span class="muted">Slide Header</span></div>
+    <div class="card"><strong>{{ $teacherCount }}</strong><br><span class="muted">Portfolio Guru</span></div>
 </div>
 
 <h3>Berita Terbaru</h3>
