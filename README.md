@@ -78,3 +78,10 @@ SCHOOL_GALLERY_EVENT_COLUMN=event_name
 - Public List Berita: `/berita`
 - Public Detail Berita: `/berita/{slug}`
 - Public Detail Event Galeri: `/galeri/event/{eventSlug}`
+
+## Fitur Publik Lanjutan
+
+- Search berita server-side via query string: `/berita?q=kata-kunci`
+- Highlight keyword otomatis pada hasil pencarian berita
+- Galeri lightbox fullscreen dengan navigasi keyboard (`Esc`, `←`, `→`)
+- Statistik event di halaman detail event galeri (jumlah foto, tanggal awal/terbaru)

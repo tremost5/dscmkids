@@ -72,13 +72,23 @@ class LandingController extends Controller
 
     public function newsIndex()
     {
+        $query = trim((string) request()->query('q', ''));
+
         $latestNews = News::query()
             ->where('is_published', true)
+            ->when($query !== '', function ($builder) use ($query) {
+                $builder->where(function ($inner) use ($query) {
+                    $inner->where('title', 'like', '%'.$query.'%')
+                        ->orWhere('excerpt', 'like', '%'.$query.'%')
+                        ->orWhere('body', 'like', '%'.$query.'%');
+                });
+            })
             ->latest('published_at')
             ->latest('id')
-            ->paginate(12);
+            ->paginate(12)
+            ->withQueryString();
 
-        return view('news.index', compact('latestNews'));
+        return view('news.index', compact('latestNews', 'query'));
     }
 
     public function newsShow(string $slug)
@@ -113,12 +123,26 @@ class LandingController extends Controller
 
         $eventName = (string) $eventsBySlug->get($eventSlug);
         $eventItems = $galleryItems->where('event_name', $eventName)->values();
+        $timestamps = $eventItems
+            ->pluck('date')
+            ->filter()
+            ->map(fn ($date) => strtotime((string) $date))
+            ->filter(fn ($timestamp) => $timestamp !== false)
+            ->values();
+
+        $eventStats = [
+            'photo_count' => $eventItems->count(),
+            'latest_date' => $timestamps->isNotEmpty() ? date('d M Y', (int) $timestamps->max()) : null,
+            'first_date' => $timestamps->isNotEmpty() ? date('d M Y', (int) $timestamps->min()) : null,
+            'event_count' => $eventsBySlug->count(),
+        ];
 
         return view('gallery.event', [
             'eventName' => $eventName,
             'eventSlug' => $eventSlug,
             'eventItems' => $eventItems,
             'allEvents' => $eventsBySlug,
+            'eventStats' => $eventStats,
         ]);
     }
 

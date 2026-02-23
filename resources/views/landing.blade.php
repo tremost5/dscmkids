@@ -129,6 +129,21 @@
             font-size: 1.2rem;
             cursor: pointer;
         }
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 42px;
+            height: 42px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,.4);
+            background: rgba(255,255,255,.12);
+            color: #fff;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+        .lightbox-prev { left: 16px; }
+        .lightbox-next { right: 16px; }
 
         .footer { text-align:center; color:#6b7a92; padding:20px 0 30px; font-size:.85rem; }
 
@@ -316,7 +331,7 @@
                 @endphp
                 <figure class="photo">
                     @if($src)
-                        <img src="{{ $src }}" alt="{{ $title }}" data-lightbox-src="{{ $src }}" data-lightbox-title="{{ $title }}" data-lightbox-meta="{{ $eventName }}{{ $date ? ' - '.$date : '' }}">
+                        <img src="{{ $src }}" alt="{{ $title }}" data-lightbox-src="{{ $src }}" data-lightbox-title="{{ $title }}" data-lightbox-meta="{{ $eventName }}{{ $date ? ' - '.$date : '' }}" data-lightbox-index="{{ $loop->index }}">
                     @endif
                     <figcaption class="caption"><strong>{{ $title }}</strong><br>{{ $eventName }}{{ $date ? ' - '.$date : '' }}<br><a href="{{ route('gallery.event', ['eventSlug' => $eventSlug]) }}">Detail Event</a></figcaption>
                 </figure>
@@ -328,6 +343,8 @@
 
     <div class="lightbox" id="lightbox">
         <button class="lightbox-close" id="lightboxClose" aria-label="Tutup">&times;</button>
+        <button class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Sebelumnya">&#10094;</button>
+        <button class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Berikutnya">&#10095;</button>
         <div>
             <img id="lightboxImage" src="" alt="Preview">
             <div class="lightbox-meta" id="lightboxMeta"></div>
@@ -442,25 +459,52 @@
     const lightboxImage = document.getElementById('lightboxImage');
     const lightboxMeta = document.getElementById('lightboxMeta');
     const lightboxClose = document.getElementById('lightboxClose');
+    const lightboxPrev = document.getElementById('lightboxPrev');
+    const lightboxNext = document.getElementById('lightboxNext');
+    const lightboxItems = Array.from(document.querySelectorAll('[data-lightbox-src]'));
+    let activeLightboxIndex = -1;
+
+    function renderLightbox(index) {
+        if (!lightboxItems.length) {
+            return;
+        }
+
+        const safeIndex = (index + lightboxItems.length) % lightboxItems.length;
+        const item = lightboxItems[safeIndex];
+
+        activeLightboxIndex = safeIndex;
+        lightboxImage.src = item.getAttribute('data-lightbox-src') || '';
+        lightboxImage.alt = item.getAttribute('data-lightbox-title') || 'Gallery';
+        lightboxMeta.textContent = (item.getAttribute('data-lightbox-title') || '') + ' | ' + (item.getAttribute('data-lightbox-meta') || '');
+    }
 
     function closeLightbox() {
         lightbox.classList.remove('open');
         lightboxImage.src = '';
         lightboxMeta.textContent = '';
         document.body.style.overflow = '';
+        activeLightboxIndex = -1;
     }
 
-    document.querySelectorAll('[data-lightbox-src]').forEach((img) => {
+    lightboxItems.forEach((img, i) => {
         img.addEventListener('click', () => {
-            lightboxImage.src = img.getAttribute('data-lightbox-src') || '';
-            lightboxImage.alt = img.getAttribute('data-lightbox-title') || 'Gallery';
-            lightboxMeta.textContent = (img.getAttribute('data-lightbox-title') || '') + ' | ' + (img.getAttribute('data-lightbox-meta') || '');
+            renderLightbox(i);
             lightbox.classList.add('open');
             document.body.style.overflow = 'hidden';
         });
     });
 
+    function showNext(step) {
+        if (!lightbox.classList.contains('open')) {
+            return;
+        }
+
+        renderLightbox(activeLightboxIndex + step);
+    }
+
     lightboxClose.addEventListener('click', closeLightbox);
+    lightboxPrev.addEventListener('click', () => showNext(-1));
+    lightboxNext.addEventListener('click', () => showNext(1));
     lightbox.addEventListener('click', (event) => {
         if (event.target === lightbox) {
             closeLightbox();
@@ -469,6 +513,15 @@
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && lightbox.classList.contains('open')) {
             closeLightbox();
+            return;
+        }
+
+        if (event.key === 'ArrowLeft') {
+            showNext(-1);
+        }
+
+        if (event.key === 'ArrowRight') {
+            showNext(1);
         }
     });
 })();
