@@ -9,6 +9,8 @@ use App\Models\News;
 use App\Models\PageSection;
 use App\Models\TeacherProfile;
 use App\Services\SchoolDataService;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class LandingController extends Controller
 {
@@ -42,27 +44,7 @@ class LandingController extends Controller
             ->get();
 
         $schoolData = $schoolDataService->buildDashboardData();
-        $gallery = !empty($schoolData['gallery'])
-            ? $schoolData['gallery']
-            : Media::query()->latest()->take(8)->get();
-
-        $galleryItems = collect(is_iterable($gallery) ? $gallery : [])
-            ->map(function ($photo) {
-                if (is_array($photo)) {
-                    $title = $photo['title'] ?? 'Kegiatan DSCMKids';
-                    $event = $photo['event_name'] ?? $this->eventNameFromTitle($title);
-                    return array_merge($photo, ['title' => $title, 'event_name' => $event]);
-                }
-
-                $title = $photo->title ?? 'Kegiatan DSCMKids';
-                return [
-                    'title' => $title,
-                    'path' => asset('storage/'.$photo->file_path),
-                    'date' => optional($photo->created_at)->format('d M Y'),
-                    'event_name' => $this->eventNameFromTitle($title),
-                    'external' => false,
-                ];
-            });
+        $galleryItems = $this->collectGalleryItems($schoolData);
 
         $activeEvent = request()->query('event');
         $galleryEvents = $galleryItems
@@ -94,7 +76,7 @@ class LandingController extends Controller
             ->where('is_published', true)
             ->latest('published_at')
             ->latest('id')
-            ->paginate(9);
+            ->paginate(12);
 
         return view('news.index', compact('latestNews'));
     }
@@ -114,6 +96,64 @@ class LandingController extends Controller
             ->get();
 
         return view('news.show', compact('article', 'relatedNews'));
+    }
+
+    public function galleryEventShow(SchoolDataService $schoolDataService, string $eventSlug)
+    {
+        $schoolData = $schoolDataService->buildDashboardData();
+        $galleryItems = $this->collectGalleryItems($schoolData);
+
+        $eventsBySlug = $galleryItems
+            ->pluck('event_name')
+            ->filter()
+            ->unique()
+            ->mapWithKeys(fn ($eventName) => [Str::slug((string) $eventName) => $eventName]);
+
+        abort_if(!$eventsBySlug->has($eventSlug), 404);
+
+        $eventName = (string) $eventsBySlug->get($eventSlug);
+        $eventItems = $galleryItems->where('event_name', $eventName)->values();
+
+        return view('gallery.event', [
+            'eventName' => $eventName,
+            'eventSlug' => $eventSlug,
+            'eventItems' => $eventItems,
+            'allEvents' => $eventsBySlug,
+        ]);
+    }
+
+    private function collectGalleryItems(array $schoolData): Collection
+    {
+        $gallery = !empty($schoolData['gallery'])
+            ? $schoolData['gallery']
+            : Media::query()->latest()->take(8)->get();
+
+        return collect(is_iterable($gallery) ? $gallery : [])
+            ->map(function ($photo) {
+                if (is_array($photo)) {
+                    $title = $photo['title'] ?? 'Kegiatan DSCMKids';
+                    $event = $photo['event_name'] ?? $this->eventNameFromTitle($title);
+                    $slug = Str::slug((string) $event);
+
+                    return array_merge($photo, [
+                        'title' => $title,
+                        'event_name' => $event,
+                        'event_slug' => $slug,
+                    ]);
+                }
+
+                $title = $photo->title ?? 'Kegiatan DSCMKids';
+                $event = $this->eventNameFromTitle($title);
+
+                return [
+                    'title' => $title,
+                    'path' => asset('storage/'.$photo->file_path),
+                    'date' => optional($photo->created_at)->format('d M Y'),
+                    'event_name' => $event,
+                    'event_slug' => Str::slug($event),
+                    'external' => false,
+                ];
+            });
     }
 
     private function eventNameFromTitle(string $title): string

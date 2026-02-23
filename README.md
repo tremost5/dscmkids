@@ -77,3 +77,4 @@ SCHOOL_GALLERY_EVENT_COLUMN=event_name
 - Admin Portfolio Guru: `/admin/teachers`
 - Public List Berita: `/berita`
 - Public Detail Berita: `/berita/{slug}`
+- Public Detail Event Galeri: `/galeri/event/{eventSlug}`

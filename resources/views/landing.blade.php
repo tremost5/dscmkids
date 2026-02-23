@@ -86,9 +86,49 @@
 
         .gallery-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
         .photo { position:relative; overflow:hidden; border-radius:15px; min-height:210px; border:1px solid #d8e4f6; }
-        .photo img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .35s ease; }
+        .photo img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .35s ease; cursor:zoom-in; }
         .photo:hover img { transform:scale(1.05); }
         .caption { position:absolute; left:0; right:0; bottom:0; padding:9px 10px; color:#fff; background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.78)); font-size:.8rem; }
+        .caption a { color:#fff; font-weight:800; text-decoration:none; display:inline-block; margin-top:4px; border-bottom:1px solid rgba(255,255,255,.7); }
+
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(7, 13, 30, 0.92);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 99;
+            padding: 20px;
+        }
+        .lightbox.open { display:flex; }
+        .lightbox img {
+            max-width: min(1100px, 92vw);
+            max-height: 78vh;
+            object-fit: contain;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,.22);
+            box-shadow: 0 20px 38px rgba(0,0,0,.45);
+        }
+        .lightbox-meta {
+            margin-top: 10px;
+            color: #dce7ff;
+            text-align: center;
+            font-weight: 700;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 16px;
+            right: 18px;
+            width: 38px;
+            height: 38px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,.4);
+            background: rgba(255,255,255,.12);
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
 
         .footer { text-align:center; color:#6b7a92; padding:20px 0 30px; font-size:.85rem; }
 
@@ -270,20 +310,29 @@
                     $title = is_array($photo) ? ($photo['title'] ?? 'Kegiatan DSCMKids') : $photo->title;
                     $date = is_array($photo) ? ($photo['date'] ?? null) : optional($photo->created_at)->format('d M Y');
                     $eventName = is_array($photo) ? ($photo['event_name'] ?? 'Kegiatan Umum') : 'Kegiatan Umum';
+                    $eventSlug = is_array($photo) ? ($photo['event_slug'] ?? \Illuminate\Support\Str::slug($eventName)) : \Illuminate\Support\Str::slug($eventName);
                     $pathValue = is_array($photo) ? ($photo['path'] ?? null) : asset('storage/'.$photo->file_path);
                     $src = is_string($pathValue) && (str_starts_with($pathValue, 'http://') || str_starts_with($pathValue, 'https://')) ? $pathValue : (is_string($pathValue) ? asset(ltrim($pathValue, '/')) : null);
                 @endphp
                 <figure class="photo">
                     @if($src)
-                        <img src="{{ $src }}" alt="{{ $title }}">
+                        <img src="{{ $src }}" alt="{{ $title }}" data-lightbox-src="{{ $src }}" data-lightbox-title="{{ $title }}" data-lightbox-meta="{{ $eventName }}{{ $date ? ' - '.$date : '' }}">
                     @endif
-                    <figcaption class="caption"><strong>{{ $title }}</strong><br>{{ $eventName }}{{ $date ? ' - '.$date : '' }}</figcaption>
+                    <figcaption class="caption"><strong>{{ $title }}</strong><br>{{ $eventName }}{{ $date ? ' - '.$date : '' }}<br><a href="{{ route('gallery.event', ['eventSlug' => $eventSlug]) }}">Detail Event</a></figcaption>
                 </figure>
             @empty
                 <figure class="photo"><figcaption class="caption"><strong>Tidak ada foto untuk event ini</strong></figcaption></figure>
             @endforelse
         </div>
     </section>
+
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightboxClose" aria-label="Tutup">&times;</button>
+        <div>
+            <img id="lightboxImage" src="" alt="Preview">
+            <div class="lightbox-meta" id="lightboxMeta"></div>
+        </div>
+    </div>
 
     <footer class="footer">&copy; {{ date('Y') }} DSCMKids - Dirancang untuk anak sekolah minggu dan orang tua murid.</footer>
 </main>
@@ -388,6 +437,40 @@
             clearInterval(timerRoll);
         }
     }, 32);
+
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxMeta = document.getElementById('lightboxMeta');
+    const lightboxClose = document.getElementById('lightboxClose');
+
+    function closeLightbox() {
+        lightbox.classList.remove('open');
+        lightboxImage.src = '';
+        lightboxMeta.textContent = '';
+        document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('[data-lightbox-src]').forEach((img) => {
+        img.addEventListener('click', () => {
+            lightboxImage.src = img.getAttribute('data-lightbox-src') || '';
+            lightboxImage.alt = img.getAttribute('data-lightbox-title') || 'Gallery';
+            lightboxMeta.textContent = (img.getAttribute('data-lightbox-title') || '') + ' | ' + (img.getAttribute('data-lightbox-meta') || '');
+            lightbox.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (event) => {
+        if (event.target === lightbox) {
+            closeLightbox();
+        }
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && lightbox.classList.contains('open')) {
+            closeLightbox();
+        }
+    });
 })();
 </script>
 </body>
