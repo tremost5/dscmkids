@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Announcement;
+use App\Models\News;
+use App\Models\PageSection;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,11 +15,58 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::updateOrCreate(
+            ['email' => 'admin@dscmkids.org'],
+            [
+                'name' => 'Admin DSCMKids',
+                'password' => 'password123',
+            ]
+        );
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        $sections = [
+            [
+                'section_key' => 'hero',
+                'title' => 'System Informasi Sekolah Minggu DSCMKids',
+                'content' => 'Membantu orang tua, guru, dan pengurus melayani anak dengan informasi terpusat: jadwal, berita, kegiatan, dan materi.',
+            ],
+            [
+                'section_key' => 'about',
+                'title' => 'Tentang DSCMKids',
+                'content' => 'DSCMKids adalah pelayanan sekolah minggu yang berfokus pada pertumbuhan iman anak melalui pembelajaran kreatif, komunitas hangat, dan pendampingan konsisten.',
+            ],
+            [
+                'section_key' => 'cta',
+                'title' => 'Ayo Terlibat!',
+                'content' => 'Hubungi admin sekolah minggu untuk pendaftaran anak, informasi kelas, atau kolaborasi pelayanan.',
+            ],
+        ];
+
+        foreach ($sections as $section) {
+            PageSection::updateOrCreate(
+                ['section_key' => $section['section_key']],
+                $section
+            );
+        }
+
+        News::updateOrCreate(
+            ['slug' => 'ibadah-anak-minggu-ceria'],
+            [
+                'title' => 'Ibadah Anak Minggu Ceria',
+                'excerpt' => 'Ibadah anak minggu ini mengangkat tema kasih dan keberanian.',
+                'body' => 'Anak-anak akan belajar melalui pujian, permainan, dan renungan interaktif sesuai kelompok usia.',
+                'is_published' => true,
+                'published_at' => now()->subDay(),
+            ]
+        );
+
+        Announcement::updateOrCreate(
+            ['title' => 'Jadwal Pelayanan Guru Minggu Ini'],
+            [
+                'body' => 'Mohon semua guru hadir 30 menit sebelum ibadah dimulai untuk briefing singkat.',
+                'event_date' => now()->addDays(3)->toDateString(),
+                'location' => 'Gedung Utama',
+                'is_active' => true,
+            ]
+        );
     }
 }
