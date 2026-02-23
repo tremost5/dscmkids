@@ -1,66 +1,70 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# DSCMKids Website
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Website sistem informasi Sekolah Minggu DSCMKids berbasis Laravel 11, dengan:
 
-## About Laravel
+- Landing page premium (analytics, grafik kehadiran, galeri kegiatan).
+- Admin panel CRUD untuk berita, informasi, konten section, dan media.
+- Integrasi database eksternal untuk metrik siswa, kehadiran, dan foto kegiatan.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Requirement
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP 8.2+
+- Composer
+- MySQL/MariaDB (untuk koneksi external analytics)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Setup Local
 
-## Learning Laravel
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan storage:link
+php artisan serve
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Admin Default
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- URL: `/admin/login`
+- Email: `admin@dscmkids.org`
+- Password: `password123`
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Konfigurasi Database External
 
-## Laravel Sponsors
+Set di `.env`:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```env
+EXTERNAL_DB_CONNECTION=mysql
+EXTERNAL_DB_HOST=127.0.0.1
+EXTERNAL_DB_PORT=3306
+EXTERNAL_DB_DATABASE=external_school
+EXTERNAL_DB_USERNAME=root
+EXTERNAL_DB_PASSWORD=
 
-### Premium Partners
+SCHOOL_DATA_CONNECTION=external
+SCHOOL_STUDENTS_TABLE=students
+SCHOOL_STUDENTS_ACTIVE_COLUMN=is_active
+SCHOOL_STUDENTS_CLASS_COLUMN=class_name
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+SCHOOL_ATTENDANCE_TABLE=attendances
+SCHOOL_ATTENDANCE_DATE_COLUMN=attendance_date
+SCHOOL_ATTENDANCE_STATUS_COLUMN=status
+SCHOOL_ATTENDANCE_PRESENT_VALUES=1,true,present,hadir
 
-## Contributing
+SCHOOL_GALLERY_TABLE=activity_photos
+SCHOOL_GALLERY_TITLE_COLUMN=title
+SCHOOL_GALLERY_PATH_COLUMN=file_path
+SCHOOL_GALLERY_DATE_COLUMN=activity_date
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Catatan Integrasi Galeri External
 
-## Code of Conduct
+- Jika `file_path` berisi URL penuh (`http://` / `https://`) maka gambar dirender langsung.
+- Jika external DB belum siap, landing page tetap hidup dengan fallback data lokal.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Struktur Utama
 
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Landing Controller: `app/Http/Controllers/LandingController.php`
+- Service Analytics External: `app/Services/SchoolDataService.php`
+- Landing View Premium: `resources/views/landing.blade.php`
+- Admin CRUD Routes: `routes/web.php`

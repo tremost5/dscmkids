@@ -6,10 +6,11 @@ use App\Models\Announcement;
 use App\Models\Media;
 use App\Models\News;
 use App\Models\PageSection;
+use App\Services\SchoolDataService;
 
 class LandingController extends Controller
 {
-    public function index()
+    public function index(SchoolDataService $schoolDataService)
     {
         $sections = PageSection::query()->get()->keyBy('section_key');
 
@@ -23,11 +24,14 @@ class LandingController extends Controller
         $announcements = Announcement::query()
             ->where('is_active', true)
             ->orderBy('event_date')
-            ->take(4)
+            ->take(6)
             ->get();
 
-        $gallery = Media::query()->latest()->take(6)->get();
+        $schoolData = $schoolDataService->buildDashboardData();
+        $gallery = !empty($schoolData['gallery'])
+            ? $schoolData['gallery']
+            : Media::query()->latest()->take(8)->get();
 
-        return view('landing', compact('sections', 'news', 'announcements', 'gallery'));
+        return view('landing', compact('sections', 'news', 'announcements', 'gallery', 'schoolData'));
     }
 }
