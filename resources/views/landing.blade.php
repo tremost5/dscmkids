@@ -72,6 +72,10 @@
             letter-spacing:.3px;
             animation: pulseLive 1.4s ease-in-out infinite;
         }
+        .live-badge.offline {
+            background: #475569;
+            animation: none;
+        }
         @keyframes pulseLive { 0% { opacity:1; } 50% { opacity:.55; } 100% { opacity:1; } }
         .theater p { color: rgba(248,250,252,.84); margin-top:6px; }
         .theater-screen {
@@ -284,7 +288,7 @@
                 <h2 class="title" style="color:#fff;margin-bottom:0;">{{ $liveStream['title'] ?? 'Live Streaming Ibadah Anak' }}</h2>
                 <p>{{ $liveStream['description'] ?? 'Saksikan siaran langsung DSCMKids.' }}</p>
             </div>
-            <span class="live-badge">LIVE STREAM</span>
+            <span class="live-badge {{ !($liveStream['is_live'] ?? false) ? 'offline' : '' }}">{{ ($liveStream['is_live'] ?? false) ? 'LIVE NOW' : 'OFFLINE' }}</span>
         </div>
         <div class="theater-screen">
             @if(!empty($liveStream['embed_url']))

@@ -4,7 +4,7 @@ Website sistem informasi Sekolah Minggu DSCMKids berbasis Laravel 11, dengan:
 
 - Landing page premium (hero slider, grafik kehadiran bulat per kelas, galeri kegiatan).
 - Admin panel CRUD untuk berita, informasi, konten section, dan media.
-- Admin panel CRUD untuk slide header dan portfolio guru.
+- Admin panel CRUD untuk slide header, portfolio guru, dan menu Live Streaming.
 - Integrasi database eksternal untuk metrik siswa, kehadiran, dan foto kegiatan.
 
 ## Requirement
@@ -75,6 +75,7 @@ SCHOOL_GALLERY_EVENT_COLUMN=event_name
 - Admin CRUD Routes: `routes/web.php`
 - Admin Hero Slide: `/admin/slides`
 - Admin Portfolio Guru: `/admin/teachers`
+- Admin Live Streaming: `/admin/livestream`
 - Public List Berita: `/berita`
 - Public Detail Berita: `/berita/{slug}`
 - Public Detail Event Galeri: `/galeri/event/{eventSlug}`
@@ -83,19 +84,23 @@ SCHOOL_GALLERY_EVENT_COLUMN=event_name
 
 - Search berita server-side via query string: `/berita?q=kata-kunci`
 - Highlight keyword otomatis pada hasil pencarian berita
-- Galeri lightbox fullscreen dengan navigasi keyboard (`Esc`, `←`, `→`)
+- Galeri lightbox fullscreen dengan navigasi keyboard (`Esc`, `Left`, `Right`)
 - Statistik event di halaman detail event galeri (jumlah foto, tanggal awal/terbaru)
 - Layar theater live streaming YouTube di landing page
 
 ## Setup Live Streaming (Admin)
 
-1. Buka admin: `Konten`.
-2. Edit section dengan `section_key = livestream`.
-3. Isi `meta` JSON:
+1. Buka admin: `Live Streaming`.
+2. Isi judul, deskripsi, link YouTube, dan centang status live jika sedang siaran.
+3. Simpan perubahan.
+
+Alternatif manual tetap bisa lewat `Konten` dengan `section_key = livestream`.
+Format `meta` JSON:
 
 ```json
 {
-  "youtube_url": "https://www.youtube.com/watch?v=YOUR_VIDEO_ID"
+  "youtube_url": "https://www.youtube.com/watch?v=YOUR_VIDEO_ID",
+  "is_live": true
 }
 ```
 

@@ -70,6 +70,7 @@ class LandingController extends Controller
             'description' => $liveDescription,
             'youtube_url' => is_string($youtubeRawUrl) ? $youtubeRawUrl : null,
             'embed_url' => $youtubeEmbedUrl,
+            'is_live' => (bool) ($liveSection?->meta['is_live'] ?? false),
         ];
 
         return view('landing', [

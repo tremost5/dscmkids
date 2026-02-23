@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PageSectionController;
 use App\Http\Controllers\Admin\TeacherProfileController;
+use App\Http\Controllers\Admin\LiveStreamController;
 use App\Http\Controllers\LandingController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,5 +33,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('media', MediaController::class);
         Route::resource('slides', HeroSlideController::class)->parameters(['slides' => 'slide']);
         Route::resource('teachers', TeacherProfileController::class)->parameters(['teachers' => 'teacher']);
+        Route::get('livestream', [LiveStreamController::class, 'edit'])->name('livestream.edit');
+        Route::put('livestream', [LiveStreamController::class, 'update'])->name('livestream.update');
     });
 });
