@@ -41,6 +41,37 @@ class StudentGameController extends Controller
         ]);
     }
 
+    public function progress(Request $request)
+    {
+        $user = $request->user();
+        abort_unless($user && $user->role === 'student', 403);
+
+        $weekStart = now()->startOfWeek()->toDateString();
+        $weekEnd = now()->endOfWeek()->toDateString();
+
+        $weeklyQuizScore = Schema::hasTable('daily_quiz_results')
+            ? (int) DailyQuizResult::query()->where('user_id', $user->id)->whereBetween('quiz_date', [$weekStart, $weekEnd])->sum('score')
+            : 0;
+        $weeklyQuizDays = Schema::hasTable('daily_quiz_results')
+            ? (int) DailyQuizResult::query()->where('user_id', $user->id)->whereBetween('quiz_date', [$weekStart, $weekEnd])->distinct('quiz_date')->count('quiz_date')
+            : 0;
+        $weeklyArcadeScore = Schema::hasTable('arcade_game_scores')
+            ? (int) ArcadeGameScore::query()->where('user_id', $user->id)->whereBetween('played_on', [$weekStart, $weekEnd])->sum('score')
+            : 0;
+
+        $recentQuiz = Schema::hasTable('daily_quiz_results')
+            ? DailyQuizResult::query()->where('user_id', $user->id)->latest('quiz_date')->take(10)->get()
+            : collect();
+
+        return view('student.progress', [
+            'user' => $user,
+            'weeklyQuizScore' => $weeklyQuizScore,
+            'weeklyQuizDays' => $weeklyQuizDays,
+            'weeklyArcadeScore' => $weeklyArcadeScore,
+            'recentQuiz' => $recentQuiz,
+        ]);
+    }
+
     public function submitDailyQuiz(Request $request): JsonResponse
     {
         if (!Schema::hasTable('daily_quiz_results')) {
@@ -393,4 +424,3 @@ class StudentGameController extends Controller
         })->all();
     }
 }
-

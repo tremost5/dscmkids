@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Berita DSCMKids</title>
+    <meta name="description" content="Berita terbaru kegiatan dan pembelajaran sekolah minggu DSCMKids.">
+    <link rel="canonical" href="{{ url()->current() }}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Berita DSCMKids">
+    <meta property="og:description" content="Update berita dan kegiatan terbaru DSCMKids.">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -64,5 +71,10 @@
 
     <div class="news-pagination" id="paginationWrap">{{ $latestNews->links() }}</div>
 </div>
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js'); });
+}
+</script>
 </body>
 </html>

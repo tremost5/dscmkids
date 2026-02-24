@@ -6,6 +6,7 @@ use App\Models\Testimonial;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class TestimonialSubmissionController extends Controller
 {
@@ -22,6 +23,16 @@ class TestimonialSubmissionController extends Controller
             'message' => ['required', 'string', 'max:700'],
             'rating' => ['required', 'integer', 'min:1', 'max:5'],
         ]);
+
+        $normalized = Str::lower($data['message']);
+        foreach (config('moderation.blocked_words', []) as $word) {
+            $needle = Str::lower(trim((string) $word));
+            if ($needle !== '' && Str::contains($normalized, $needle)) {
+                return redirect(route('landing').'#testimoni')
+                    ->withErrors(['message' => 'Testimonial mengandung kata yang tidak diizinkan.'])
+                    ->withInput();
+            }
+        }
 
         Testimonial::create([
             'name' => trim($data['name']),

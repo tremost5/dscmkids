@@ -4,8 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DSCMKids | Sekolah Minggu Modern</title>
+    <meta name="description" content="DSCMKids: sekolah minggu modern dengan quiz harian, materi edukatif bertingkat, galeri kegiatan, dan dashboard pertumbuhan iman murid.">
+    <link rel="canonical" href="{{ url()->current() }}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="DSCMKids | Sekolah Minggu Modern">
+    <meta property="og:description" content="Platform informatif dan edukatif untuk murid, orang tua, dan guru sekolah minggu.">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:image" content="{{ asset('favicon.ico') }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DSCMKids | Sekolah Minggu Modern">
+    <meta name="twitter:description" content="Quiz harian, materi bertingkat, galeri kegiatan, dan progress murid.">
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+    <meta name="theme-color" content="#1459de">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -129,6 +141,7 @@
     <a href="#renungan">Renungan</a>
     <a href="#kids-zone">Zona Murid</a>
     <a href="#quiz-zone">Quiz & Ranking</a>
+    <a href="#materials">Materi Edu</a>
     <a href="#photo-zone">Zona Foto</a>
     <a href="#analytics">Analytics</a>
     <a href="#informasi">Informasi</a>
@@ -294,6 +307,30 @@
                 <div class="challenge-progress"><span id="challengeProgressBar"></span></div>
                 <div class="challenge-score" id="challengeScore">0/4 Tantangan selesai</div>
             </article>
+        </div>
+    </section>
+
+    <section class="section panel reveal" id="materials">
+        <h2 class="title">Materi Edukatif Bertingkat</h2>
+        <p class="muted">Materi Alkitab disusun per level (easy, medium, hard) agar pembelajaran bertahap dan terarah.</p>
+        <div class="games-grid">
+            @forelse($featuredMaterials as $material)
+                <article class="game-card">
+                    <h4>{{ $material->title }}</h4>
+                    <p><strong>{{ strtoupper($material->level) }}</strong> | {{ $material->class_group ?: 'Semua kelas' }} | {{ $material->bible_reference ?: '-' }}</p>
+                    <p>{{ $material->summary ?: \Illuminate\Support\Str::limit(strip_tags($material->content), 100) }}</p>
+                </article>
+            @empty
+                <article class="game-card"><h4>Belum ada materi</h4><p>Admin dapat menambah dari panel Materi Edu.</p></article>
+            @endforelse
+        </div>
+        <div class="hero-actions" style="margin-top:12px;">
+            <a class="btn btn-light" href="{{ route('materials.index') }}">Buka Semua Materi</a>
+            @auth
+                @if(auth()->user()->role === 'student')
+                    <a class="btn btn-ghost" href="{{ route('student.progress') }}" style="color:#1e3a8a;border-color:#bcd0f5;background:#ecf3ff;">Lihat Progress Saya</a>
+                @endif
+            @endauth
         </div>
     </section>
 
@@ -594,6 +631,25 @@ window.DSCM_LANDING_DATA = {
     resetSeenUrl: @json(route('student.reset.seen')),
     isStudentLoggedIn: @json(auth()->check() && auth()->user()->role === 'student'),
 };
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js').catch(function () {
+            // Ignore SW registration errors on shared hosting.
+        });
+    });
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "DSCMKids",
+  "url": "{{ url('/') }}",
+  "logo": "{{ asset('favicon.ico') }}",
+  "sameAs": []
+}
 </script>
 </body>
 </html>

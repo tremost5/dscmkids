@@ -5,9 +5,12 @@ Website sistem informasi Sekolah Minggu DSCMKids berbasis Laravel 11, dengan:
 - Landing page premium (hero slider, grafik kehadiran bulat per kelas, galeri kegiatan).
 - Admin panel CRUD untuk berita, informasi, konten section, dan media.
 - Admin panel CRUD untuk slide header, portfolio guru, dan menu Live Streaming.
+- Admin panel materi edukatif bertingkat + broadcast notifikasi.
 - Integrasi database eksternal untuk metrik siswa, kehadiran, dan foto kegiatan.
 - Renungan harian murid di landing page.
 - Galeri khusus "Minggu Ini" dari foto selfie presensi (external DB).
+- Testimonial publik + balasan admin.
+- PWA support (installable) + sitemap SEO.
 
 ## Requirement
 
@@ -25,6 +28,20 @@ php artisan migrate --seed
 php artisan storage:link
 php artisan serve
 ```
+
+## Migrasi Wajib Setelah Update Fitur Baru
+
+Jalankan:
+
+```bash
+php artisan migrate --force
+```
+
+Fitur yang butuh migrasi:
+- testimonials + admin_reply
+- learning_materials
+- notification_broadcasts
+- admin_activity_logs
 
 ## Admin Default
 
@@ -79,6 +96,25 @@ SCHOOL_WEEKLY_GALLERY_LIMIT=12
 
 - Jika `file_path` berisi URL penuh (`http://` / `https://`) maka gambar dirender langsung.
 - Jika external DB belum siap, landing page tetap hidup dengan fallback data lokal.
+
+## SEO & Indexing
+
+- `sitemap.xml` tersedia di `/sitemap.xml`
+- `robots.txt` sudah menunjuk ke sitemap
+- Meta OG/Twitter dan JSON-LD ditambahkan di halaman publik utama
+
+## PWA
+
+- Manifest: `/manifest.webmanifest`
+- Service Worker: `/sw.js`
+
+## Broadcast Notifikasi (Opsional WhatsApp)
+
+Set webhook (opsional) di `.env`:
+
+```env
+WHATSAPP_BROADCAST_WEBHOOK=
+```
 
 ## Struktur Utama
 

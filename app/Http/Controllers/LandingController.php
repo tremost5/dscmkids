@@ -10,6 +10,7 @@ use App\Models\HeroSlide;
 use App\Models\Media;
 use App\Models\News;
 use App\Models\PageSection;
+use App\Models\LearningMaterial;
 use App\Models\TeacherProfile;
 use App\Models\User;
 use App\Models\StudentRewardClaim;
@@ -56,6 +57,14 @@ class LandingController extends Controller
                 ->orderBy('sort_order')
                 ->latest('id')
                 ->take(6)
+                ->get()
+            : collect();
+        $featuredMaterials = Schema::hasTable('learning_materials')
+            ? LearningMaterial::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->latest('id')
+                ->take(3)
                 ->get()
             : collect();
 
@@ -118,6 +127,7 @@ class LandingController extends Controller
             'slides' => $slides,
             'teachers' => $teachers,
             'testimonials' => $testimonials,
+            'featuredMaterials' => $featuredMaterials,
             'liveStream' => $liveStream,
             'todayQuiz' => $todayQuiz,
             'dailyLeaderboard' => $dailyLeaderboard,

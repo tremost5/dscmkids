@@ -117,9 +117,11 @@
             <a href="{{ route('admin.quiz-banks.index') }}">Bank Soal</a>
             <a href="{{ route('admin.sections.index') }}">Konten</a>
             <a href="{{ route('admin.media.index') }}">Media</a>
+            <a href="{{ route('admin.materials.index') }}">Materi Edu</a>
             <a href="{{ route('admin.slides.index') }}">Slide Header</a>
             <a href="{{ route('admin.teachers.index') }}">Portfolio Guru</a>
             <a href="{{ route('admin.testimonials.index') }}">Testimonial</a>
+            <a href="{{ route('admin.notifications.index') }}">Notifikasi</a>
             <a href="{{ route('admin.livestream.edit') }}">Live Streaming</a>
             <a href="{{ route('admin.spiritual.edit') }}">Tema & Renungan</a>
             <a href="{{ route('landing') }}" target="_blank">Lihat Situs</a>

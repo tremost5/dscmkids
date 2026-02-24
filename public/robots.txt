@@ -1,2 +1,3 @@
 User-agent: *
 Disallow:
+Sitemap: https://dscmkids.online/sitemap.xml

@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $article->title }} | DSCMKids</title>
+    <meta name="description" content="{{ $article->excerpt ? e($article->excerpt) : e(\Illuminate\Support\Str::limit(strip_tags($article->body), 150)) }}">
+    <link rel="canonical" href="{{ url()->current() }}">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{{ e($article->title) }} | DSCMKids">
+    <meta property="og:description" content="{{ $article->excerpt ? e($article->excerpt) : e(\Illuminate\Support\Str::limit(strip_tags($article->body), 150)) }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,5 +43,10 @@
         </section>
     @endif
 </div>
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js'); });
+}
+</script>
 </body>
 </html>

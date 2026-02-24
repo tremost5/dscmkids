@@ -12,7 +12,11 @@ use App\Http\Controllers\Admin\TeacherProfileController;
 use App\Http\Controllers\Admin\LiveStreamController;
 use App\Http\Controllers\Admin\SpiritualContentController;
 use App\Http\Controllers\Admin\TestimonialController;
+use App\Http\Controllers\Admin\LearningMaterialController as AdminLearningMaterialController;
+use App\Http\Controllers\Admin\NotificationBroadcastController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\LearningMaterialController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StudentAuthController;
 use App\Http\Controllers\StudentGameController;
 use App\Http\Controllers\TestimonialSubmissionController;
@@ -22,7 +26,9 @@ Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/berita', [LandingController::class, 'newsIndex'])->name('news.index');
 Route::get('/berita/{slug}', [LandingController::class, 'newsShow'])->name('news.show');
 Route::get('/galeri/event/{eventSlug}', [LandingController::class, 'galleryEventShow'])->name('gallery.event');
-Route::post('/testimoni', [TestimonialSubmissionController::class, 'store'])->name('testimonials.submit');
+Route::get('/materi', [LearningMaterialController::class, 'index'])->name('materials.index');
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::post('/testimoni', [TestimonialSubmissionController::class, 'store'])->middleware('throttle:5,1')->name('testimonials.submit');
 Route::post('/murid/quiz/submit', [StudentGameController::class, 'submitDailyQuiz'])
     ->middleware('auth')
     ->name('student.quiz.submit');
@@ -38,12 +44,13 @@ Route::post('/murid/arcade/score', [StudentGameController::class, 'submitArcadeS
 
 Route::prefix('murid')->name('student.')->group(function () {
     Route::get('/arcade', [StudentGameController::class, 'arcade'])->name('arcade');
+    Route::get('/progress', [StudentGameController::class, 'progress'])->middleware('auth')->name('progress');
 
     Route::middleware('guest')->group(function () {
         Route::get('/login', [StudentAuthController::class, 'showLogin'])->name('login');
-        Route::post('/login', [StudentAuthController::class, 'login'])->name('login.submit');
+        Route::post('/login', [StudentAuthController::class, 'login'])->middleware('throttle:8,1')->name('login.submit');
         Route::get('/daftar', [StudentAuthController::class, 'showRegister'])->name('register');
-        Route::post('/daftar', [StudentAuthController::class, 'register'])->name('register.submit');
+        Route::post('/daftar', [StudentAuthController::class, 'register'])->middleware('throttle:6,1')->name('register.submit');
     });
 
     Route::middleware('auth')->group(function () {
@@ -57,7 +64,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
     });
 
-    Route::middleware(['auth', 'admin'])->group(function () {
+    Route::middleware(['auth', 'admin', 'admin.activity'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -68,7 +75,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('media', MediaController::class);
         Route::resource('slides', HeroSlideController::class)->parameters(['slides' => 'slide']);
         Route::resource('teachers', TeacherProfileController::class)->parameters(['teachers' => 'teacher']);
+        Route::resource('materials', AdminLearningMaterialController::class)->except('show');
         Route::resource('testimonials', TestimonialController::class)->except('show');
+        Route::get('notifications', [NotificationBroadcastController::class, 'index'])->name('notifications.index');
+        Route::get('notifications/create', [NotificationBroadcastController::class, 'create'])->name('notifications.create');
+        Route::post('notifications', [NotificationBroadcastController::class, 'store'])->name('notifications.store');
         Route::get('livestream', [LiveStreamController::class, 'edit'])->name('livestream.edit');
         Route::put('livestream', [LiveStreamController::class, 'update'])->name('livestream.update');
         Route::get('spiritual', [SpiritualContentController::class, 'edit'])->name('spiritual.edit');

@@ -25,6 +25,7 @@
                 <a href="{{ route('student.register') }}" class="arcade-btn arcade-btn-ghost">Daftar Murid</a>
             @else
                 <span class="arcade-chip">Skor tersimpan ke akun kamu</span>
+                <a href="{{ route('student.progress') }}" class="arcade-btn arcade-btn-ghost">Lihat Progress</a>
             @endif
         </div>
     </section>
