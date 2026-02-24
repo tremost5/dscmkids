@@ -1,0 +1,63 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-l0sNRNKZ.js",
+    "name": "app",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/gallery-event.css": {
+    "file": "assets/gallery-event-i2aYoLh3.css",
+    "src": "resources/css/gallery-event.css",
+    "isEntry": true
+  },
+  "resources/css/landing.css": {
+    "file": "assets/landing-D87FS8RE.css",
+    "src": "resources/css/landing.css",
+    "isEntry": true
+  },
+  "resources/css/news.css": {
+    "file": "assets/news-Cf1lm5KB.css",
+    "src": "resources/css/news.css",
+    "isEntry": true
+  },
+  "resources/css/student-arcade.css": {
+    "file": "assets/student-arcade-DUtbyc2S.css",
+    "src": "resources/css/student-arcade.css",
+    "isEntry": true
+  },
+  "resources/css/student-auth.css": {
+    "file": "assets/student-auth-CWnOow1e.css",
+    "src": "resources/css/student-auth.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-CKl8NZMC.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/gallery-event.js": {
+    "file": "assets/gallery-event-gxrOcjHt.js",
+    "name": "gallery-event",
+    "src": "resources/js/gallery-event.js",
+    "isEntry": true
+  },
+  "resources/js/landing.js": {
+    "file": "assets/landing-DtI8wroK.js",
+    "name": "landing",
+    "src": "resources/js/landing.js",
+    "isEntry": true
+  },
+  "resources/js/news.js": {
+    "file": "assets/news-B7gBJPSp.js",
+    "name": "news",
+    "src": "resources/js/news.js",
+    "isEntry": true
+  },
+  "resources/js/student-arcade.js": {
+    "file": "assets/student-arcade-sgEi0llA.js",
+    "name": "student-arcade",
+    "src": "resources/js/student-arcade.js",
+    "isEntry": true
+  }
+}

@@ -1,0 +1,1 @@
+document.addEventListener("DOMContentLoaded",()=>{const t=document.getElementById("searchForm"),e=document.getElementById("newsSearch");if(!t||!e)return;let n=null;e.addEventListener("input",()=>{clearTimeout(n),n=setTimeout(()=>{(e.value.trim().length===0||e.value.trim().length>=2)&&t.submit()},550)})});
