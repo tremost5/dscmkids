@@ -147,21 +147,21 @@
 </header>
 
 <nav class="quick-nav">
-    <a href="#monthly-theme">Tema Bulanan</a>
-    <a href="#renungan">Renungan</a>
-    <a href="#kids-zone">Zona Murid</a>
-    <a href="#quiz-zone">Quiz & Ranking</a>
-    <a href="#materials">Materi Edu</a>
+    <a href="#monthly-theme" data-short="TM" title="Tema Bulanan">Tema Bulanan</a>
+    <a href="#renungan" data-short="RG" title="Renungan">Renungan</a>
+    <a href="#kids-zone" data-short="ZM" title="Zona Murid">Zona Murid</a>
+    <a href="#quiz-zone" data-short="QZ" title="Quiz & Ranking">Quiz & Ranking</a>
+    <a href="#materials" data-short="ME" title="Materi Edu">Materi Edu</a>
     @if($parentPortalCfg['enabled'])
-        <a href="#parent-portal">Parent Portal</a>
+        <a href="#parent-portal" data-short="PP" title="Parent Portal">Parent Portal</a>
     @endif
-    <a href="#photo-zone">Zona Foto</a>
-    <a href="#analytics">Analytics</a>
-    <a href="#informasi">Informasi</a>
-    <a href="#teachers">Guru</a>
-    <a href="#testimoni">Testimoni</a>
-    <a href="#gallery">Galeri</a>
-    <a href="#live">Live</a>
+    <a href="#photo-zone" data-short="ZF" title="Zona Foto">Zona Foto</a>
+    <a href="#analytics" data-short="AN" title="Analytics">Analytics</a>
+    <a href="#informasi" data-short="IF" title="Informasi">Informasi</a>
+    <a href="#teachers" data-short="GR" title="Guru">Guru</a>
+    <a href="#testimoni" data-short="TS" title="Testimoni">Testimoni</a>
+    <a href="#gallery" data-short="GL" title="Galeri">Galeri</a>
+    <a href="#live" data-short="LV" title="Live">Live</a>
 </nav>
 
 <main class="container">

@@ -591,7 +591,49 @@
         }
         @media (max-width: 640px) {
             .top { height: 72vh; border-radius: 0 0 18px 18px; }
-            .quick-nav { border-radius: 20px; top: 8px; }
+            .quick-nav {
+                position: fixed;
+                right: 8px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: auto;
+                max-width: 52px;
+                margin: 0;
+                border-radius: 14px;
+                padding: 7px 6px;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                z-index: 50;
+                background: rgba(255,255,255,.95);
+                border: 1px solid #cfdcf6;
+                box-shadow: 0 12px 26px rgba(30, 64, 175, .18);
+            }
+            .quick-nav a {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+                display: grid;
+                place-items: center;
+                padding: 0;
+                font-size: 0;
+                background: #eef4ff;
+                color: #1d4ed8;
+                border: 1px solid #d5e3fb;
+            }
+            .quick-nav a::before {
+                content: attr(data-short);
+                font-size: .66rem;
+                font-weight: 900;
+                letter-spacing: .2px;
+            }
+            .quick-nav a:hover,
+            .quick-nav a:focus-visible {
+                background: #1d4ed8;
+                color: #fff;
+                border-color: #1d4ed8;
+                outline: none;
+            }
             .teacher-grid, .gallery-grid, .stats, .testimonial-grid, .testimonial-form-grid { grid-template-columns: 1fr; }
             .hero-actions { gap: 8px; }
             .btn { padding: 10px 13px; font-size: .84rem; }
