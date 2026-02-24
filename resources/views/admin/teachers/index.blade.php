@@ -12,7 +12,7 @@
         <tr>
             <td>
                 @if($teacher->photo_path)
-                    <img src="{{ asset('storage/'.$teacher->photo_path) }}" alt="guru" style="width:70px;height:70px;object-fit:cover;border-radius:50%;">
+                    <img src="{{ route('teacher.photo', $teacher) }}" alt="guru" style="width:70px;height:70px;object-fit:cover;border-radius:50%;" onerror="this.onerror=null;this.style.display='none';">
                 @else
                     -
                 @endif

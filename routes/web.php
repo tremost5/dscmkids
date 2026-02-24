@@ -23,6 +23,7 @@ use App\Http\Controllers\StudentGameController;
 use App\Http\Controllers\StudentWalletController;
 use App\Http\Controllers\TestimonialSubmissionController;
 use App\Http\Controllers\ParentPortalController;
+use App\Http\Controllers\TeacherPhotoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -32,6 +33,7 @@ Route::get('/galeri/event/{eventSlug}', [LandingController::class, 'galleryEvent
 Route::get('/materi', [LearningMaterialController::class, 'index'])->name('materials.index');
 Route::get('/orangtua', [ParentPortalController::class, 'index'])->name('parent.portal');
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/teacher-photo/{teacher}', TeacherPhotoController::class)->name('teacher.photo');
 Route::post('/testimoni', [TestimonialSubmissionController::class, 'store'])->middleware('throttle:5,1')->name('testimonials.submit');
 Route::post('/murid/quiz/submit', [StudentGameController::class, 'submitDailyQuiz'])
     ->middleware('auth')

@@ -465,7 +465,7 @@
             @forelse($teachers as $teacher)
                 <article class="teacher">
                     @if($teacher->photo_path)
-                        <img src="{{ asset('storage/'.$teacher->photo_path) }}" alt="{{ $teacher->name }}">
+                        <img src="{{ route('teacher.photo', $teacher) }}" alt="{{ $teacher->name }}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1545239351-1141bd82e8a6?q=80&w=900&auto=format&fit=crop';">
                     @else
                         <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?q=80&w=900&auto=format&fit=crop" alt="{{ $teacher->name }}">
                     @endif

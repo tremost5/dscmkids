@@ -5,7 +5,7 @@
 @section('content')
 <h1 style="margin-top:0;">{{ $teacher->name }}</h1>
 @if($teacher->photo_path)
-    <img src="{{ asset('storage/'.$teacher->photo_path) }}" alt="{{ $teacher->name }}" style="width:130px;height:130px;object-fit:cover;border-radius:50%;">
+    <img src="{{ route('teacher.photo', $teacher) }}" alt="{{ $teacher->name }}" style="width:130px;height:130px;object-fit:cover;border-radius:50%;" onerror="this.onerror=null;this.style.display='none';">
 @endif
 <p><strong>{{ $teacher->role }}</strong> {{ $teacher->class_group ? ' - '.$teacher->class_group : '' }}</p>
 <p>{{ $teacher->bio }}</p>
