@@ -46,6 +46,7 @@ class SchoolDataService
                     'absent' => max(0, $studentTotal - $todayAttendance),
                 ],
                 'gallery' => $this->fetchGallery($connection, $galleryTable),
+                'weekly_gallery' => $this->fetchWeeklySelfieGallery($connection),
             ];
         } catch (Throwable) {
             return $this->fallbackData();
@@ -261,6 +262,90 @@ class SchoolDataService
         return !empty($gallery) ? $gallery : $this->localGallery();
     }
 
+    private function fetchWeeklySelfieGallery(string $connection): array
+    {
+        $table = config('school_data.weekly_gallery.table', config('school_data.attendance.table'));
+        $pathColumn = config('school_data.weekly_gallery.path_column', 'selfie_path');
+        $dateColumn = config('school_data.weekly_gallery.date_column', config('school_data.attendance.date_column'));
+        $statusColumn = config('school_data.weekly_gallery.status_column', config('school_data.attendance.status_column'));
+        $titleColumn = config('school_data.weekly_gallery.title_column', '');
+        $nameColumn = config('school_data.weekly_gallery.name_column', 'student_name');
+        $classColumn = config('school_data.weekly_gallery.class_column', config('school_data.attendance.class_column'));
+        $limit = max(4, (int) config('school_data.weekly_gallery.limit', 12));
+        $onlyPresent = (bool) config('school_data.weekly_gallery.only_present', true);
+        $schema = Schema::connection($connection);
+
+        if (!$schema->hasTable($table) || !$schema->hasColumn($table, $pathColumn)) {
+            return [];
+        }
+
+        $query = DB::connection($connection)->table($table);
+
+        if ($dateColumn && $schema->hasColumn($table, $dateColumn)) {
+            $query->whereBetween($dateColumn, [
+                Carbon::today()->startOfWeek()->toDateString(),
+                Carbon::today()->endOfWeek()->toDateString(),
+            ])->orderByDesc($dateColumn);
+        }
+
+        if ($onlyPresent && $statusColumn && $schema->hasColumn($table, $statusColumn)) {
+            $query->whereIn($statusColumn, config('school_data.attendance.present_values', []));
+        }
+
+        if (!$dateColumn || !$schema->hasColumn($table, $dateColumn)) {
+            $query->orderByDesc($pathColumn);
+        }
+
+        $columns = array_values(array_unique(array_filter([
+            $pathColumn,
+            $dateColumn,
+            $statusColumn,
+            $titleColumn,
+            $nameColumn,
+            $classColumn,
+        ])));
+
+        $rows = $query->limit($limit)->get($columns);
+        $items = [];
+
+        foreach ($rows as $row) {
+            $imagePath = (string) ($row->{$pathColumn} ?? '');
+            if ($imagePath === '') {
+                continue;
+            }
+
+            $title = trim((string) ($titleColumn && isset($row->{$titleColumn}) ? $row->{$titleColumn} : ''));
+            $studentName = trim((string) ($nameColumn && isset($row->{$nameColumn}) ? $row->{$nameColumn} : ''));
+            $className = trim((string) ($classColumn && isset($row->{$classColumn}) ? $row->{$classColumn} : ''));
+            $eventName = 'Selfie Absensi Minggu Ini';
+
+            if ($title === '' && $studentName !== '') {
+                $title = 'Selfie '.$studentName.($className !== '' ? ' ('.$className.')' : '');
+            } elseif ($title === '') {
+                $title = 'Selfie Kehadiran';
+            }
+
+            $dateLabel = null;
+            if ($dateColumn && isset($row->{$dateColumn})) {
+                try {
+                    $dateLabel = Carbon::parse($row->{$dateColumn})->format('d M Y');
+                } catch (Throwable) {
+                    $dateLabel = null;
+                }
+            }
+
+            $items[] = [
+                'title' => $title,
+                'path' => $imagePath,
+                'date' => $dateLabel,
+                'event_name' => $eventName,
+                'external' => true,
+            ];
+        }
+
+        return $items;
+    }
+
     private function isPresent(mixed $value): bool
     {
         $presentValues = collect(config('school_data.attendance.present_values', []))
@@ -313,6 +398,7 @@ class SchoolDataService
                 'absent' => max(0, $studentTotal - $todayAttendance),
             ],
             'gallery' => $this->localGallery(),
+            'weekly_gallery' => [],
         ];
     }
 

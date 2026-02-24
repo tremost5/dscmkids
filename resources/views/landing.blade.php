@@ -36,6 +36,14 @@
         ]];
 
     $galleryItems = is_iterable($gallery) ? collect($gallery)->all() : [];
+    $weeklyGalleryItems = is_iterable($weeklyGallery ?? null) ? collect($weeklyGallery)->all() : [];
+    $devotion = is_array($dailyDevotion ?? null) ? $dailyDevotion : [
+        'day' => now()->locale('id')->translatedFormat('l'),
+        'title' => 'Tuhan Menyertai Setiap Hari',
+        'verse' => 'Yosua 1:9',
+        'message' => 'Tuhan tidak pernah meninggalkanmu. Tetap berani, setia berdoa, dan lakukan yang benar hari ini.',
+        'challenge' => 'Berdoa 2 menit untuk satu temanmu hari ini.',
+    ];
 
     $readingPlans = [
         ['day' => 'Senin', 'title' => 'Tuhan Selalu Menolong', 'reference' => 'Mazmur 121:1-2', 'point' => 'Saat takut, ingat Tuhan menjaga kamu.'],
@@ -107,8 +115,10 @@
 </header>
 
 <nav class="quick-nav">
+    <a href="#renungan">Renungan</a>
     <a href="#kids-zone">Zona Murid</a>
     <a href="#quiz-zone">Quiz & Ranking</a>
+    <a href="#weekly-gallery">Galeri Minggu Ini</a>
     <a href="#analytics">Analytics</a>
     <a href="#informasi">Informasi</a>
     <a href="#teachers">Guru</a>
@@ -138,6 +148,22 @@
         <article class="stat"><div class="s-label">Hadir Hari Ini</div><div class="s-value" id="rolledPresent" data-counter="{{ (int) ($metrics['attendance_today'] ?? 0) }}">{{ number_format((int) ($metrics['attendance_today'] ?? 0)) }}</div></article>
         <article class="stat"><div class="s-label">Persentase Hadir</div><div class="s-value" data-counter="{{ (int) round((float) ($metrics['attendance_rate'] ?? 0)) }}" data-suffix="%">{{ number_format((float) ($metrics['attendance_rate'] ?? 0), 1) }}%</div></article>
         <article class="stat"><div class="s-label">Kelas Aktif</div><div class="s-value" data-counter="{{ (int) ($metrics['active_classes'] ?? 0) }}">{{ number_format((int) ($metrics['active_classes'] ?? 0)) }}</div></article>
+    </section>
+
+    <section class="section panel reveal devotion-panel" id="renungan">
+        <h2 class="title">Renungan Harian Murid</h2>
+        <p class="muted">Hari ini <strong>{{ $devotion['day'] }}</strong> | <strong>{{ $devotion['verse'] }}</strong></p>
+        <div class="devotion-grid">
+            <article class="devotion-card">
+                <h3>{{ $devotion['title'] }}</h3>
+                <p>{{ $devotion['message'] }}</p>
+            </article>
+            <article class="devotion-card devotion-challenge">
+                <h3>Misi Iman Hari Ini</h3>
+                <p>{{ $devotion['challenge'] }}</p>
+                <div class="verse-pill">Doa singkat: "Tuhan Yesus, tolong aku jadi pelaku firman-Mu hari ini. Amin."</div>
+            </article>
+        </div>
     </section>
 
     <section class="theater reveal" id="live">
@@ -180,6 +206,30 @@
                     <strong>{{ $attendanceTotals['absent'] ?? 0 }} murid</strong>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section class="section panel reveal" id="weekly-gallery">
+        <h2 class="title">Galeri Minggu Ini: Selfie Presensi</h2>
+        <p class="muted">Otomatis dari database presensi minggu berjalan (Senin-Minggu).</p>
+        <div class="gallery-grid">
+            @forelse($weeklyGalleryItems as $photo)
+                @php
+                    $title = is_array($photo) ? ($photo['title'] ?? 'Selfie Kehadiran') : 'Selfie Kehadiran';
+                    $date = is_array($photo) ? ($photo['date'] ?? null) : null;
+                    $eventName = is_array($photo) ? ($photo['event_name'] ?? 'Selfie Absensi Minggu Ini') : 'Selfie Absensi Minggu Ini';
+                    $pathValue = is_array($photo) ? ($photo['path'] ?? null) : null;
+                    $src = is_string($pathValue) && (str_starts_with($pathValue, 'http://') || str_starts_with($pathValue, 'https://')) ? $pathValue : (is_string($pathValue) ? asset(ltrim($pathValue, '/')) : null);
+                @endphp
+                <figure class="photo">
+                    @if($src)
+                        <img src="{{ $src }}" alt="{{ $title }}" data-lightbox-src="{{ $src }}" data-lightbox-title="{{ $title }}" data-lightbox-meta="{{ $eventName }}{{ $date ? ' - '.$date : '' }}" data-lightbox-index="{{ $loop->index }}">
+                    @endif
+                    <figcaption class="caption"><strong>{{ $title }}</strong><br>{{ $eventName }}{{ $date ? ' - '.$date : '' }}</figcaption>
+                </figure>
+            @empty
+                <figure class="photo"><figcaption class="caption"><strong>Belum ada selfie presensi minggu ini</strong><br>Pastikan kolom selfie dan tanggal presensi sudah termapping di `.env`.</figcaption></figure>
+            @endforelse
         </div>
     </section>
 

@@ -6,6 +6,8 @@ Website sistem informasi Sekolah Minggu DSCMKids berbasis Laravel 11, dengan:
 - Admin panel CRUD untuk berita, informasi, konten section, dan media.
 - Admin panel CRUD untuk slide header, portfolio guru, dan menu Live Streaming.
 - Integrasi database eksternal untuk metrik siswa, kehadiran, dan foto kegiatan.
+- Renungan harian murid di landing page.
+- Galeri khusus "Minggu Ini" dari foto selfie presensi (external DB).
 
 ## Requirement
 
@@ -60,6 +62,17 @@ SCHOOL_GALLERY_TITLE_COLUMN=title
 SCHOOL_GALLERY_PATH_COLUMN=file_path
 SCHOOL_GALLERY_DATE_COLUMN=activity_date
 SCHOOL_GALLERY_EVENT_COLUMN=event_name
+
+# Galeri selfie presensi minggu berjalan
+SCHOOL_WEEKLY_GALLERY_TABLE=attendances
+SCHOOL_WEEKLY_GALLERY_PATH_COLUMN=selfie_path
+SCHOOL_WEEKLY_GALLERY_DATE_COLUMN=attendance_date
+SCHOOL_WEEKLY_GALLERY_STATUS_COLUMN=status
+SCHOOL_WEEKLY_GALLERY_TITLE_COLUMN=
+SCHOOL_WEEKLY_GALLERY_NAME_COLUMN=student_name
+SCHOOL_WEEKLY_GALLERY_CLASS_COLUMN=class_name
+SCHOOL_WEEKLY_GALLERY_ONLY_PRESENT=true
+SCHOOL_WEEKLY_GALLERY_LIMIT=12
 ```
 
 ## Catatan Integrasi Galeri External

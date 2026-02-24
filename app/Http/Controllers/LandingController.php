@@ -51,6 +51,8 @@ class LandingController extends Controller
 
         $schoolData = $schoolDataService->buildDashboardData();
         $galleryItems = $this->collectGalleryItems($schoolData);
+        $weeklyGalleryItems = $this->collectWeeklyGalleryItems($schoolData);
+        $dailyDevotion = $this->buildDailyDevotion();
 
         $activeEvent = request()->query('event');
         $galleryEvents = $galleryItems
@@ -99,6 +101,8 @@ class LandingController extends Controller
             'galleryEvents' => $galleryEvents,
             'activeEvent' => $activeEvent,
             'schoolData' => $schoolData,
+            'weeklyGallery' => $weeklyGalleryItems,
+            'dailyDevotion' => $dailyDevotion,
             'slides' => $slides,
             'teachers' => $teachers,
             'liveStream' => $liveStream,
@@ -227,6 +231,53 @@ class LandingController extends Controller
         $candidate = trim((string) ($parts[0] ?? ''));
 
         return $candidate !== '' ? $candidate : 'Kegiatan Umum';
+    }
+
+    private function collectWeeklyGalleryItems(array $schoolData): Collection
+    {
+        $weeklyGallery = !empty($schoolData['weekly_gallery'])
+            ? $schoolData['weekly_gallery']
+            : [];
+
+        return collect(is_iterable($weeklyGallery) ? $weeklyGallery : [])
+            ->map(function ($photo) {
+                if (!is_array($photo)) {
+                    return null;
+                }
+
+                $title = (string) ($photo['title'] ?? 'Selfie Kehadiran');
+                $event = (string) ($photo['event_name'] ?? 'Selfie Absensi Minggu Ini');
+
+                return array_merge($photo, [
+                    'title' => $title,
+                    'event_name' => $event,
+                    'event_slug' => Str::slug($event),
+                ]);
+            })
+            ->filter()
+            ->values();
+    }
+
+    private function buildDailyDevotion(): array
+    {
+        $dayKey = strtolower(now()->englishDayOfWeek);
+        $devotions = config('kids_program.daily_devotions', []);
+        $fallback = [
+            'title' => 'Tuhan Menyertai Setiap Hari',
+            'verse' => 'Yosua 1:9',
+            'message' => 'Tuhan tidak pernah meninggalkanmu. Tetap berani, setia berdoa, dan lakukan yang benar hari ini.',
+            'challenge' => 'Berdoa 2 menit untuk satu temanmu hari ini.',
+        ];
+
+        $item = $devotions[$dayKey] ?? $devotions[array_key_first($devotions)] ?? $fallback;
+
+        return [
+            'day' => now()->locale('id')->translatedFormat('l'),
+            'title' => (string) ($item['title'] ?? $fallback['title']),
+            'verse' => (string) ($item['verse'] ?? $fallback['verse']),
+            'message' => (string) ($item['message'] ?? $fallback['message']),
+            'challenge' => (string) ($item['challenge'] ?? $fallback['challenge']),
+        ];
     }
 
     private function youtubeEmbedUrl(?string $url): ?string

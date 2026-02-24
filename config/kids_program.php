@@ -1,6 +1,51 @@
 <?php
 
 return [
+    'daily_devotions' => [
+        'monday' => [
+            'title' => 'Kasih Dimulai dari Rumah',
+            'verse' => 'Yohanes 13:34',
+            'message' => 'Yesus mengajar kita saling mengasihi. Mulai dari rumah: bicara lembut, bantu orang tua, dan jadi pembawa damai.',
+            'challenge' => 'Lakukan 1 tindakan kasih di rumah tanpa disuruh.',
+        ],
+        'tuesday' => [
+            'title' => 'Berani Karena Tuhan',
+            'verse' => 'Yosua 1:9',
+            'message' => 'Saat kamu takut, ingat Tuhan berjalan bersamamu. Kamu bisa tetap jujur dan berani melakukan yang benar.',
+            'challenge' => 'Doakan hal yang kamu takuti lalu ceritakan pada orang tua.',
+        ],
+        'wednesday' => [
+            'title' => 'Hati yang Taat',
+            'verse' => 'Efesus 6:1',
+            'message' => 'Ketaatan bukan kelemahan, melainkan bukti kasih kepada Tuhan. Taat membuat hati bertumbuh dewasa.',
+            'challenge' => 'Pilih 1 instruksi orang tua dan kerjakan dengan sukacita.',
+        ],
+        'thursday' => [
+            'title' => 'Syukur di Segala Keadaan',
+            'verse' => '1 Tesalonika 5:18',
+            'message' => 'Bersyukur membuka mata kita melihat kebaikan Tuhan setiap hari, bahkan lewat hal kecil.',
+            'challenge' => 'Tulis 3 hal yang kamu syukuri hari ini.',
+        ],
+        'friday' => [
+            'title' => 'Belajar Mengampuni',
+            'verse' => 'Kolose 3:13',
+            'message' => 'Mengampuni memang tidak selalu mudah, tapi Tuhan memberi kekuatan agar hati kita tetap damai.',
+            'challenge' => 'Maafkan teman/saudara yang membuatmu kesal minggu ini.',
+        ],
+        'saturday' => [
+            'title' => 'Tetap Semangat Berbuat Baik',
+            'verse' => 'Galatia 6:9',
+            'message' => 'Kebaikan yang kecil kalau dilakukan terus akan jadi berkat besar untuk banyak orang.',
+            'challenge' => 'Lakukan 1 kebaikan rahasia untuk seseorang.',
+        ],
+        'sunday' => [
+            'title' => 'Bersukacita Beribadah',
+            'verse' => 'Mazmur 122:1',
+            'message' => 'Hari Tuhan adalah hari sukacita. Datang beribadah dengan hati siap memuji dan belajar Firman.',
+            'challenge' => 'Hafalkan 1 ayat hari ini dan ucapkan di rumah.',
+        ],
+    ],
+
     'weekly_badges' => [
         ['label' => 'Faith Starter', 'min_score' => 0],
         ['label' => 'Faith Explorer', 'min_score' => 220],
@@ -80,4 +125,3 @@ return [
         ['title' => 'Susun Ayat Cepat', 'description' => 'Susun kata ayat hafalan jadi urutan yang benar.'],
     ],
 ];
-
