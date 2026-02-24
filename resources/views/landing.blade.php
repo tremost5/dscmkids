@@ -27,93 +27,10 @@
         @vite(['resources/css/landing.css', 'resources/js/landing.js'])
     @endif
     <style>
-        /* Fallback mobile rail menu: aktif walau asset build lama masih tercache */
+        /* Mobile override: sembunyikan quick-nav di HP */
         @media (max-width: 900px) {
             .quick-nav {
-                position: fixed;
-                right: 10px;
-                top: 96px;
-                z-index: 140;
-                width: 52px;
-                max-width: 52px;
-                max-height: calc(100vh - 120px);
-                overflow-y: auto;
-                overflow-x: hidden;
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
-                padding: 8px;
-                border-radius: 18px;
-                background: rgba(16, 36, 74, 0.92);
-                box-shadow: 0 14px 34px rgba(9, 20, 41, 0.34);
-                scrollbar-width: thin;
-            }
-
-            .quick-nav a {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: 36px;
-                height: 36px;
-                min-width: 36px;
-                border-radius: 999px;
-                padding: 0;
-                font-size: 0;
-                line-height: 1;
-                white-space: nowrap;
-                text-decoration: none;
-                color: #f8fbff;
-                background: rgba(255, 255, 255, 0.18);
-                border: 1px solid rgba(255, 255, 255, 0.28);
-                transition: transform .18s ease, background-color .18s ease, box-shadow .18s ease;
-            }
-
-            .quick-nav a::before {
-                content: attr(data-short);
-                font-size: 11px;
-                font-weight: 800;
-                letter-spacing: .03em;
-            }
-
-            .quick-nav a:hover,
-            .quick-nav a:focus-visible {
-                transform: translateX(-2px);
-                background: rgba(255, 255, 255, 0.3);
-                box-shadow: 0 8px 18px rgba(9, 20, 41, 0.32);
-            }
-
-            .quick-nav.quick-nav--expanded {
-                width: min(78vw, 240px);
-                max-width: min(78vw, 240px);
-                padding: 10px;
-            }
-
-            .quick-nav.quick-nav--expanded a {
-                width: 100%;
-                justify-content: flex-start;
-                gap: 8px;
-                padding: 0 12px;
-                font-size: 13px;
-                font-weight: 700;
-            }
-
-            .quick-nav.quick-nav--expanded a::before {
-                content: attr(data-short);
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: 26px;
-                height: 26px;
-                border-radius: 999px;
-                background: rgba(255, 255, 255, 0.18);
-                font-size: 10px;
-            }
-
-            .quick-nav.quick-nav--expanded a::after {
-                content: attr(data-label);
-                font-size: 12px;
-                font-weight: 800;
-                color: #f8fbff;
+                display: none !important;
             }
         }
     </style>
