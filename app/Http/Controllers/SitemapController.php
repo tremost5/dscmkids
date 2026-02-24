@@ -26,9 +26,19 @@ class SitemapController extends Controller
             ];
         }
 
-        $xml = view('sitemap', compact('urls'))->render();
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
+        foreach ($urls as $url) {
+            $xml .= "    <url>\n";
+            $xml .= '        <loc>'.e($url['loc'])."</loc>\n";
+            if (!empty($url['lastmod'])) {
+                $xml .= '        <lastmod>'.e((string) $url['lastmod'])."</lastmod>\n";
+            }
+            $xml .= '        <priority>'.e((string) ($url['priority'] ?? '0.5'))."</priority>\n";
+            $xml .= "    </url>\n";
+        }
+        $xml .= '</urlset>';
 
         return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
     }
 }
-
