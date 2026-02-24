@@ -502,7 +502,7 @@
         </div>
     </div>
 
-    <footer class="footer">&copy; {{ date('Y') }} DSCMKids - Dirancang untuk anak sekolah minggu dan orang tua murid.</footer>
+    <footer class="footer">&copy; {{ date('Y') }} DSCMKids - support by Kharisnet</footer>
 </main>
 
 <script>
