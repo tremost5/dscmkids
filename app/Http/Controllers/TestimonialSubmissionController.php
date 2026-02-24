@@ -29,10 +29,10 @@ class TestimonialSubmissionController extends Controller
             'message' => trim($data['message']),
             'rating' => (int) $data['rating'],
             'sort_order' => 999,
-            'is_active' => false,
+            'is_active' => true,
         ]);
 
         return redirect(route('landing').'#testimoni')
-            ->with('success', 'Terima kasih. Testimonial berhasil dikirim dan menunggu review admin.');
+            ->with('success', 'Terima kasih. Testimonial berhasil dikirim.');
     }
 }
