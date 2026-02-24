@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PageSectionController;
 use App\Http\Controllers\Admin\TeacherProfileController;
 use App\Http\Controllers\Admin\LiveStreamController;
+use App\Http\Controllers\Admin\SpiritualContentController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\StudentAuthController;
 use App\Http\Controllers\StudentGameController;
@@ -66,5 +67,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('teachers', TeacherProfileController::class)->parameters(['teachers' => 'teacher']);
         Route::get('livestream', [LiveStreamController::class, 'edit'])->name('livestream.edit');
         Route::put('livestream', [LiveStreamController::class, 'update'])->name('livestream.update');
+        Route::get('spiritual', [SpiritualContentController::class, 'edit'])->name('spiritual.edit');
+        Route::put('spiritual', [SpiritualContentController::class, 'update'])->name('spiritual.update');
     });
 });

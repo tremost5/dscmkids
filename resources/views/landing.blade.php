@@ -37,7 +37,15 @@
 
     $galleryItems = is_iterable($gallery) ? collect($gallery)->all() : [];
     $weeklyGalleryItems = is_iterable($weeklyGallery ?? null) ? collect($weeklyGallery)->all() : [];
+    $themeMonthly = is_array($monthlyTheme ?? null) ? $monthlyTheme : [
+        'title' => 'Tema Bulanan DSCMKids',
+        'subtitle' => 'Fokus Pertumbuhan Iman',
+        'verse' => 'Kolose 2:7',
+        'description' => 'Bulan ini kita belajar bertumbuh dalam kasih dan ketaatan kepada Tuhan melalui tindakan sederhana setiap hari.',
+        'highlight' => 'Akar iman yang kuat melahirkan hidup yang berdampak.',
+    ];
     $devotion = is_array($dailyDevotion ?? null) ? $dailyDevotion : [
+        'section_title' => 'Renungan Harian Murid',
         'day' => now()->locale('id')->translatedFormat('l'),
         'title' => 'Tuhan Menyertai Setiap Hari',
         'verse' => 'Yosua 1:9',
@@ -115,6 +123,7 @@
 </header>
 
 <nav class="quick-nav">
+    <a href="#monthly-theme">Tema Bulanan</a>
     <a href="#renungan">Renungan</a>
     <a href="#kids-zone">Zona Murid</a>
     <a href="#quiz-zone">Quiz & Ranking</a>
@@ -150,8 +159,18 @@
         <article class="stat"><div class="s-label">Kelas Aktif</div><div class="s-value" data-counter="{{ (int) ($metrics['active_classes'] ?? 0) }}">{{ number_format((int) ($metrics['active_classes'] ?? 0)) }}</div></article>
     </section>
 
+    <section class="section panel reveal monthly-theme-panel" id="monthly-theme">
+        <p class="theme-kicker">{{ $themeMonthly['subtitle'] }}</p>
+        <h2 class="title">{{ $themeMonthly['title'] }}</h2>
+        <p class="muted">{{ $themeMonthly['description'] }}</p>
+        <div class="theme-meta-row">
+            <div class="theme-verse">Ayat Tema: <strong>{{ $themeMonthly['verse'] }}</strong></div>
+            <div class="theme-highlight">{{ $themeMonthly['highlight'] }}</div>
+        </div>
+    </section>
+
     <section class="section panel reveal devotion-panel" id="renungan">
-        <h2 class="title">Renungan Harian Murid</h2>
+        <h2 class="title">{{ $devotion['section_title'] }}</h2>
         <p class="muted">Hari ini <strong>{{ $devotion['day'] }}</strong> | <strong>{{ $devotion['verse'] }}</strong></p>
         <div class="devotion-grid">
             <article class="devotion-card">

@@ -52,7 +52,8 @@ class LandingController extends Controller
         $schoolData = $schoolDataService->buildDashboardData();
         $galleryItems = $this->collectGalleryItems($schoolData);
         $weeklyGalleryItems = $this->collectWeeklyGalleryItems($schoolData);
-        $dailyDevotion = $this->buildDailyDevotion();
+        $monthlyTheme = $this->buildMonthlyTheme($sections->get('monthly_theme'));
+        $dailyDevotion = $this->buildDailyDevotion($sections->get('daily_devotions'));
 
         $activeEvent = request()->query('event');
         $galleryEvents = $galleryItems
@@ -102,6 +103,7 @@ class LandingController extends Controller
             'activeEvent' => $activeEvent,
             'schoolData' => $schoolData,
             'weeklyGallery' => $weeklyGalleryItems,
+            'monthlyTheme' => $monthlyTheme,
             'dailyDevotion' => $dailyDevotion,
             'slides' => $slides,
             'teachers' => $teachers,
@@ -258,10 +260,29 @@ class LandingController extends Controller
             ->values();
     }
 
-    private function buildDailyDevotion(): array
+    private function buildMonthlyTheme(?PageSection $section): array
+    {
+        $fallback = [
+            'title' => 'Tema Bulanan DSCMKids',
+            'subtitle' => 'Fokus Pertumbuhan Iman',
+            'verse' => 'Kolose 2:7',
+            'description' => 'Bulan ini kita belajar bertumbuh dalam kasih dan ketaatan kepada Tuhan melalui tindakan sederhana setiap hari.',
+            'highlight' => 'Akar iman yang kuat melahirkan hidup yang berdampak.',
+        ];
+
+        return [
+            'title' => (string) ($section?->title ?: $fallback['title']),
+            'subtitle' => (string) (($section?->meta['subtitle'] ?? '') ?: $fallback['subtitle']),
+            'verse' => (string) (($section?->meta['verse'] ?? '') ?: $fallback['verse']),
+            'description' => (string) ($section?->content ?: $fallback['description']),
+            'highlight' => (string) (($section?->meta['highlight'] ?? '') ?: $fallback['highlight']),
+        ];
+    }
+
+    private function buildDailyDevotion(?PageSection $section = null): array
     {
         $dayKey = strtolower(now()->englishDayOfWeek);
-        $devotions = config('kids_program.daily_devotions', []);
+        $devotions = (array) ($section?->meta['days'] ?? config('kids_program.daily_devotions', []));
         $fallback = [
             'title' => 'Tuhan Menyertai Setiap Hari',
             'verse' => 'Yosua 1:9',
@@ -272,6 +293,7 @@ class LandingController extends Controller
         $item = $devotions[$dayKey] ?? $devotions[array_key_first($devotions)] ?? $fallback;
 
         return [
+            'section_title' => (string) ($section?->title ?: 'Renungan Harian Murid'),
             'day' => now()->locale('id')->translatedFormat('l'),
             'title' => (string) ($item['title'] ?? $fallback['title']),
             'verse' => (string) ($item['verse'] ?? $fallback['verse']),
