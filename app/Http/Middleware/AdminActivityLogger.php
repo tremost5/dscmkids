@@ -14,22 +14,25 @@ class AdminActivityLogger
     {
         $response = $next($request);
 
-        if (
-            $request->user()
-            && $request->user()->isAdmin()
-            && $request->isMethodSafe() === false
-            && Schema::hasTable('admin_activity_logs')
-        ) {
-            AdminActivityLog::create([
-                'user_id' => $request->user()->id,
-                'method' => $request->method(),
-                'path' => '/'.$request->path(),
-                'ip_address' => $request->ip(),
-                'user_agent' => substr((string) $request->userAgent(), 0, 500),
-            ]);
+        try {
+            if (
+                $request->user()
+                && $request->user()->isAdmin()
+                && $request->isMethodSafe() === false
+                && Schema::hasTable('admin_activity_logs')
+            ) {
+                AdminActivityLog::create([
+                    'user_id' => $request->user()->id,
+                    'method' => $request->method(),
+                    'path' => '/'.$request->path(),
+                    'ip_address' => $request->ip(),
+                    'user_agent' => substr((string) $request->userAgent(), 0, 500),
+                ]);
+            }
+        } catch (\Throwable) {
+            // Never block admin actions when audit logging fails on shared hosting.
         }
 
         return $response;
     }
 }
-
