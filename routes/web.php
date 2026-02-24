@@ -15,12 +15,14 @@ use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\StudentAuthController;
 use App\Http\Controllers\StudentGameController;
+use App\Http\Controllers\TestimonialSubmissionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/berita', [LandingController::class, 'newsIndex'])->name('news.index');
 Route::get('/berita/{slug}', [LandingController::class, 'newsShow'])->name('news.show');
 Route::get('/galeri/event/{eventSlug}', [LandingController::class, 'galleryEventShow'])->name('gallery.event');
+Route::post('/testimoni', [TestimonialSubmissionController::class, 'store'])->name('testimonials.submit');
 Route::post('/murid/quiz/submit', [StudentGameController::class, 'submitDailyQuiz'])
     ->middleware('auth')
     ->name('student.quiz.submit');

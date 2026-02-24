@@ -50,12 +50,14 @@ class LandingController extends Controller
             ->take(8)
             ->get();
 
-        $testimonials = Testimonial::query()
-            ->where('is_active', true)
-            ->orderBy('sort_order')
-            ->latest('id')
-            ->take(6)
-            ->get();
+        $testimonials = Schema::hasTable('testimonials')
+            ? Testimonial::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->latest('id')
+                ->take(6)
+                ->get()
+            : collect();
 
         $schoolData = $schoolDataService->buildDashboardData();
         $galleryItems = $this->collectGalleryItems($schoolData);

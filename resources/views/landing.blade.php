@@ -524,8 +524,41 @@
                 </article>
             @endforelse
         </div>
+
+        <form class="testimonial-form" method="POST" action="{{ route('testimonials.submit') }}">
+            @csrf
+            <h3 class="photo-subtitle" style="margin-top:6px;">Kirim Testimoni Kamu</h3>
+            <div class="testimonial-form-grid">
+                <div class="field">
+                    <label>Nama
+                        <input type="text" name="name" value="{{ old('name') }}" placeholder="Nama depan / panggilan" required>
+                    </label>
+                </div>
+                <div class="field">
+                    <label>Keterangan (opsional)
+                        <input type="text" name="role_label" value="{{ old('role_label') }}" placeholder="Contoh: Ortu Natan - Kelas 3">
+                    </label>
+                </div>
+            </div>
+            <div class="field">
+                <label>Pilih Bintang</label>
+                <div class="star-rating">
+                    @for($star = 5; $star >= 1; $star--)
+                        <input type="radio" id="rating{{ $star }}" name="rating" value="{{ $star }}" {{ (int) old('rating', 5) === $star ? 'checked' : '' }}>
+                        <label for="rating{{ $star }}" title="{{ $star }} bintang">★</label>
+                    @endfor
+                </div>
+            </div>
+            <div class="field">
+                <label>Isi Testimoni
+                    <textarea name="message" rows="4" placeholder="Bagikan pengalaman singkatmu..." required>{{ old('message') }}</textarea>
+                </label>
+            </div>
+            <button type="submit" class="btn btn-light">Kirim Testimoni</button>
+        </form>
+
         <div class="hero-actions" style="margin-top:14px;">
-            <a href="{{ route('student.register') }}" class="btn btn-light">Daftarkan Murid</a>
+            <a href="https://biodata.dscmkids.online" target="_blank" rel="noopener" class="btn btn-light">Daftarkan Murid</a>
             <a href="#photo-zone" class="btn btn-ghost" style="color:#1e3a8a;border-color:#bcd0f5;background:#ecf3ff;">Lihat Kegiatan</a>
         </div>
     </section>
