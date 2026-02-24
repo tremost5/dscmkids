@@ -447,6 +447,27 @@
             font-weight: 800;
         }
         .testimonial-card p { margin: 8px 0 0; color: #334155; font-weight: 700; }
+        .testimonial-reply {
+            margin-top: 8px;
+            border-left: 3px solid #93c5fd;
+            background: #eff6ff;
+            border-radius: 8px;
+            padding: 7px 9px;
+        }
+        .testimonial-reply span {
+            display: block;
+            color: #1d4ed8;
+            font-size: .78rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .25px;
+        }
+        .testimonial-reply p {
+            margin: 4px 0 0;
+            font-size: .86rem;
+            color: #1e3a8a;
+            font-weight: 700;
+        }
         .testimonial-form {
             margin-top: 14px;
             border: 1px solid #d5e3fa;

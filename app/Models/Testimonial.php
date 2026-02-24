@@ -14,6 +14,7 @@ class Testimonial extends Model
         'role_label',
         'message',
         'rating',
+        'admin_reply',
         'avatar_path',
         'sort_order',
         'is_active',
@@ -28,4 +29,3 @@ class Testimonial extends Model
         ];
     }
 }
-

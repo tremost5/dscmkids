@@ -512,6 +512,12 @@
                     </div>
                     <div class="testimonial-stars">{{ str_repeat('★', max(1, min(5, (int) $item->rating))) }}</div>
                     <p>"{{ $item->message }}"</p>
+                    @if(filled($item->admin_reply))
+                        <div class="testimonial-reply">
+                            <span>Respon Admin DSCMKids:</span>
+                            <p>{{ $item->admin_reply }}</p>
+                        </div>
+                    @endif
                 </article>
             @empty
                 <article class="testimonial-card">

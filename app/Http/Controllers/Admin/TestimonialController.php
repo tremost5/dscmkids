@@ -30,6 +30,7 @@ class TestimonialController extends Controller
             'name' => ['required', 'string', 'max:120'],
             'role_label' => ['nullable', 'string', 'max:160'],
             'message' => ['required', 'string', 'max:700'],
+            'admin_reply' => ['nullable', 'string', 'max:700'],
             'rating' => ['required', 'integer', 'min:1', 'max:5'],
             'avatar' => ['nullable', 'image', 'max:4096'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
@@ -40,6 +41,7 @@ class TestimonialController extends Controller
             'name' => $data['name'],
             'role_label' => $data['role_label'] ?? null,
             'message' => $data['message'],
+            'admin_reply' => $data['admin_reply'] ?? null,
             'rating' => (int) $data['rating'],
             'sort_order' => (int) ($data['sort_order'] ?? 0),
             'is_active' => $request->boolean('is_active'),
@@ -103,4 +105,3 @@ class TestimonialController extends Controller
         return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial berhasil dihapus.');
     }
 }
-

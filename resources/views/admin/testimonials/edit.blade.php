@@ -13,6 +13,11 @@
         <div class="field"><label>Rating (1-5)<input type="number" min="1" max="5" name="rating" value="{{ old('rating', $testimonial->rating) }}" required></label></div>
     </div>
     <div class="field"><label>Isi Testimonial<textarea name="message" required>{{ old('message', $testimonial->message) }}</textarea></label></div>
+    <div class="field">
+        <label>Balasan Admin (opsional)
+            <textarea name="admin_reply" placeholder="Tulis respon singkat admin untuk testimonial ini...">{{ old('admin_reply', $testimonial->admin_reply) }}</textarea>
+        </label>
+    </div>
     <div class="grid-2">
         <div class="field"><label>Urutan Tampil<input type="number" min="0" name="sort_order" value="{{ old('sort_order', $testimonial->sort_order) }}"></label></div>
         <div class="field"><label>Ganti Avatar<input type="file" name="avatar" accept="image/*"></label></div>
@@ -27,4 +32,3 @@
     </div>
 </form>
 @endsection
-

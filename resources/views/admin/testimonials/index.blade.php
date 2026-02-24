@@ -7,7 +7,7 @@
 <div class="actions"><a class="btn btn-primary" href="{{ route('admin.testimonials.create') }}">Tambah Testimonial</a></div>
 
 <table>
-    <thead><tr><th>Avatar</th><th>Nama</th><th>Keterangan</th><th>Rating</th><th>Status</th><th>Aksi</th></tr></thead>
+    <thead><tr><th>Avatar</th><th>Nama</th><th>Keterangan</th><th>Rating</th><th>Status</th><th>Balasan</th><th>Aksi</th></tr></thead>
     <tbody>
     @forelse($testimonials as $item)
         <tr>
@@ -25,6 +25,7 @@
             </td>
             <td>{{ str_repeat('★', max(1, min(5, (int) $item->rating))) }}</td>
             <td>{{ $item->is_active ? 'Aktif' : 'Nonaktif' }}</td>
+            <td>{{ filled($item->admin_reply) ? 'Sudah dibalas' : 'Belum' }}</td>
             <td class="actions">
                 <a class="btn btn-secondary" href="{{ route('admin.testimonials.edit', $item) }}">Edit</a>
                 <form method="POST" action="{{ route('admin.testimonials.destroy', $item) }}" onsubmit="return confirm('Hapus testimonial ini?')">
@@ -35,11 +36,10 @@
             </td>
         </tr>
     @empty
-        <tr><td colspan="6" class="muted">Belum ada testimonial.</td></tr>
+        <tr><td colspan="7" class="muted">Belum ada testimonial.</td></tr>
     @endforelse
     </tbody>
 </table>
 
 <div style="margin-top:12px;">{{ $testimonials->links() }}</div>
 @endsection
-
