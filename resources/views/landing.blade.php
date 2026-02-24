@@ -147,21 +147,21 @@
 </header>
 
 <nav class="quick-nav">
-    <a href="#monthly-theme" data-short="TM" title="Tema Bulanan">Tema Bulanan</a>
-    <a href="#renungan" data-short="RG" title="Renungan">Renungan</a>
-    <a href="#kids-zone" data-short="ZM" title="Zona Murid">Zona Murid</a>
-    <a href="#quiz-zone" data-short="QZ" title="Quiz & Ranking">Quiz & Ranking</a>
-    <a href="#materials" data-short="ME" title="Materi Edu">Materi Edu</a>
+    <a href="#monthly-theme" data-short="TM" data-label="Tema Bulanan" title="Tema Bulanan">Tema Bulanan</a>
+    <a href="#renungan" data-short="RG" data-label="Renungan" title="Renungan">Renungan</a>
+    <a href="#kids-zone" data-short="ZM" data-label="Zona Murid" title="Zona Murid">Zona Murid</a>
+    <a href="#quiz-zone" data-short="QZ" data-label="Quiz & Ranking" title="Quiz & Ranking">Quiz & Ranking</a>
+    <a href="#materials" data-short="ME" data-label="Materi Edu" title="Materi Edu">Materi Edu</a>
     @if($parentPortalCfg['enabled'])
-        <a href="#parent-portal" data-short="PP" title="Parent Portal">Parent Portal</a>
+        <a href="#parent-portal" data-short="PP" data-label="Parent Portal" title="Parent Portal">Parent Portal</a>
     @endif
-    <a href="#photo-zone" data-short="ZF" title="Zona Foto">Zona Foto</a>
-    <a href="#analytics" data-short="AN" title="Analytics">Analytics</a>
-    <a href="#informasi" data-short="IF" title="Informasi">Informasi</a>
-    <a href="#teachers" data-short="GR" title="Guru">Guru</a>
-    <a href="#testimoni" data-short="TS" title="Testimoni">Testimoni</a>
-    <a href="#gallery" data-short="GL" title="Galeri">Galeri</a>
-    <a href="#live" data-short="LV" title="Live">Live</a>
+    <a href="#photo-zone" data-short="ZF" data-label="Zona Foto" title="Zona Foto">Zona Foto</a>
+    <a href="#analytics" data-short="AN" data-label="Analytics" title="Analytics">Analytics</a>
+    <a href="#informasi" data-short="IF" data-label="Informasi" title="Informasi">Informasi</a>
+    <a href="#teachers" data-short="GR" data-label="Guru" title="Guru">Guru</a>
+    <a href="#testimoni" data-short="TS" data-label="Testimoni" title="Testimoni">Testimoni</a>
+    <a href="#gallery" data-short="GL" data-label="Galeri" title="Galeri">Galeri</a>
+    <a href="#live" data-short="LV" data-label="Live" title="Live">Live</a>
 </nav>
 
 <main class="container">

@@ -72,6 +72,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startAutoRotate();
 
+    const quickNav = document.querySelector('.quick-nav');
+    if (quickNav) {
+        let collapseTimer = null;
+        const mobileQuery = window.matchMedia('(max-width: 900px)');
+
+        function expandQuickNavTemporarily() {
+            if (!mobileQuery.matches) {
+                return;
+            }
+            quickNav.classList.add('expanded');
+            window.clearTimeout(collapseTimer);
+            collapseTimer = window.setTimeout(() => {
+                quickNav.classList.remove('expanded');
+            }, 2200);
+        }
+
+        quickNav.addEventListener('click', (event) => {
+            const targetLink = event.target.closest('a');
+            if (!targetLink) {
+                return;
+            }
+            expandQuickNavTemporarily();
+        });
+
+        quickNav.addEventListener('touchstart', () => {
+            expandQuickNavTemporarily();
+        }, { passive: true });
+
+        window.addEventListener('resize', () => {
+            if (!mobileQuery.matches) {
+                quickNav.classList.remove('expanded');
+                window.clearTimeout(collapseTimer);
+            }
+        });
+    }
+
     const labels = classData.map((x) => x.class).concat(['Tidak Hadir']);
     const values = classData.map((x) => Number(x.present)).concat([absentTotal]);
     const colors = ['#2563eb','#0ea5e9','#0d9488','#14b8a6','#f59e0b','#f97316','#ec4899','#a855f7','#6366f1','#94a3b8'];

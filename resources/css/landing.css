@@ -589,7 +589,7 @@
             .teacher-grid, .gallery-grid, .testimonial-grid, .testimonial-form-grid { grid-template-columns: repeat(2, 1fr); }
             .circle-wrap { grid-template-columns: 1fr; }
         }
-        @media (max-width: 640px) {
+        @media (max-width: 900px) {
             .top { height: 72vh; border-radius: 0 0 18px 18px; }
             .quick-nav {
                 position: fixed;
@@ -620,6 +620,7 @@
                 background: #eef4ff;
                 color: #1d4ed8;
                 border: 1px solid #d5e3fb;
+                transition: all .2s ease;
             }
             .quick-nav a::before {
                 content: attr(data-short);
@@ -627,6 +628,22 @@
                 font-weight: 900;
                 letter-spacing: .2px;
             }
+            .quick-nav.expanded {
+                max-width: 185px;
+                align-items: stretch;
+                padding: 8px;
+            }
+            .quick-nav.expanded a {
+                width: auto;
+                min-height: 34px;
+                height: auto;
+                justify-content: flex-start;
+                padding: 7px 10px;
+                font-size: .72rem;
+                font-weight: 800;
+                line-height: 1.15;
+            }
+            .quick-nav.expanded a::before { content: none; }
             .quick-nav a:hover,
             .quick-nav a:focus-visible {
                 background: #1d4ed8;
