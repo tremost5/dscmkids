@@ -53,12 +53,10 @@ Route::prefix('murid')->name('student.')->group(function () {
     Route::get('/progress', [StudentGameController::class, 'progress'])->middleware('auth')->name('progress');
     Route::get('/wallet', [StudentWalletController::class, 'index'])->middleware('auth')->name('wallet');
 
-    Route::middleware('guest')->group(function () {
-        Route::get('/login', [StudentAuthController::class, 'showLogin'])->name('login');
-        Route::post('/login', [StudentAuthController::class, 'login'])->middleware('throttle:8,1')->name('login.submit');
-        Route::get('/daftar', [StudentAuthController::class, 'showRegister'])->name('register');
-        Route::post('/daftar', [StudentAuthController::class, 'register'])->middleware('throttle:6,1')->name('register.submit');
-    });
+    Route::get('/login', [StudentAuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [StudentAuthController::class, 'login'])->middleware('throttle:8,1')->name('login.submit');
+    Route::get('/daftar', [StudentAuthController::class, 'showRegister'])->name('register');
+    Route::post('/daftar', [StudentAuthController::class, 'register'])->middleware('throttle:6,1')->name('register.submit');
 
     Route::middleware('auth')->group(function () {
         Route::post('/logout', [StudentAuthController::class, 'logout'])->name('logout');
