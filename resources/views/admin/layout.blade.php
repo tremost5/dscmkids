@@ -124,6 +124,7 @@
             <a href="{{ route('admin.notifications.index') }}">Notifikasi</a>
             <a href="{{ route('admin.livestream.edit') }}">Live Streaming</a>
             <a href="{{ route('admin.spiritual.edit') }}">Tema & Renungan</a>
+            <a href="{{ route('admin.parent-portal.edit') }}">Parent Portal</a>
             <a href="{{ route('landing') }}" target="_blank">Lihat Situs</a>
             <form action="{{ route('admin.logout') }}" method="POST" style="display:inline;">
                 @csrf

@@ -66,6 +66,12 @@
         'message' => 'Tuhan tidak pernah meninggalkanmu. Tetap berani, setia berdoa, dan lakukan yang benar hari ini.',
         'challenge' => 'Berdoa 2 menit untuk satu temanmu hari ini.',
     ];
+    $parentPortalCfg = is_array($parentPortal ?? null) ? $parentPortal : [
+        'enabled' => false,
+        'title' => 'Portal Orang Tua DSCMKids',
+        'description' => 'Ringkasan mingguan untuk orang tua.',
+        'cta_url' => '',
+    ];
 
     $readingPlans = [
         ['day' => 'Senin', 'title' => 'Tuhan Selalu Menolong', 'reference' => 'Mazmur 121:1-2', 'point' => 'Saat takut, ingat Tuhan menjaga kamu.'],
@@ -113,8 +119,12 @@
                 <a href="#teachers" class="btn btn-ghost">Portfolio Guru</a>
                 <a href="#gallery" class="btn btn-ghost">Galeri</a>
                 <a href="{{ route('news.index') }}" class="btn btn-ghost">Semua Berita</a>
+                @if($parentPortalCfg['enabled'])
+                    <a href="{{ route('parent.portal') }}" class="btn btn-ghost">Portal Orang Tua</a>
+                @endif
                 @auth
                     @if(auth()->user()->role === 'student')
+                        <a href="{{ route('student.wallet') }}" class="btn btn-ghost">Achievement Wallet</a>
                         <form method="POST" action="{{ route('student.logout') }}" style="display:inline;">
                             @csrf
                             <button type="submit" class="btn btn-ghost">Logout Murid ({{ auth()->user()->name }})</button>
@@ -142,6 +152,9 @@
     <a href="#kids-zone">Zona Murid</a>
     <a href="#quiz-zone">Quiz & Ranking</a>
     <a href="#materials">Materi Edu</a>
+    @if($parentPortalCfg['enabled'])
+        <a href="#parent-portal">Parent Portal</a>
+    @endif
     <a href="#photo-zone">Zona Foto</a>
     <a href="#analytics">Analytics</a>
     <a href="#informasi">Informasi</a>
@@ -184,6 +197,19 @@
             <div class="theme-highlight">{{ $themeMonthly['highlight'] }}</div>
         </div>
     </section>
+
+    @if($parentPortalCfg['enabled'])
+        <section class="section panel reveal" id="parent-portal">
+            <h2 class="title">{{ $parentPortalCfg['title'] }}</h2>
+            <p class="muted">{{ $parentPortalCfg['description'] }}</p>
+            <div class="hero-actions" style="margin-top:8px;">
+                <a href="{{ route('parent.portal') }}" class="btn btn-light">Buka Parent Portal</a>
+                @if($parentPortalCfg['cta_url'] !== '')
+                    <a href="{{ $parentPortalCfg['cta_url'] }}" target="_blank" rel="noopener" class="btn btn-ghost" style="color:#1e3a8a;border-color:#bcd0f5;background:#ecf3ff;">Link Pendampingan</a>
+                @endif
+            </div>
+        </section>
+    @endif
 
     <section class="section panel reveal devotion-panel" id="renungan">
         <h2 class="title">{{ $devotion['section_title'] }}</h2>

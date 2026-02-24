@@ -16,7 +16,7 @@
 </head>
 <body>
 <div class="wrap">
-    <p><a href="{{ route('landing') }}">&larr; Kembali ke Landing</a></p>
+    <p><a href="{{ route('landing') }}">&larr; Kembali ke Landing</a> | <a href="{{ route('student.wallet') }}">Achievement Wallet</a></p>
     <h1>Progress Murid: {{ $user->name }}</h1>
     <div class="grid">
         <div class="card"><strong>{{ (int) $user->points }}</strong><br>Total Poin</div>
@@ -47,4 +47,3 @@
 </div>
 </body>
 </html>
-

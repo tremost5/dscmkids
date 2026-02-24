@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PageSectionController;
+use App\Http\Controllers\Admin\ParentPortalController as AdminParentPortalController;
 use App\Http\Controllers\Admin\TeacherProfileController;
 use App\Http\Controllers\Admin\LiveStreamController;
 use App\Http\Controllers\Admin\SpiritualContentController;
@@ -19,7 +20,9 @@ use App\Http\Controllers\LearningMaterialController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StudentAuthController;
 use App\Http\Controllers\StudentGameController;
+use App\Http\Controllers\StudentWalletController;
 use App\Http\Controllers\TestimonialSubmissionController;
+use App\Http\Controllers\ParentPortalController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -27,6 +30,7 @@ Route::get('/berita', [LandingController::class, 'newsIndex'])->name('news.index
 Route::get('/berita/{slug}', [LandingController::class, 'newsShow'])->name('news.show');
 Route::get('/galeri/event/{eventSlug}', [LandingController::class, 'galleryEventShow'])->name('gallery.event');
 Route::get('/materi', [LearningMaterialController::class, 'index'])->name('materials.index');
+Route::get('/orangtua', [ParentPortalController::class, 'index'])->name('parent.portal');
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::post('/testimoni', [TestimonialSubmissionController::class, 'store'])->middleware('throttle:5,1')->name('testimonials.submit');
 Route::post('/murid/quiz/submit', [StudentGameController::class, 'submitDailyQuiz'])
@@ -45,6 +49,7 @@ Route::post('/murid/arcade/score', [StudentGameController::class, 'submitArcadeS
 Route::prefix('murid')->name('student.')->group(function () {
     Route::get('/arcade', [StudentGameController::class, 'arcade'])->name('arcade');
     Route::get('/progress', [StudentGameController::class, 'progress'])->middleware('auth')->name('progress');
+    Route::get('/wallet', [StudentWalletController::class, 'index'])->middleware('auth')->name('wallet');
 
     Route::middleware('guest')->group(function () {
         Route::get('/login', [StudentAuthController::class, 'showLogin'])->name('login');
@@ -84,5 +89,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('livestream', [LiveStreamController::class, 'update'])->name('livestream.update');
         Route::get('spiritual', [SpiritualContentController::class, 'edit'])->name('spiritual.edit');
         Route::put('spiritual', [SpiritualContentController::class, 'update'])->name('spiritual.update');
+        Route::get('parent-portal', [AdminParentPortalController::class, 'edit'])->name('parent-portal.edit');
+        Route::put('parent-portal', [AdminParentPortalController::class, 'update'])->name('parent-portal.update');
     });
 });

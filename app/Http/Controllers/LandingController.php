@@ -73,6 +73,7 @@ class LandingController extends Controller
         $weeklyGalleryItems = $this->collectWeeklyGalleryItems($schoolData);
         $monthlyTheme = $this->buildMonthlyTheme($sections->get('monthly_theme'));
         $dailyDevotion = $this->buildDailyDevotion($sections->get('daily_devotions'));
+        $parentPortal = $this->buildParentPortalConfig($sections->get('parent_portal'));
 
         $activeEvent = request()->query('event');
         $galleryEvents = $galleryItems
@@ -124,6 +125,7 @@ class LandingController extends Controller
             'weeklyGallery' => $weeklyGalleryItems,
             'monthlyTheme' => $monthlyTheme,
             'dailyDevotion' => $dailyDevotion,
+            'parentPortal' => $parentPortal,
             'slides' => $slides,
             'teachers' => $teachers,
             'testimonials' => $testimonials,
@@ -297,6 +299,16 @@ class LandingController extends Controller
             'verse' => (string) (($section?->meta['verse'] ?? '') ?: $fallback['verse']),
             'description' => (string) ($section?->content ?: $fallback['description']),
             'highlight' => (string) (($section?->meta['highlight'] ?? '') ?: $fallback['highlight']),
+        ];
+    }
+
+    private function buildParentPortalConfig(?PageSection $section): array
+    {
+        return [
+            'enabled' => (bool) ($section?->meta['enabled'] ?? false),
+            'title' => (string) ($section?->title ?: 'Portal Orang Tua DSCMKids'),
+            'description' => (string) ($section?->content ?: 'Ringkasan mingguan untuk orang tua.'),
+            'cta_url' => (string) ($section?->meta['cta_url'] ?? ''),
         ];
     }
 
