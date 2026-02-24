@@ -395,6 +395,19 @@
         .teacher p { margin: 4px 0 0; color: #52617d; font-size: .9rem; }
 
         .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .photo-zone {
+            border-color: #d6e3f8;
+            background:
+                radial-gradient(circle at 0% 0%, rgba(59,130,246,.08), transparent 35%),
+                radial-gradient(circle at 100% 0%, rgba(20,184,166,.08), transparent 34%),
+                linear-gradient(145deg, #f8fbff, #f3f7ff);
+        }
+        .photo-subtitle {
+            margin: 0 0 8px;
+            font-family: 'Baloo 2', sans-serif;
+            font-size: 1.35rem;
+            color: #1e3a8a;
+        }
         .filter-pill { border: 1px solid #d1def4; background: #fff; color: #334155; font-weight: 700; border-radius: 999px; padding: 8px 12px; text-decoration: none; transition: transform .2s ease; }
         .filter-pill:hover { transform: translateY(-1px); }
         .filter-pill.active { background: #1d4ed8; border-color: #1d4ed8; color: #fff; }

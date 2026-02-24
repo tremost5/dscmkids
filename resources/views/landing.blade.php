@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DSCMKids | Sekolah Minggu Modern</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -127,7 +129,7 @@
     <a href="#renungan">Renungan</a>
     <a href="#kids-zone">Zona Murid</a>
     <a href="#quiz-zone">Quiz & Ranking</a>
-    <a href="#weekly-gallery">Galeri Minggu Ini</a>
+    <a href="#photo-zone">Zona Foto</a>
     <a href="#analytics">Analytics</a>
     <a href="#informasi">Informasi</a>
     <a href="#teachers">Guru</a>
@@ -225,30 +227,6 @@
                     <strong>{{ $attendanceTotals['absent'] ?? 0 }} murid</strong>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <section class="section panel reveal" id="weekly-gallery">
-        <h2 class="title">Galeri Minggu Ini: Selfie Presensi</h2>
-        <p class="muted">Otomatis dari database presensi minggu berjalan (Senin-Minggu).</p>
-        <div class="gallery-grid">
-            @forelse($weeklyGalleryItems as $photo)
-                @php
-                    $title = is_array($photo) ? ($photo['title'] ?? 'Selfie Kehadiran') : 'Selfie Kehadiran';
-                    $date = is_array($photo) ? ($photo['date'] ?? null) : null;
-                    $eventName = is_array($photo) ? ($photo['event_name'] ?? 'Selfie Absensi Minggu Ini') : 'Selfie Absensi Minggu Ini';
-                    $pathValue = is_array($photo) ? ($photo['path'] ?? null) : null;
-                    $src = is_string($pathValue) && (str_starts_with($pathValue, 'http://') || str_starts_with($pathValue, 'https://')) ? $pathValue : (is_string($pathValue) ? asset(ltrim($pathValue, '/')) : null);
-                @endphp
-                <figure class="photo">
-                    @if($src)
-                        <img src="{{ $src }}" alt="{{ $title }}" data-lightbox-src="{{ $src }}" data-lightbox-title="{{ $title }}" data-lightbox-meta="{{ $eventName }}{{ $date ? ' - '.$date : '' }}" data-lightbox-index="{{ $loop->index }}">
-                    @endif
-                    <figcaption class="caption"><strong>{{ $title }}</strong><br>{{ $eventName }}{{ $date ? ' - '.$date : '' }}</figcaption>
-                </figure>
-            @empty
-                <figure class="photo"><figcaption class="caption"><strong>Belum ada selfie presensi minggu ini</strong><br>Pastikan kolom selfie dan tanggal presensi sudah termapping di `.env`.</figcaption></figure>
-            @endforelse
         </div>
     </section>
 
@@ -456,34 +434,62 @@
         </div>
     </section>
 
-    <section class="section panel reveal" id="gallery">
-        <h2 class="title">Galeri Kegiatan</h2>
-        <div class="filter-bar">
-            <a href="{{ route('landing') }}#gallery" class="filter-pill {{ empty($activeEvent) ? 'active' : '' }}">Semua Event</a>
-            @foreach($galleryEvents as $event)
-                <a href="{{ route('landing', ['event' => $event]) }}#gallery" class="filter-pill {{ $activeEvent === $event ? 'active' : '' }}">{{ $event }}</a>
-            @endforeach
-        </div>
-        <div class="gallery-grid">
-            @forelse($galleryItems as $photo)
-                @php
-                    $title = is_array($photo) ? ($photo['title'] ?? 'Kegiatan DSCMKids') : $photo->title;
-                    $date = is_array($photo) ? ($photo['date'] ?? null) : optional($photo->created_at)->format('d M Y');
-                    $eventName = is_array($photo) ? ($photo['event_name'] ?? 'Kegiatan Umum') : 'Kegiatan Umum';
-                    $eventSlug = is_array($photo) ? ($photo['event_slug'] ?? \Illuminate\Support\Str::slug($eventName)) : \Illuminate\Support\Str::slug($eventName);
-                    $pathValue = is_array($photo) ? ($photo['path'] ?? null) : asset('storage/'.$photo->file_path);
-                    $src = is_string($pathValue) && (str_starts_with($pathValue, 'http://') || str_starts_with($pathValue, 'https://')) ? $pathValue : (is_string($pathValue) ? asset(ltrim($pathValue, '/')) : null);
-                @endphp
-                <figure class="photo">
-                    @if($src)
-                        <img src="{{ $src }}" alt="{{ $title }}" data-lightbox-src="{{ $src }}" data-lightbox-title="{{ $title }}" data-lightbox-meta="{{ $eventName }}{{ $date ? ' - '.$date : '' }}" data-lightbox-index="{{ $loop->index }}">
-                    @endif
-                    <figcaption class="caption"><strong>{{ $title }}</strong><br>{{ $eventName }}{{ $date ? ' - '.$date : '' }}<br><a href="{{ route('gallery.event', ['eventSlug' => $eventSlug]) }}">Detail Event</a></figcaption>
-                </figure>
-            @empty
-                <figure class="photo"><figcaption class="caption"><strong>Tidak ada foto untuk event ini</strong></figcaption></figure>
-            @endforelse
-        </div>
+    <section class="section panel reveal photo-zone" id="photo-zone">
+        <h2 class="title">Zona Foto Kegiatan</h2>
+        <p class="muted">Semua konten foto disusun di bagian bawah: selfie presensi minggu ini dan galeri event kegiatan.</p>
+
+        <section id="weekly-gallery">
+            <h3 class="photo-subtitle">Galeri Minggu Ini: Selfie Presensi</h3>
+            <div class="gallery-grid">
+                @forelse($weeklyGalleryItems as $photo)
+                    @php
+                        $title = is_array($photo) ? ($photo['title'] ?? 'Selfie Kehadiran') : 'Selfie Kehadiran';
+                        $date = is_array($photo) ? ($photo['date'] ?? null) : null;
+                        $eventName = is_array($photo) ? ($photo['event_name'] ?? 'Selfie Absensi Minggu Ini') : 'Selfie Absensi Minggu Ini';
+                        $pathValue = is_array($photo) ? ($photo['path'] ?? null) : null;
+                        $src = is_string($pathValue) && (str_starts_with($pathValue, 'http://') || str_starts_with($pathValue, 'https://')) ? $pathValue : (is_string($pathValue) ? asset(ltrim($pathValue, '/')) : null);
+                    @endphp
+                    <figure class="photo">
+                        @if($src)
+                            <img src="{{ $src }}" alt="{{ $title }}" data-lightbox-src="{{ $src }}" data-lightbox-title="{{ $title }}" data-lightbox-meta="{{ $eventName }}{{ $date ? ' - '.$date : '' }}" data-lightbox-index="{{ $loop->index }}">
+                        @endif
+                        <figcaption class="caption"><strong>{{ $title }}</strong><br>{{ $eventName }}{{ $date ? ' - '.$date : '' }}</figcaption>
+                    </figure>
+                @empty
+                    <figure class="photo"><figcaption class="caption"><strong>Belum ada selfie presensi minggu ini</strong><br>Pastikan kolom selfie dan tanggal presensi sudah termapping di `.env`.</figcaption></figure>
+                @endforelse
+            </div>
+        </section>
+
+        <section id="gallery" style="margin-top:14px;">
+            <h3 class="photo-subtitle">Galeri Kegiatan</h3>
+            <div class="filter-bar">
+                <a href="{{ route('landing') }}#gallery" class="filter-pill {{ empty($activeEvent) ? 'active' : '' }}">Semua Event</a>
+                @foreach($galleryEvents as $event)
+                    <a href="{{ route('landing', ['event' => $event]) }}#gallery" class="filter-pill {{ $activeEvent === $event ? 'active' : '' }}">{{ $event }}</a>
+                @endforeach
+            </div>
+            <div class="gallery-grid">
+                @forelse($galleryItems as $photo)
+                    @php
+                        $title = is_array($photo) ? ($photo['title'] ?? 'Kegiatan DSCMKids') : $photo->title;
+                        $date = is_array($photo) ? ($photo['date'] ?? null) : optional($photo->created_at)->format('d M Y');
+                        $eventName = is_array($photo) ? ($photo['event_name'] ?? 'Kegiatan Umum') : 'Kegiatan Umum';
+                        $eventSlug = is_array($photo) ? ($photo['event_slug'] ?? \Illuminate\Support\Str::slug($eventName)) : \Illuminate\Support\Str::slug($eventName);
+                        $pathValue = is_array($photo) ? ($photo['path'] ?? null) : asset('storage/'.$photo->file_path);
+                        $src = is_string($pathValue) && (str_starts_with($pathValue, 'http://') || str_starts_with($pathValue, 'https://')) ? $pathValue : (is_string($pathValue) ? asset(ltrim($pathValue, '/')) : null);
+                    @endphp
+                    <figure class="photo">
+                        @if($src)
+                            <img src="{{ $src }}" alt="{{ $title }}" data-lightbox-src="{{ $src }}" data-lightbox-title="{{ $title }}" data-lightbox-meta="{{ $eventName }}{{ $date ? ' - '.$date : '' }}" data-lightbox-index="{{ $loop->index }}">
+                        @endif
+                        <figcaption class="caption"><strong>{{ $title }}</strong><br>{{ $eventName }}{{ $date ? ' - '.$date : '' }}<br><a href="{{ route('gallery.event', ['eventSlug' => $eventSlug]) }}">Detail Event</a></figcaption>
+                    </figure>
+                @empty
+                    <figure class="photo"><figcaption class="caption"><strong>Tidak ada foto untuk event ini</strong></figcaption></figure>
+                @endforelse
+            </div>
+        </section>
     </section>
 
     <div class="lightbox" id="lightbox">
