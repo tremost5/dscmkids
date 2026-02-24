@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\PageSectionController;
 use App\Http\Controllers\Admin\TeacherProfileController;
 use App\Http\Controllers\Admin\LiveStreamController;
 use App\Http\Controllers\Admin\SpiritualContentController;
+use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\StudentAuthController;
 use App\Http\Controllers\StudentGameController;
@@ -65,6 +66,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('media', MediaController::class);
         Route::resource('slides', HeroSlideController::class)->parameters(['slides' => 'slide']);
         Route::resource('teachers', TeacherProfileController::class)->parameters(['teachers' => 'teacher']);
+        Route::resource('testimonials', TestimonialController::class)->except('show');
         Route::get('livestream', [LiveStreamController::class, 'edit'])->name('livestream.edit');
         Route::put('livestream', [LiveStreamController::class, 'update'])->name('livestream.update');
         Route::get('spiritual', [SpiritualContentController::class, 'edit'])->name('spiritual.edit');

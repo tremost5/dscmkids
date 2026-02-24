@@ -133,6 +133,7 @@
     <a href="#analytics">Analytics</a>
     <a href="#informasi">Informasi</a>
     <a href="#teachers">Guru</a>
+    <a href="#testimoni">Testimoni</a>
     <a href="#gallery">Galeri</a>
     <a href="#live">Live</a>
 </nav>
@@ -490,6 +491,43 @@
                 @endforelse
             </div>
         </section>
+    </section>
+
+    <section class="section panel reveal testimonial-zone" id="testimoni">
+        <h2 class="title">Testimoni Orang Tua & Murid</h2>
+        <p class="muted">Cerita singkat dampak pelayanan sekolah minggu DSCMKids.</p>
+        <div class="testimonial-grid">
+            @forelse($testimonials as $item)
+                <article class="testimonial-card">
+                    <div class="testimonial-head">
+                        @if($item->avatar_path)
+                            <img src="{{ asset('storage/'.$item->avatar_path) }}" alt="{{ $item->name }}" class="testimonial-avatar">
+                        @else
+                            <div class="testimonial-avatar avatar-fallback">{{ strtoupper(substr((string) $item->name, 0, 1)) }}</div>
+                        @endif
+                        <div>
+                            <strong>{{ $item->name }}</strong>
+                            <div class="muted">{{ $item->role_label ?? 'Keluarga DSCMKids' }}</div>
+                        </div>
+                    </div>
+                    <div class="testimonial-stars">{{ str_repeat('★', max(1, min(5, (int) $item->rating))) }}</div>
+                    <p>"{{ $item->message }}"</p>
+                </article>
+            @empty
+                <article class="testimonial-card">
+                    <div class="testimonial-head">
+                        <div class="testimonial-avatar avatar-fallback">D</div>
+                        <div><strong>Demo</strong><div class="muted">Ortu Murid</div></div>
+                    </div>
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p>"Anak jadi lebih semangat berdoa dan antusias ikut sekolah minggu."</p>
+                </article>
+            @endforelse
+        </div>
+        <div class="hero-actions" style="margin-top:14px;">
+            <a href="{{ route('student.register') }}" class="btn btn-light">Daftarkan Murid</a>
+            <a href="#photo-zone" class="btn btn-ghost" style="color:#1e3a8a;border-color:#bcd0f5;background:#ecf3ff;">Lihat Kegiatan</a>
+        </div>
     </section>
 
     <div class="lightbox" id="lightbox">

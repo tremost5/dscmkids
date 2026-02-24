@@ -13,6 +13,7 @@ use App\Models\PageSection;
 use App\Models\TeacherProfile;
 use App\Models\User;
 use App\Models\StudentRewardClaim;
+use App\Models\Testimonial;
 use App\Services\SchoolDataService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
@@ -47,6 +48,13 @@ class LandingController extends Controller
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->take(8)
+            ->get();
+
+        $testimonials = Testimonial::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->latest('id')
+            ->take(6)
             ->get();
 
         $schoolData = $schoolDataService->buildDashboardData();
@@ -107,6 +115,7 @@ class LandingController extends Controller
             'dailyDevotion' => $dailyDevotion,
             'slides' => $slides,
             'teachers' => $teachers,
+            'testimonials' => $testimonials,
             'liveStream' => $liveStream,
             'todayQuiz' => $todayQuiz,
             'dailyLeaderboard' => $dailyLeaderboard,
