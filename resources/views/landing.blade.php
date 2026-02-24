@@ -8,219 +8,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root { --ink:#11213f; --muted:#5b6987; --bg:#f4f9ff; --card:#fff; --line:#d9e5f6; --radius:20px; }
-        * { box-sizing:border-box; }
-        html, body { margin:0; }
-        body { font-family:'Nunito',sans-serif; color:var(--ink); background:radial-gradient(circle at 0% 0%, #dbeafe, transparent 35%),radial-gradient(circle at 100% 10%, #cffafe, transparent 35%),var(--bg); }
-        .container { width:min(1160px,92vw); margin:0 auto; }
 
-        .top { position:relative; height:min(68vh,580px); border-radius:0 0 30px 30px; overflow:hidden; box-shadow:0 22px 44px rgba(13,27,52,.25); }
-        .slide { position:absolute; inset:0; opacity:0; transform:scale(1.06); transition:opacity 1.4s ease, transform 6s ease; will-change:opacity,transform; }
-        .slide.active { opacity:1; transform:scale(1); }
-        .slide img { width:100%; height:100%; object-fit:cover; }
-        .slide.active img { animation:kenBurns 8s ease forwards; }
-        @keyframes kenBurns { from { transform:scale(1.05) translateX(0); } to { transform:scale(1.14) translateX(-1.8%); } }
-
-        .overlay { position:absolute; inset:0; background:linear-gradient(115deg, rgba(4,9,22,.76), rgba(4,9,22,.42) 48%, rgba(4,9,22,.2)); display:flex; align-items:center; }
-        .hero-content { width:min(1160px,92vw); margin:0 auto; color:#fff; transform:translateY(8px); opacity:0; transition:all .65s ease; }
-        .hero-content.enter { transform:translateY(0); opacity:1; }
-        .badge { display:inline-block; padding:6px 12px; border-radius:999px; background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.35); font-weight:800; font-size:.78rem; }
-        .hero-title { font-family:'Baloo 2',sans-serif; font-size:clamp(2rem,4.1vw,3.9rem); line-height:1.04; margin:14px 0 0; max-width:760px; }
-        .hero-sub { margin-top:10px; max-width:720px; color:rgba(255,255,255,.92); font-size:1.05rem; }
-        .hero-actions { margin-top:20px; display:flex; gap:10px; flex-wrap:wrap; }
-        .btn { border:0; text-decoration:none; padding:11px 15px; border-radius:12px; font-weight:800; display:inline-flex; align-items:center; cursor:pointer; }
-        .btn-light { background:#fff; color:#0f172a; }
-        .btn-ghost { background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.35); }
-
-        .hero-nav { position:absolute; left:50%; transform:translateX(-50%); bottom:14px; display:flex; gap:8px; z-index:3; }
-        .dot { width:34px; height:4px; border-radius:999px; background:rgba(255,255,255,.34); overflow:hidden; }
-        .dot span { display:block; width:0; height:100%; background:#fff; }
-        .dot.active span { animation:fillLine 4.6s linear forwards; }
-        @keyframes fillLine { from { width:0; } to { width:100%; } }
-
-        .stats { margin-top:-44px; position:relative; z-index:2; display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
-        .stat { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px; box-shadow:0 12px 30px rgba(13,29,58,.09); }
-        .s-label { color:var(--muted); font-weight:700; font-size:.83rem; text-transform:uppercase; }
-        .s-value { font-size:clamp(1.45rem,3vw,2.2rem); font-weight:900; margin-top:4px; }
-
-        .section { margin-top:16px; }
-        .panel { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:18px; box-shadow:0 12px 30px rgba(13,29,58,.07); }
-        .title { margin:0 0 10px; font-family:'Baloo 2',sans-serif; font-size:1.7rem; line-height:1.1; }
-        .muted { color:var(--muted); }
-        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-        .theater {
-            margin-top: 16px;
-            border-radius: 24px;
-            border: 1px solid #1f355b;
-            padding: 18px;
-            background:
-                radial-gradient(circle at 12% 0%, rgba(59,130,246,.2), transparent 40%),
-                radial-gradient(circle at 88% 10%, rgba(20,184,166,.18), transparent 35%),
-                linear-gradient(145deg, #020617, #111827 40%, #1e293b 100%);
-            color: #f8fafc;
-            box-shadow: 0 20px 42px rgba(2, 6, 23, .45);
-        }
-        .theater-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-        .live-badge {
-            background:#ef4444;
-            color:#fff;
-            border-radius:999px;
-            padding:6px 10px;
-            font-size:.75rem;
-            font-weight:900;
-            letter-spacing:.3px;
-            animation: pulseLive 1.4s ease-in-out infinite;
-        }
-        .live-badge.offline {
-            background: #475569;
-            animation: none;
-        }
-        @keyframes pulseLive { 0% { opacity:1; } 50% { opacity:.55; } 100% { opacity:1; } }
-        .theater p { color: rgba(248,250,252,.84); margin-top:6px; }
-        .theater-screen {
-            margin-top: 12px;
-            border-radius: 18px;
-            border: 1px solid rgba(148,163,184,.3);
-            overflow: hidden;
-            background: #020617;
-            position: relative;
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), 0 18px 36px rgba(0,0,0,.45);
-        }
-        .theater-screen::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 28px;
-            background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,0));
-            pointer-events: none;
-            z-index: 2;
-        }
-        .theater-iframe { display:block; width:100%; aspect-ratio:16/9; border:0; }
-        .theater-empty {
-            width:100%;
-            aspect-ratio:16/9;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            text-align:center;
-            padding:16px;
-            color:#cbd5e1;
-            background: radial-gradient(circle at center, #1e293b, #020617);
-            font-weight:700;
-        }
-
-        .circle-wrap { display:grid; grid-template-columns:.9fr 1.1fr; gap:12px; align-items:center; }
-        .donut-box { position:relative; min-height:270px; }
-        .donut-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
-        .big-roll { font-size:clamp(2rem,4vw,2.8rem); font-weight:900; color:#0f172a; line-height:1; }
-        .small-roll { color:var(--muted); font-weight:700; margin-top:6px; }
-
-        .class-list { display:grid; gap:8px; }
-        .class-row { border:1px solid #e3ebf8; border-radius:12px; padding:9px 11px; display:flex; justify-content:space-between; align-items:center; background:linear-gradient(120deg,#fff,#f9fbff); }
-        .chip { width:11px; height:11px; border-radius:999px; display:inline-block; margin-right:7px; }
-
-        .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-        .info-card { border-radius:16px; color:#fff; padding:16px; min-height:150px; }
-        .info-card h3 { margin:0; font-family:'Baloo 2',sans-serif; font-size:1.25rem; }
-        .info-card p { margin:8px 0 0; color:rgba(255,255,255,.92); }
-        .c1 { background:linear-gradient(140deg,#0ea5e9,#2563eb); }
-        .c2 { background:linear-gradient(140deg,#0d9488,#14b8a6); }
-        .c3 { background:linear-gradient(140deg,#f97316,#ef4444); }
-
-        .news-list, .ann-list { display:grid; gap:10px; }
-        .item { border:1px solid #e1e9f8; border-radius:14px; padding:12px; background:linear-gradient(120deg,#fff,#f8fbff); }
-        .item h3 { margin:0; font-size:1.05rem; }
-        .item p { margin:7px 0 0; color:#3f4e6a; }
-        .meta { color:#677791; font-size:.83rem; margin-top:6px; }
-
-        .teacher-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-        .teacher { border:1px solid #dde7f8; border-radius:16px; padding:12px; background:#fff; }
-        .teacher img { width:100%; height:170px; object-fit:cover; border-radius:12px; border:1px solid #d7e4f6; }
-        .teacher h4 { margin:10px 0 0; font-size:1rem; }
-        .teacher p { margin:4px 0 0; color:#52617d; font-size:.9rem; }
-
-        .filter-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
-        .filter-pill { border:1px solid #d1def4; background:#fff; color:#334155; font-weight:700; border-radius:999px; padding:8px 12px; text-decoration:none; }
-        .filter-pill.active { background:#1d4ed8; border-color:#1d4ed8; color:#fff; }
-
-        .gallery-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-        .photo { position:relative; overflow:hidden; border-radius:15px; min-height:210px; border:1px solid #d8e4f6; }
-        .photo img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .35s ease; cursor:zoom-in; }
-        .photo:hover img { transform:scale(1.05); }
-        .caption { position:absolute; left:0; right:0; bottom:0; padding:9px 10px; color:#fff; background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.78)); font-size:.8rem; }
-        .caption a { color:#fff; font-weight:800; text-decoration:none; display:inline-block; margin-top:4px; border-bottom:1px solid rgba(255,255,255,.7); }
-
-        .lightbox {
-            position: fixed;
-            inset: 0;
-            background: rgba(7, 13, 30, 0.92);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 99;
-            padding: 20px;
-        }
-        .lightbox.open { display:flex; }
-        .lightbox img {
-            max-width: min(1100px, 92vw);
-            max-height: 78vh;
-            object-fit: contain;
-            border-radius: 14px;
-            border: 1px solid rgba(255,255,255,.22);
-            box-shadow: 0 20px 38px rgba(0,0,0,.45);
-        }
-        .lightbox-meta {
-            margin-top: 10px;
-            color: #dce7ff;
-            text-align: center;
-            font-weight: 700;
-        }
-        .lightbox-close {
-            position: absolute;
-            top: 16px;
-            right: 18px;
-            width: 38px;
-            height: 38px;
-            border-radius: 999px;
-            border: 1px solid rgba(255,255,255,.4);
-            background: rgba(255,255,255,.12);
-            color: #fff;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-        .lightbox-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 42px;
-            height: 42px;
-            border-radius: 999px;
-            border: 1px solid rgba(255,255,255,.4);
-            background: rgba(255,255,255,.12);
-            color: #fff;
-            font-size: 1.3rem;
-            cursor: pointer;
-        }
-        .lightbox-prev { left: 16px; }
-        .lightbox-next { right: 16px; }
-
-        .footer { text-align:center; color:#6b7a92; padding:20px 0 30px; font-size:.85rem; }
-
-        @media (max-width:980px) {
-            .stats { grid-template-columns:repeat(2,1fr); }
-            .grid-2 { grid-template-columns:1fr; }
-            .cards { grid-template-columns:1fr; }
-            .teacher-grid, .gallery-grid { grid-template-columns:repeat(2,1fr); }
-            .circle-wrap { grid-template-columns:1fr; }
-        }
-        @media (max-width:640px) {
-            .top { height:72vh; border-radius:0 0 18px 18px; }
-            .teacher-grid, .gallery-grid, .stats { grid-template-columns:1fr; }
-        }
-    </style>
+    @if (!app()->environment('testing'))
+        @vite(['resources/css/landing.css', 'resources/js/landing.js'])
+    @endif
 </head>
 <body>
 @php
@@ -245,6 +36,34 @@
         ]];
 
     $galleryItems = is_iterable($gallery) ? collect($gallery)->all() : [];
+
+    $readingPlans = [
+        ['day' => 'Senin', 'title' => 'Tuhan Selalu Menolong', 'reference' => 'Mazmur 121:1-2', 'point' => 'Saat takut, ingat Tuhan menjaga kamu.'],
+        ['day' => 'Selasa', 'title' => 'Yesus Sahabatku', 'reference' => 'Yohanes 15:12-13', 'point' => 'Kasih itu terlihat lewat tindakan baik setiap hari.'],
+        ['day' => 'Rabu', 'title' => 'Belajar Taat', 'reference' => 'Efesus 6:1-3', 'point' => 'Taat pada orang tua menyenangkan hati Tuhan.'],
+        ['day' => 'Kamis', 'title' => 'Hati yang Bersyukur', 'reference' => '1 Tesalonika 5:18', 'point' => 'Ucap syukur di hal kecil maupun besar.'],
+        ['day' => 'Jumat', 'title' => 'Berani Berbuat Benar', 'reference' => 'Yosua 1:9', 'point' => 'Tetap benar walau tidak mudah.'],
+        ['day' => 'Sabtu', 'title' => 'Mengampuni Teman', 'reference' => 'Kolose 3:13', 'point' => 'Mengampuni membuat hati damai.'],
+        ['day' => 'Minggu', 'title' => 'Bersukacita di Rumah Tuhan', 'reference' => 'Mazmur 122:1', 'point' => 'Ibadah bersama adalah sukacita.'],
+    ];
+
+    $memoryVerses = [
+        ['text' => 'Kasihilah seorang akan yang lain.', 'reference' => 'Yohanes 13:34'],
+        ['text' => 'Segala perkara dapat kutanggung di dalam Dia.', 'reference' => 'Filipi 4:13'],
+        ['text' => 'Tuhan adalah gembalaku, takkan kekurangan aku.', 'reference' => 'Mazmur 23:1'],
+        ['text' => 'Bersukacitalah senantiasa di dalam Tuhan.', 'reference' => 'Filipi 4:4'],
+    ];
+
+    $challengeItems = [
+        'Doakan orang tua sebelum tidur',
+        'Baca Alkitab minimal 10 menit',
+        'Lakukan 1 kebaikan tanpa disuruh',
+        'Hafalkan 1 ayat minggu ini',
+    ];
+
+    $currentDayName = now()->locale('id')->translatedFormat('l');
+    $todayReading = collect($readingPlans)->firstWhere('day', $currentDayName) ?? $readingPlans[0];
+    $memoryVerse = $memoryVerses[array_rand($memoryVerses)];
 @endphp
 
 <header class="top" id="home">
@@ -259,10 +78,23 @@
             <h1 class="hero-title" id="heroTitle">{{ $slidesData[0]['title'] ?? ($sections['hero']->title ?? 'Selamat Datang') }}</h1>
             <p class="hero-sub" id="heroSubtitle">{{ $slidesData[0]['subtitle'] ?? ($sections['hero']->content ?? '') }}</p>
             <div class="hero-actions">
+                <a href="#kids-zone" class="btn btn-light">Zona Murid</a>
                 <a href="#analytics" class="btn btn-light">Lihat Kehadiran</a>
                 <a href="#teachers" class="btn btn-ghost">Portfolio Guru</a>
                 <a href="#gallery" class="btn btn-ghost">Galeri</a>
                 <a href="{{ route('news.index') }}" class="btn btn-ghost">Semua Berita</a>
+                @auth
+                    @if(auth()->user()->role === 'student')
+                        <form method="POST" action="{{ route('student.logout') }}" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-ghost">Logout Murid ({{ auth()->user()->name }})</button>
+                        </form>
+                    @endif
+                @else
+                    <a href="{{ route('student.login') }}" class="btn btn-ghost">Login Murid</a>
+                    <a href="{{ route('student.register') }}" class="btn btn-ghost">Daftar Murid</a>
+                @endauth
+                <a href="{{ route('student.arcade') }}" class="btn btn-ghost">Arcade Murid</a>
                 <a href="{{ route('admin.login') }}" class="btn btn-ghost">Admin</a>
             </div>
         </div>
@@ -274,18 +106,44 @@
     </div>
 </header>
 
+<nav class="quick-nav">
+    <a href="#kids-zone">Zona Murid</a>
+    <a href="#quiz-zone">Quiz & Ranking</a>
+    <a href="#analytics">Analytics</a>
+    <a href="#informasi">Informasi</a>
+    <a href="#teachers">Guru</a>
+    <a href="#gallery">Galeri</a>
+    <a href="#live">Live</a>
+</nav>
+
 <main class="container">
-    <section class="stats">
-        <article class="stat"><div class="s-label">Jumlah Siswa</div><div class="s-value">{{ number_format((int) ($metrics['students_total'] ?? 0)) }}</div></article>
-        <article class="stat"><div class="s-label">Hadir Hari Ini</div><div class="s-value" id="rolledPresent">{{ number_format((int) ($metrics['attendance_today'] ?? 0)) }}</div></article>
-        <article class="stat"><div class="s-label">Persentase Hadir</div><div class="s-value">{{ number_format((float) ($metrics['attendance_rate'] ?? 0), 1) }}%</div></article>
-        <article class="stat"><div class="s-label">Kelas Aktif</div><div class="s-value">{{ number_format((int) ($metrics['active_classes'] ?? 0)) }}</div></article>
+    @if($dailyResetNotice)
+        <section class="section panel reveal" id="dailyResetNotice">
+            <strong>Daily Quest Reset</strong>
+            <p class="muted" style="margin:6px 0 0;">Quest harian sudah direset. Kerjakan quiz hari ini dan main arcade untuk naik ranking.</p>
+            <div class="hero-actions" style="margin-top:10px;">
+                <button type="button" class="btn btn-light" id="dismissResetNotice">Siap, lanjut main</button>
+            </div>
+        </section>
+    @endif
+
+    @if(session('success'))
+        <section class="section panel reveal">
+            <strong>{{ session('success') }}</strong>
+        </section>
+    @endif
+
+    <section class="stats reveal">
+        <article class="stat"><div class="s-label">Jumlah Siswa</div><div class="s-value" data-counter="{{ (int) ($metrics['students_total'] ?? 0) }}">{{ number_format((int) ($metrics['students_total'] ?? 0)) }}</div></article>
+        <article class="stat"><div class="s-label">Hadir Hari Ini</div><div class="s-value" id="rolledPresent" data-counter="{{ (int) ($metrics['attendance_today'] ?? 0) }}">{{ number_format((int) ($metrics['attendance_today'] ?? 0)) }}</div></article>
+        <article class="stat"><div class="s-label">Persentase Hadir</div><div class="s-value" data-counter="{{ (int) round((float) ($metrics['attendance_rate'] ?? 0)) }}" data-suffix="%">{{ number_format((float) ($metrics['attendance_rate'] ?? 0), 1) }}%</div></article>
+        <article class="stat"><div class="s-label">Kelas Aktif</div><div class="s-value" data-counter="{{ (int) ($metrics['active_classes'] ?? 0) }}">{{ number_format((int) ($metrics['active_classes'] ?? 0)) }}</div></article>
     </section>
 
-    <section class="theater" id="live">
+    <section class="theater reveal" id="live">
         <div class="theater-head">
             <div>
-                <h2 class="title" style="color:#fff;margin-bottom:0;">{{ $liveStream['title'] ?? 'Live Streaming Ibadah Anak' }}</h2>
+                <h2 class="title">{{ $liveStream['title'] ?? 'Live Streaming Ibadah Anak' }}</h2>
                 <p>{{ $liveStream['description'] ?? 'Saksikan siaran langsung DSCMKids.' }}</p>
             </div>
             <span class="live-badge {{ !($liveStream['is_live'] ?? false) ? 'offline' : '' }}">{{ ($liveStream['is_live'] ?? false) ? 'LIVE NOW' : 'OFFLINE' }}</span>
@@ -299,7 +157,7 @@
         </div>
     </section>
 
-    <section class="section panel" id="analytics">
+    <section class="section panel reveal" id="analytics">
         <h2 class="title">Kehadiran Hari Ini (PG, TKA, TKB, 1-6)</h2>
         <p class="muted">Grafik bulat menampilkan komposisi kehadiran per kelas, terhubung ke database presensi.</p>
         <div class="circle-wrap">
@@ -317,7 +175,7 @@
                         <strong>{{ $entry['present'] }} murid</strong>
                     </div>
                 @endforeach
-                <div class="class-row" style="background:#f8fafc;">
+                <div class="class-row total-row">
                     <div>Total Tidak Hadir</div>
                     <strong>{{ $attendanceTotals['absent'] ?? 0 }} murid</strong>
                 </div>
@@ -325,7 +183,146 @@
         </div>
     </section>
 
-    <section class="section grid-2" id="informasi">
+    <section class="section panel kids-zone reveal" id="kids-zone">
+        <h2 class="title">Zona Murid: Bacaan Alkitab Minggu Ini</h2>
+        <p class="kids-subtitle">Hari ini <strong>{{ $todayReading['day'] }}</strong> - {{ $todayReading['title'] }} ({{ $todayReading['reference'] }}).</p>
+        <div class="kids-grid">
+            <article class="kids-card">
+                <h3 class="title kids-mini-title">Rencana Bacaan 7 Hari</h3>
+                <div class="verse-pill">Ayat Hafalan: "{{ $memoryVerse['text'] }}" - <strong>{{ $memoryVerse['reference'] }}</strong></div>
+                <div class="reading-list">
+                    @foreach($readingPlans as $plan)
+                        <div class="reading-item">
+                            <div>
+                                <div class="reading-day">{{ $plan['day'] }}</div>
+                                <div class="reading-ref">{{ $plan['reference'] }}</div>
+                            </div>
+                            <div class="muted">{{ $plan['point'] }}</div>
+                        </div>
+                    @endforeach
+                </div>
+            </article>
+            <article class="kids-card">
+                <h3 class="title kids-mini-title">Badge Progress Mingguan</h3>
+                @if(auth()->check() && auth()->user()->role === 'student')
+                    <p class="muted">
+                        Badge aktif: <strong>{{ $studentProgress['weekly_badge'] ?? 'Faith Starter' }}</strong>.
+                        Hari aktif minggu ini: {{ $studentProgress['weekly_completed_days'] ?? 0 }}/7.
+                    </p>
+                    <div class="challenge-progress"><span style="width: {{ (int) ($studentProgress['weekly_completion_percent'] ?? 0) }}%"></span></div>
+                    <div class="challenge-score">{{ (int) ($studentProgress['weekly_total_score'] ?? 0) }} poin minggu ini</div>
+                    @if($studentProgress['weekly_reward_claimed'] ?? false)
+                        <div class="quiz-result" style="color:#15803d;">Reward minggu ini sudah diklaim.</div>
+                    @elseif($studentProgress['weekly_reward_claimable'] ?? false)
+                        <div class="hero-actions" style="margin-top:10px;">
+                            <button class="btn btn-light" type="button" id="claimWeeklyRewardBtn">Klaim Reward Mingguan</button>
+                        </div>
+                        <div class="quiz-result" id="claimRewardResult"></div>
+                    @else
+                        <div class="quiz-result">
+                            Kumpulkan minimal {{ (int) ($studentProgress['weekly_reward_threshold'] ?? 240) }} poin/minggu untuk klaim reward.
+                        </div>
+                    @endif
+                @else
+                    <p class="muted">
+                        Login murid dulu untuk menyimpan skor quiz, naik badge mingguan, dan masuk ranking harian.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="{{ route('student.login') }}" class="btn btn-light">Login Murid</a>
+                        <a href="{{ route('student.register') }}" class="btn btn-ghost">Daftar Murid</a>
+                    </div>
+                @endif
+
+                <h3 class="title kids-mini-title" style="margin-top:14px;">Tantangan Iman Mingguan</h3>
+                <p class="muted">Checklist ini tersimpan di perangkat kamu. Yuk capai 4/4!</p>
+                <div class="challenge-list" id="challengeList">
+                    @foreach($challengeItems as $index => $task)
+                        <label class="challenge-item">
+                            <input type="checkbox" data-challenge-index="{{ $index }}">
+                            <span>{{ $task }}</span>
+                        </label>
+                    @endforeach
+                </div>
+                <div class="challenge-progress"><span id="challengeProgressBar"></span></div>
+                <div class="challenge-score" id="challengeScore">0/4 Tantangan selesai</div>
+            </article>
+        </div>
+    </section>
+
+    <section class="section panel reveal" id="quiz-zone">
+        <h2 class="title">Zona Murid v2: Kuis Ayat Harian & Ranking</h2>
+        <p class="muted">{{ $todayQuiz['title'] ?? 'Kuis Ayat Harian' }} | Ayat minggu ini: <strong>{{ $todayQuiz['memory_verse'] ?? '-' }}</strong></p>
+        <div class="kids-grid">
+            <article class="kids-card">
+                <h3 class="title kids-mini-title">Kuis Hari Ini</h3>
+                @if(auth()->check() && auth()->user()->role === 'student')
+                    <form id="dailyQuizForm">
+                        <input type="hidden" name="quiz_key" value="{{ $todayQuiz['quiz_key'] ?? '' }}">
+                        <div class="quiz-list">
+                            @foreach(($todayQuiz['questions'] ?? []) as $question)
+                                <div class="quiz-item">
+                                    <div class="quiz-question">{{ $loop->iteration }}. {{ $question['question'] }}</div>
+                                    <div class="quiz-options">
+                                        @foreach($question['options'] as $option)
+                                            <label class="quiz-option">
+                                                <input type="radio" name="answers[{{ $question['id'] }}]" value="{{ $option }}">
+                                                <span>{{ $option }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <button class="btn btn-light" type="submit">Kirim Jawaban</button>
+                        <div class="quiz-result" id="quizResultBox"></div>
+                    </form>
+                @else
+                    <p class="muted">Login sebagai murid untuk mengerjakan kuis dan simpan skor harian.</p>
+                    <div class="hero-actions">
+                        <a href="{{ route('student.login') }}" class="btn btn-light">Login Murid</a>
+                        <a href="{{ route('student.register') }}" class="btn btn-ghost">Daftar Murid</a>
+                    </div>
+                @endif
+            </article>
+            <article class="kids-card">
+                <h3 class="title kids-mini-title">Ranking Harian</h3>
+                <div id="dailyLeaderboardList" class="leaderboard-list">
+                    @forelse($dailyLeaderboard as $item)
+                        <div class="leaderboard-row">
+                            <strong>#{{ $item['rank'] }} {{ $item['name'] }}</strong>
+                            <span>{{ $item['score'] }} pts</span>
+                        </div>
+                    @empty
+                        <div class="leaderboard-row">Belum ada skor hari ini.</div>
+                    @endforelse
+                </div>
+
+                <h3 class="title kids-mini-title" style="margin-top:14px;">Top Mingguan</h3>
+                <div class="leaderboard-list">
+                    @forelse($weeklyLeaderboard as $item)
+                        <div class="leaderboard-row">
+                            <strong>#{{ $item['rank'] }} {{ $item['name'] }}</strong>
+                            <span>{{ $item['weekly_score'] }} pts</span>
+                        </div>
+                    @empty
+                        <div class="leaderboard-row">Belum ada skor minggu ini.</div>
+                    @endforelse
+                </div>
+            </article>
+        </div>
+        <div class="games-grid">
+            @foreach($miniGames as $game)
+                <article class="game-card">
+                    <h4>{{ $game['title'] }}</h4>
+                    <p>{{ $game['description'] }}</p>
+                    <a class="btn btn-light" href="{{ route('student.arcade') }}">Mainkan di Arcade</a>
+                </article>
+            @endforeach
+        </div>
+        <div class="game-output">Buka halaman Arcade Murid untuk gameplay penuh + penyimpanan skor.</div>
+    </section>
+
+    <section class="section grid-2 reveal" id="informasi">
         <article class="panel">
             <h2 class="title">Konten Umum Informatif & Edukatif</h2>
             <div class="cards">
@@ -350,7 +347,7 @@
         </article>
     </section>
 
-    <section class="section panel" id="teachers">
+    <section class="section panel reveal" id="teachers">
         <h2 class="title">Portfolio Singkat Guru</h2>
         <p class="muted">Profil guru diinput dari admin panel.</p>
         <div class="teacher-grid">
@@ -374,15 +371,15 @@
         </div>
     </section>
 
-    <section class="section panel">
+    <section class="section panel reveal">
         <h2 class="title">Berita Terbaru</h2>
         <div class="news-list">
             @forelse($news as $item)
                 <article class="item">
-                    <h3><a href="{{ route('news.show', $item->slug) }}" style="text-decoration:none;color:inherit;">{{ $item->title }}</a></h3>
+                    <h3><a href="{{ route('news.show', $item->slug) }}" class="news-link-title">{{ $item->title }}</a></h3>
                     <div class="meta">{{ optional($item->published_at)->format('d M Y H:i') ?? '-' }}</div>
                     <p>{{ $item->excerpt ?? \Illuminate\Support\Str::limit(strip_tags($item->body), 160) }}</p>
-                    <a href="{{ route('news.show', $item->slug) }}" style="display:inline-block;margin-top:8px;font-weight:800;color:#1d4ed8;text-decoration:none;">Baca Selengkapnya</a>
+                    <a href="{{ route('news.show', $item->slug) }}" class="news-link-more">Baca Selengkapnya</a>
                 </article>
             @empty
                 <article class="item">Belum ada berita.</article>
@@ -390,7 +387,7 @@
         </div>
     </section>
 
-    <section class="section panel" id="gallery">
+    <section class="section panel reveal" id="gallery">
         <h2 class="title">Galeri Kegiatan</h2>
         <div class="filter-bar">
             <a href="{{ route('landing') }}#gallery" class="filter-pill {{ empty($activeEvent) ? 'active' : '' }}">Semua Event</a>
@@ -434,176 +431,18 @@
 </main>
 
 <script>
-(function () {
-    const slides = @json($slidesData);
-    const slideEls = Array.from(document.querySelectorAll('[data-slide]'));
-    const dots = Array.from(document.querySelectorAll('[data-dot]'));
-    const titleEl = document.getElementById('heroTitle');
-    const subtitleEl = document.getElementById('heroSubtitle');
-    const heroContent = document.getElementById('heroContent');
-
-    const slideDuration = 4600;
-    let index = 0;
-
-    function animateText(newTitle, newSubtitle) {
-        heroContent.classList.remove('enter');
-        setTimeout(() => {
-            titleEl.textContent = newTitle || 'Sekolah Minggu DSCMKids';
-            subtitleEl.textContent = newSubtitle || '';
-            heroContent.classList.add('enter');
-        }, 220);
-    }
-
-    function goToSlide(nextIndex) {
-        if (nextIndex === index) {
-            return;
-        }
-
-        slideEls[index].classList.remove('active');
-        dots[index]?.classList.remove('active');
-
-        index = nextIndex;
-
-        slideEls[index].classList.add('active');
-        dots[index]?.classList.add('active');
-        animateText(slides[index].title, slides[index].subtitle);
-    }
-
-    dots.forEach((dot, i) => {
-        dot.addEventListener('click', () => {
-            goToSlide(i);
-            resetAutoRotate();
-        });
-    });
-
-    let timer;
-    function startAutoRotate() {
-        if (slideEls.length <= 1) {
-            return;
-        }
-
-        timer = setInterval(() => {
-            goToSlide((index + 1) % slideEls.length);
-        }, slideDuration);
-    }
-
-    function resetAutoRotate() {
-        clearInterval(timer);
-        startAutoRotate();
-    }
-
-    startAutoRotate();
-
-    const classData = @json($classAttendance);
-    const presentTotal = Number(@json((int) ($attendanceTotals['present'] ?? 0)));
-    const absentTotal = Number(@json((int) ($attendanceTotals['absent'] ?? 0)));
-
-    const labels = classData.map((x) => x.class).concat(['Tidak Hadir']);
-    const values = classData.map((x) => Number(x.present)).concat([absentTotal]);
-    const colors = ['#2563eb','#0ea5e9','#0d9488','#14b8a6','#f59e0b','#f97316','#ec4899','#a855f7','#6366f1','#94a3b8'];
-
-    document.querySelectorAll('[data-chip]').forEach((el) => {
-        const i = Number(el.getAttribute('data-chip'));
-        el.style.background = colors[i % colors.length];
-    });
-
-    const donutCanvas = document.getElementById('attendanceDonut');
-    if (donutCanvas && labels.length > 0) {
-        new Chart(donutCanvas.getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels,
-                datasets: [{ data: values, backgroundColor: labels.map((_, i) => colors[i % colors.length]), borderWidth: 0, hoverOffset: 8 }],
-            },
-            options: { responsive: true, cutout: '68%', plugins: { legend: { display: false }, tooltip: { backgroundColor: '#0f172a', titleColor: '#fff', bodyColor: '#e2e8f0' } } }
-        });
-    }
-
-    const rollEl = document.getElementById('centerRoll');
-    let current = 0;
-    const steps = 36;
-    const increment = presentTotal / steps;
-    let tick = 0;
-    const timerRoll = setInterval(() => {
-        tick += 1;
-        current += increment;
-        rollEl.textContent = Math.round(current).toLocaleString('id-ID');
-        if (tick >= steps) {
-            rollEl.textContent = presentTotal.toLocaleString('id-ID');
-            clearInterval(timerRoll);
-        }
-    }, 32);
-
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImage = document.getElementById('lightboxImage');
-    const lightboxMeta = document.getElementById('lightboxMeta');
-    const lightboxClose = document.getElementById('lightboxClose');
-    const lightboxPrev = document.getElementById('lightboxPrev');
-    const lightboxNext = document.getElementById('lightboxNext');
-    const lightboxItems = Array.from(document.querySelectorAll('[data-lightbox-src]'));
-    let activeLightboxIndex = -1;
-
-    function renderLightbox(index) {
-        if (!lightboxItems.length) {
-            return;
-        }
-
-        const safeIndex = (index + lightboxItems.length) % lightboxItems.length;
-        const item = lightboxItems[safeIndex];
-
-        activeLightboxIndex = safeIndex;
-        lightboxImage.src = item.getAttribute('data-lightbox-src') || '';
-        lightboxImage.alt = item.getAttribute('data-lightbox-title') || 'Gallery';
-        lightboxMeta.textContent = (item.getAttribute('data-lightbox-title') || '') + ' | ' + (item.getAttribute('data-lightbox-meta') || '');
-    }
-
-    function closeLightbox() {
-        lightbox.classList.remove('open');
-        lightboxImage.src = '';
-        lightboxMeta.textContent = '';
-        document.body.style.overflow = '';
-        activeLightboxIndex = -1;
-    }
-
-    lightboxItems.forEach((img, i) => {
-        img.addEventListener('click', () => {
-            renderLightbox(i);
-            lightbox.classList.add('open');
-            document.body.style.overflow = 'hidden';
-        });
-    });
-
-    function showNext(step) {
-        if (!lightbox.classList.contains('open')) {
-            return;
-        }
-
-        renderLightbox(activeLightboxIndex + step);
-    }
-
-    lightboxClose.addEventListener('click', closeLightbox);
-    lightboxPrev.addEventListener('click', () => showNext(-1));
-    lightboxNext.addEventListener('click', () => showNext(1));
-    lightbox.addEventListener('click', (event) => {
-        if (event.target === lightbox) {
-            closeLightbox();
-        }
-    });
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && lightbox.classList.contains('open')) {
-            closeLightbox();
-            return;
-        }
-
-        if (event.key === 'ArrowLeft') {
-            showNext(-1);
-        }
-
-        if (event.key === 'ArrowRight') {
-            showNext(1);
-        }
-    });
-})();
+window.DSCM_LANDING_DATA = {
+    slides: @json($slidesData),
+    classData: @json($classAttendance),
+    presentTotal: @json((int) ($attendanceTotals['present'] ?? 0)),
+    absentTotal: @json((int) ($attendanceTotals['absent'] ?? 0)),
+    csrfToken: @json(csrf_token()),
+    quizSubmitUrl: @json(route('student.quiz.submit')),
+    rewardClaimUrl: @json(route('student.reward.claim')),
+    resetSeenUrl: @json(route('student.reset.seen')),
+    isStudentLoggedIn: @json(auth()->check() && auth()->user()->role === 'student'),
+};
 </script>
 </body>
 </html>
+

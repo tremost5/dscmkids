@@ -112,6 +112,7 @@
             <a href="{{ route('admin.dashboard') }}">Dashboard</a>
             <a href="{{ route('admin.news.index') }}">Berita</a>
             <a href="{{ route('admin.announcements.index') }}">Informasi</a>
+            <a href="{{ route('admin.quiz-banks.index') }}">Bank Soal</a>
             <a href="{{ route('admin.sections.index') }}">Konten</a>
             <a href="{{ route('admin.media.index') }}">Media</a>
             <a href="{{ route('admin.slides.index') }}">Slide Header</a>

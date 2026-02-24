@@ -3,11 +3,15 @@
 namespace Database\Seeders;
 
 use App\Models\Announcement;
+use App\Models\DailyQuizBank;
+use App\Models\DailyQuizOption;
+use App\Models\DailyQuizQuestion;
 use App\Models\News;
 use App\Models\PageSection;
 use App\Models\TeacherProfile;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,6 +24,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@dscmkids.org'],
             [
                 'name' => 'Admin DSCMKids',
+                'role' => 'admin',
                 'password' => 'password123',
             ]
         );
@@ -111,5 +116,47 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $this->seedDailyQuizBanks();
+
+    }
+
+    private function seedDailyQuizBanks(): void
+    {
+        if (!Schema::hasTable('daily_quiz_banks')) {
+            return;
+        }
+
+        $quizSets = config('kids_program.quiz_sets', []);
+        foreach ($quizSets as $dayKey => $set) {
+            $bank = DailyQuizBank::updateOrCreate(
+                ['day_key' => (string) $dayKey],
+                [
+                    'title' => (string) ($set['title'] ?? 'Kuis Harian'),
+                    'memory_verse' => (string) ($set['memory_verse'] ?? ''),
+                    'is_active' => true,
+                ]
+            );
+
+            $bank->questions()->delete();
+
+            foreach (($set['questions'] ?? []) as $qIndex => $questionRow) {
+                $question = DailyQuizQuestion::create([
+                    'daily_quiz_bank_id' => $bank->id,
+                    'question_text' => (string) ($questionRow['question'] ?? ''),
+                    'sort_order' => $qIndex + 1,
+                    'is_active' => true,
+                ]);
+
+                foreach (($questionRow['options'] ?? []) as $oIndex => $optionText) {
+                    $isCorrect = ((string) $optionText) === ((string) ($questionRow['answer'] ?? ''));
+                    DailyQuizOption::create([
+                        'daily_quiz_question_id' => $question->id,
+                        'option_text' => (string) $optionText,
+                        'is_correct' => $isCorrect,
+                        'sort_order' => $oIndex + 1,
+                    ]);
+                }
+            }
+        }
     }
 }

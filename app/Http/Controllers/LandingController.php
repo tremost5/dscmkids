@@ -3,13 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
+use App\Models\DailyQuizBank;
+use App\Models\DailyQuizQuestion;
+use App\Models\DailyQuizResult;
 use App\Models\HeroSlide;
 use App\Models\Media;
 use App\Models\News;
 use App\Models\PageSection;
 use App\Models\TeacherProfile;
+use App\Models\User;
+use App\Models\StudentRewardClaim;
 use App\Services\SchoolDataService;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class LandingController extends Controller
@@ -73,6 +79,18 @@ class LandingController extends Controller
             'is_live' => (bool) ($liveSection?->meta['is_live'] ?? false),
         ];
 
+        $todayQuiz = $this->buildTodayQuizPayload();
+        $dailyLeaderboard = $this->dailyLeaderboard();
+        $weeklyLeaderboard = $this->weeklyLeaderboard();
+        $miniGames = config('kids_program.mini_games', []);
+
+        $studentProgress = null;
+        $dailyResetNotice = false;
+        if (auth()->check() && auth()->user()?->role === 'student') {
+            $studentProgress = $this->studentProgress(auth()->id());
+            $dailyResetNotice = $this->shouldShowDailyResetNotice(auth()->user());
+        }
+
         return view('landing', [
             'sections' => $sections,
             'news' => $news,
@@ -84,6 +102,12 @@ class LandingController extends Controller
             'slides' => $slides,
             'teachers' => $teachers,
             'liveStream' => $liveStream,
+            'todayQuiz' => $todayQuiz,
+            'dailyLeaderboard' => $dailyLeaderboard,
+            'weeklyLeaderboard' => $weeklyLeaderboard,
+            'studentProgress' => $studentProgress,
+            'miniGames' => $miniGames,
+            'dailyResetNotice' => $dailyResetNotice,
         ]);
     }
 
@@ -250,5 +274,178 @@ class LandingController extends Controller
         }
 
         return 'https://www.youtube.com/embed/'.$videoId.'?autoplay=0&rel=0';
+    }
+
+    private function buildTodayQuizPayload(): array
+    {
+        if (Schema::hasTable('daily_quiz_banks')) {
+            $dayKey = strtolower(now()->englishDayOfWeek);
+            $bank = DailyQuizBank::query()
+                ->where('day_key', $dayKey)
+                ->where('is_active', true)
+                ->with(['questions' => fn ($q) => $q->where('is_active', true)->orderBy('sort_order'), 'questions.options'])
+                ->first();
+
+            if ($bank && $bank->questions->isNotEmpty()) {
+                $questions = $bank->questions
+                    ->map(function (DailyQuizQuestion $item) {
+                        return [
+                            'id' => (string) $item->id,
+                            'question' => (string) $item->question_text,
+                            'options' => $item->options->pluck('option_text')->values()->all(),
+                        ];
+                    })
+                    ->filter(fn ($item) => $item['id'] !== '' && $item['question'] !== '' && !empty($item['options']))
+                    ->values()
+                    ->all();
+
+                return [
+                    'quiz_key' => $bank->day_key,
+                    'title' => $bank->title,
+                    'memory_verse' => $bank->memory_verse ?: '',
+                    'questions' => $questions,
+                ];
+            }
+        }
+
+        $quizSets = config('kids_program.quiz_sets', []);
+        $dayKey = strtolower(now()->englishDayOfWeek);
+        $fallbackKey = array_key_first($quizSets);
+        $activeKey = array_key_exists($dayKey, $quizSets) ? $dayKey : (string) $fallbackKey;
+        $set = $quizSets[$activeKey] ?? ['questions' => []];
+        $questions = collect($set['questions'] ?? [])
+            ->map(function ($item) {
+                return [
+                    'id' => (string) ($item['id'] ?? ''),
+                    'question' => (string) ($item['question'] ?? ''),
+                    'options' => array_values($item['options'] ?? []),
+                ];
+            })
+            ->filter(fn ($item) => $item['id'] !== '' && $item['question'] !== '' && !empty($item['options']))
+            ->values()
+            ->all();
+
+        return [
+            'quiz_key' => $activeKey,
+            'title' => (string) ($set['title'] ?? 'Kuis Ayat Harian'),
+            'memory_verse' => (string) ($set['memory_verse'] ?? ''),
+            'questions' => $questions,
+        ];
+    }
+
+    private function dailyLeaderboard(): array
+    {
+        if (!Schema::hasTable('daily_quiz_results')) {
+            return [];
+        }
+
+        return DailyQuizResult::query()
+            ->with('user:id,name,points')
+            ->whereDate('quiz_date', now()->toDateString())
+            ->orderByDesc('score')
+            ->orderBy('updated_at')
+            ->take(10)
+            ->get()
+            ->values()
+            ->map(function (DailyQuizResult $item, int $index) {
+                return [
+                    'rank' => $index + 1,
+                    'name' => (string) optional($item->user)->name,
+                    'score' => (int) $item->score,
+                    'points' => (int) optional($item->user)->points,
+                ];
+            })
+            ->all();
+    }
+
+    private function weeklyLeaderboard(): array
+    {
+        if (!Schema::hasTable('daily_quiz_results')) {
+            return [];
+        }
+
+        $weekStart = now()->startOfWeek()->toDateString();
+        $weekEnd = now()->endOfWeek()->toDateString();
+
+        return DailyQuizResult::query()
+            ->selectRaw('user_id, SUM(score) as weekly_score')
+            ->whereBetween('quiz_date', [$weekStart, $weekEnd])
+            ->groupBy('user_id')
+            ->orderByDesc('weekly_score')
+            ->take(10)
+            ->get()
+            ->map(function (DailyQuizResult $row, int $index) {
+                $user = User::query()->select('name')->find($row->user_id);
+
+                return [
+                    'rank' => $index + 1,
+                    'name' => (string) ($user?->name ?? 'Murid'),
+                    'weekly_score' => (int) $row->weekly_score,
+                ];
+            })
+            ->all();
+    }
+
+    private function studentProgress(int $userId): array
+    {
+        if (!Schema::hasTable('daily_quiz_results')) {
+            return [
+                'weekly_total_score' => 0,
+                'weekly_completed_days' => 0,
+                'weekly_completion_percent' => 0,
+                'weekly_badge' => 'Faith Starter',
+                'weekly_reward_claimed' => false,
+                'weekly_reward_claimable' => false,
+                'weekly_reward_threshold' => 240,
+            ];
+        }
+
+        $weekStart = now()->startOfWeek()->toDateString();
+        $weekEnd = now()->endOfWeek()->toDateString();
+        $weeklyTotalScore = (int) DailyQuizResult::query()
+            ->where('user_id', $userId)
+            ->whereBetween('quiz_date', [$weekStart, $weekEnd])
+            ->sum('score');
+
+        $weeklyCompletedDays = (int) DailyQuizResult::query()
+            ->where('user_id', $userId)
+            ->whereBetween('quiz_date', [$weekStart, $weekEnd])
+            ->distinct('quiz_date')
+            ->count('quiz_date');
+
+        $badgeLabel = 'Faith Starter';
+        foreach (config('kids_program.weekly_badges', []) as $badge) {
+            $threshold = (int) ($badge['min_score'] ?? 0);
+            if ($weeklyTotalScore >= $threshold) {
+                $badgeLabel = (string) ($badge['label'] ?? $badgeLabel);
+            }
+        }
+
+        $rewardClaimed = Schema::hasTable('student_reward_claims')
+            ? StudentRewardClaim::query()->where('user_id', $userId)->whereDate('week_start_date', $weekStart)->exists()
+            : false;
+        $rewardThreshold = 240;
+
+        return [
+            'weekly_total_score' => $weeklyTotalScore,
+            'weekly_completed_days' => $weeklyCompletedDays,
+            'weekly_completion_percent' => min(100, (int) round(($weeklyCompletedDays / 7) * 100)),
+            'weekly_badge' => $badgeLabel,
+            'weekly_reward_claimed' => $rewardClaimed,
+            'weekly_reward_claimable' => $weeklyTotalScore >= $rewardThreshold && !$rewardClaimed,
+            'weekly_reward_threshold' => $rewardThreshold,
+        ];
+    }
+
+    private function shouldShowDailyResetNotice(User $user): bool
+    {
+        if ($user->role !== 'student') {
+            return false;
+        }
+
+        $lastSeen = $user->last_daily_reset_seen_on;
+        $today = now()->toDateString();
+
+        return !$lastSeen || $lastSeen->toDateString() !== $today;
     }
 }
