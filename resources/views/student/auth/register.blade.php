@@ -24,29 +24,41 @@
         <div class="student-auth-error">{{ $errors->first() }}</div>
     @endif
 
-    <form method="POST" action="{{ route('student.register.submit') }}">
+    <form method="POST" action="{{ route('student.register.submit') }}" class="student-auth-form" novalidate>
         @csrf
         <div class="student-auth-field">
-            <label for="name">Nama Lengkap</label>
-            <input class="student-auth-input" id="name" type="text" name="name" value="{{ old('name') }}" required>
+            <label for="name">Nama Lengkap <span>*</span></label>
+            <input class="student-auth-input @error('name') is-invalid @enderror" id="name" type="text" name="name" value="{{ old('name') }}" maxlength="120" autocomplete="name" required>
+            @error('name')
+                <div class="student-auth-field-error">{{ $message }}</div>
+            @enderror
         </div>
         <div class="student-auth-field">
             <label for="class_group">Kelas (opsional)</label>
-            <input class="student-auth-input" id="class_group" type="text" name="class_group" value="{{ old('class_group') }}" placeholder="Contoh: TKB / Kelas 1">
+            <input class="student-auth-input @error('class_group') is-invalid @enderror" id="class_group" type="text" name="class_group" value="{{ old('class_group') }}" maxlength="100" placeholder="Contoh: TKB / Kelas 1">
             <div class="student-auth-help">Boleh dikosongkan jika belum tahu kelasnya.</div>
+            @error('class_group')
+                <div class="student-auth-field-error">{{ $message }}</div>
+            @enderror
         </div>
         <div class="student-auth-field">
-            <label for="email">Email</label>
-            <input class="student-auth-input" id="email" type="email" name="email" value="{{ old('email') }}" required>
+            <label for="email">Email <span>*</span></label>
+            <input class="student-auth-input @error('email') is-invalid @enderror" id="email" type="email" name="email" value="{{ old('email') }}" maxlength="180" autocomplete="email" required>
+            @error('email')
+                <div class="student-auth-field-error">{{ $message }}</div>
+            @enderror
         </div>
         <div class="student-auth-field">
-            <label for="password">Password</label>
-            <input class="student-auth-input" id="password" type="password" name="password" required>
+            <label for="password">Password <span>*</span></label>
+            <input class="student-auth-input @error('password') is-invalid @enderror" id="password" type="password" name="password" minlength="6" autocomplete="new-password" required>
             <div class="student-auth-help">Gunakan kombinasi huruf/angka agar lebih aman.</div>
+            @error('password')
+                <div class="student-auth-field-error">{{ $message }}</div>
+            @enderror
         </div>
         <div class="student-auth-field">
-            <label for="password_confirmation">Konfirmasi Password</label>
-            <input class="student-auth-input" id="password_confirmation" type="password" name="password_confirmation" required>
+            <label for="password_confirmation">Konfirmasi Password <span>*</span></label>
+            <input class="student-auth-input" id="password_confirmation" type="password" name="password_confirmation" minlength="6" autocomplete="new-password" required>
         </div>
         <button class="student-auth-btn" type="submit">Daftar Murid</button>
     </form>

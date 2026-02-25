@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
@@ -13,7 +14,11 @@ class StudentAuthController extends Controller
     public function showLogin()
     {
         if (Auth::check() && Auth::user()?->role === 'student') {
-            return redirect()->route('landing');
+            return redirect()->route('student.arcade');
+        }
+
+        if (Auth::check() && Auth::user()?->role === 'admin') {
+            return redirect()->route('admin.dashboard');
         }
 
         return view('student.auth.login');
@@ -22,7 +27,11 @@ class StudentAuthController extends Controller
     public function showRegister()
     {
         if (Auth::check() && Auth::user()?->role === 'student') {
-            return redirect()->route('landing');
+            return redirect()->route('student.arcade');
+        }
+
+        if (Auth::check() && Auth::user()?->role === 'admin') {
+            return redirect()->route('admin.dashboard');
         }
 
         return view('student.auth.register');
@@ -43,20 +52,22 @@ class StudentAuthController extends Controller
             'password' => ['required', 'string', 'min:6', 'confirmed'],
         ]);
 
-        $student = User::create([
-            'name' => $validated['name'],
-            'class_group' => $validated['class_group'] ?? null,
-            'email' => $validated['email'],
-            'password' => $validated['password'],
-            'role' => 'student',
-            'points' => 0,
-            'streak_days' => 0,
-        ]);
+        $student = DB::transaction(function () use ($validated) {
+            return User::create([
+                'name' => trim($validated['name']),
+                'class_group' => !empty($validated['class_group']) ? trim($validated['class_group']) : null,
+                'email' => mb_strtolower(trim($validated['email'])),
+                'password' => Hash::make($validated['password']),
+                'role' => 'student',
+                'points' => 0,
+                'streak_days' => 0,
+            ]);
+        });
 
         Auth::login($student);
         $request->session()->regenerate();
 
-        return redirect()->route('landing')->with('success', 'Akun murid berhasil dibuat. Selamat bermain dan belajar.');
+        return redirect()->intended(route('student.arcade'))->with('success', 'Akun murid berhasil dibuat. Selamat bermain dan belajar.');
     }
 
     public function login(Request $request)
@@ -66,13 +77,14 @@ class StudentAuthController extends Controller
             $request->session()->invalidate();
             $request->session()->regenerateToken();
         } elseif (Auth::check() && Auth::user()?->role === 'student') {
-            return redirect()->route('landing')->with('success', 'Kamu sudah login sebagai murid.');
+            return redirect()->route('student.arcade')->with('success', 'Kamu sudah login sebagai murid.');
         }
 
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
+        $credentials['email'] = mb_strtolower(trim($credentials['email']));
 
         $attemptPayload = [
             'email' => $credentials['email'],
@@ -95,7 +107,7 @@ class StudentAuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->route('landing')->with('success', 'Selamat datang kembali.');
+        return redirect()->intended(route('student.arcade'))->with('success', 'Selamat datang kembali.');
     }
 
     public function logout(Request $request)

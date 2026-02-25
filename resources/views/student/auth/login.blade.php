@@ -20,20 +20,36 @@
     <p class="student-auth-subtitle">Masuk untuk main kuis ayat harian dan kumpulkan badge.</p>
     <p class="student-auth-benefits">Benefit akun murid: simpan skor quiz, masuk ranking harian, klaim reward mingguan.</p>
 
+    @if(session('success'))
+        <div class="student-auth-success">{{ session('success') }}</div>
+    @endif
+
     @if($errors->any())
         <div class="student-auth-error">{{ $errors->first() }}</div>
     @endif
 
-    <form method="POST" action="{{ route('student.login.submit') }}">
+    <form method="POST" action="{{ route('student.login.submit') }}" class="student-auth-form" novalidate>
         @csrf
         <div class="student-auth-field">
-            <label for="email">Email</label>
-            <input class="student-auth-input" id="email" type="email" name="email" value="{{ old('email') }}" required>
+            <label for="email">Email <span>*</span></label>
+            <input class="student-auth-input @error('email') is-invalid @enderror" id="email" type="email" name="email" value="{{ old('email') }}" autocomplete="email" required>
+            @error('email')
+                <div class="student-auth-field-error">{{ $message }}</div>
+            @enderror
         </div>
         <div class="student-auth-field">
-            <label for="password">Password</label>
-            <input class="student-auth-input" id="password" type="password" name="password" required>
+            <label for="password">Password <span>*</span></label>
+            <input class="student-auth-input @error('password') is-invalid @enderror" id="password" type="password" name="password" autocomplete="current-password" minlength="6" required>
             <div class="student-auth-help">Minimal 6 karakter.</div>
+            @error('password')
+                <div class="student-auth-field-error">{{ $message }}</div>
+            @enderror
+        </div>
+        <div class="student-auth-field student-auth-remember">
+            <label for="remember">
+                <input id="remember" type="checkbox" name="remember" value="1" {{ old('remember') ? 'checked' : '' }}>
+                Tetap login di perangkat ini
+            </label>
         </div>
         <button class="student-auth-btn" type="submit">Masuk Sekarang</button>
     </form>
