@@ -108,13 +108,31 @@ SCHOOL_WEEKLY_GALLERY_LIMIT=12
 - Manifest: `/manifest.webmanifest`
 - Service Worker: `/sw.js`
 
+## Queue & Delivery
+
+- Broadcast notifikasi sekarang diproses lewat queue background.
+- Jika `QUEUE_CONNECTION=sync`, broadcast tetap berjalan langsung.
+- Jika memakai `database` / worker queue, jalankan worker:
+
+```bash
+php artisan queue:work
+```
+
 ## Broadcast Notifikasi (Opsional WhatsApp)
 
 Set webhook (opsional) di `.env`:
 
 ```env
 WHATSAPP_BROADCAST_WEBHOOK=
+SCHOOL_DATA_CACHE_TTL=300
 ```
+
+`SCHOOL_DATA_CACHE_TTL` mengurangi query berat ke external DB pada landing page.
+
+## Keamanan Upload Media
+
+- Admin media hanya menerima file: JPG, PNG, WEBP, GIF, MP4, dan PDF.
+- Format aktif seperti SVG / HTML diblokir agar file publik tidak bisa dipakai untuk injeksi script.
 
 ## Struktur Utama
 

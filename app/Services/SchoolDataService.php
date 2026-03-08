@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Media;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Throwable;
@@ -11,6 +12,22 @@ use Throwable;
 class SchoolDataService
 {
     public function buildDashboardData(): array
+    {
+        $ttl = max(0, (int) config('school_data.cache_ttl_seconds', 300));
+        $cacheKey = sprintf(
+            'school-dashboard:%s:%s',
+            config('school_data.connection', 'external'),
+            now()->toDateString()
+        );
+
+        if ($ttl === 0 || app()->environment('testing')) {
+            return $this->resolveDashboardData();
+        }
+
+        return Cache::remember($cacheKey, $ttl, fn () => $this->resolveDashboardData());
+    }
+
+    private function resolveDashboardData(): array
     {
         try {
             $connection = config('school_data.connection', 'external');

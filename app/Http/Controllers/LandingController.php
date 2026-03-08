@@ -5,24 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\Announcement;
 use App\Models\DailyQuizBank;
 use App\Models\DailyQuizQuestion;
-use App\Models\DailyQuizResult;
 use App\Models\HeroSlide;
 use App\Models\Media;
 use App\Models\News;
 use App\Models\PageSection;
 use App\Models\LearningMaterial;
 use App\Models\TeacherProfile;
-use App\Models\User;
-use App\Models\StudentRewardClaim;
 use App\Models\Testimonial;
 use App\Services\SchoolDataService;
+use App\Services\StudentProgressService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class LandingController extends Controller
 {
-    public function index(SchoolDataService $schoolDataService)
+    public function index(SchoolDataService $schoolDataService, StudentProgressService $studentProgressService)
     {
         $sections = PageSection::query()->get()->keyBy('section_key');
 
@@ -103,14 +101,14 @@ class LandingController extends Controller
         ];
 
         $todayQuiz = $this->buildTodayQuizPayload();
-        $dailyLeaderboard = $this->dailyLeaderboard();
-        $weeklyLeaderboard = $this->weeklyLeaderboard();
+        $dailyLeaderboard = $studentProgressService->dailyLeaderboard();
+        $weeklyLeaderboard = $studentProgressService->weeklyLeaderboard();
         $miniGames = config('kids_program.mini_games', []);
 
         $studentProgress = null;
         $dailyResetNotice = false;
         if (auth()->check() && auth()->user()?->role === 'student') {
-            $studentProgress = $this->studentProgress(auth()->id());
+            $studentProgress = $studentProgressService->weeklySummary(auth()->user());
             $dailyResetNotice = $this->shouldShowDailyResetNotice(auth()->user());
         }
 
@@ -439,111 +437,7 @@ class LandingController extends Controller
         ];
     }
 
-    private function dailyLeaderboard(): array
-    {
-        if (!Schema::hasTable('daily_quiz_results')) {
-            return [];
-        }
-
-        return DailyQuizResult::query()
-            ->with('user:id,name,points')
-            ->whereDate('quiz_date', now()->toDateString())
-            ->orderByDesc('score')
-            ->orderBy('updated_at')
-            ->take(10)
-            ->get()
-            ->values()
-            ->map(function (DailyQuizResult $item, int $index) {
-                return [
-                    'rank' => $index + 1,
-                    'name' => (string) optional($item->user)->name,
-                    'score' => (int) $item->score,
-                    'points' => (int) optional($item->user)->points,
-                ];
-            })
-            ->all();
-    }
-
-    private function weeklyLeaderboard(): array
-    {
-        if (!Schema::hasTable('daily_quiz_results')) {
-            return [];
-        }
-
-        $weekStart = now()->startOfWeek()->toDateString();
-        $weekEnd = now()->endOfWeek()->toDateString();
-
-        return DailyQuizResult::query()
-            ->selectRaw('user_id, SUM(score) as weekly_score')
-            ->whereBetween('quiz_date', [$weekStart, $weekEnd])
-            ->groupBy('user_id')
-            ->orderByDesc('weekly_score')
-            ->take(10)
-            ->get()
-            ->map(function (DailyQuizResult $row, int $index) {
-                $user = User::query()->select('name')->find($row->user_id);
-
-                return [
-                    'rank' => $index + 1,
-                    'name' => (string) ($user?->name ?? 'Murid'),
-                    'weekly_score' => (int) $row->weekly_score,
-                ];
-            })
-            ->all();
-    }
-
-    private function studentProgress(int $userId): array
-    {
-        if (!Schema::hasTable('daily_quiz_results')) {
-            return [
-                'weekly_total_score' => 0,
-                'weekly_completed_days' => 0,
-                'weekly_completion_percent' => 0,
-                'weekly_badge' => 'Faith Starter',
-                'weekly_reward_claimed' => false,
-                'weekly_reward_claimable' => false,
-                'weekly_reward_threshold' => 240,
-            ];
-        }
-
-        $weekStart = now()->startOfWeek()->toDateString();
-        $weekEnd = now()->endOfWeek()->toDateString();
-        $weeklyTotalScore = (int) DailyQuizResult::query()
-            ->where('user_id', $userId)
-            ->whereBetween('quiz_date', [$weekStart, $weekEnd])
-            ->sum('score');
-
-        $weeklyCompletedDays = (int) DailyQuizResult::query()
-            ->where('user_id', $userId)
-            ->whereBetween('quiz_date', [$weekStart, $weekEnd])
-            ->distinct('quiz_date')
-            ->count('quiz_date');
-
-        $badgeLabel = 'Faith Starter';
-        foreach (config('kids_program.weekly_badges', []) as $badge) {
-            $threshold = (int) ($badge['min_score'] ?? 0);
-            if ($weeklyTotalScore >= $threshold) {
-                $badgeLabel = (string) ($badge['label'] ?? $badgeLabel);
-            }
-        }
-
-        $rewardClaimed = Schema::hasTable('student_reward_claims')
-            ? StudentRewardClaim::query()->where('user_id', $userId)->whereDate('week_start_date', $weekStart)->exists()
-            : false;
-        $rewardThreshold = 240;
-
-        return [
-            'weekly_total_score' => $weeklyTotalScore,
-            'weekly_completed_days' => $weeklyCompletedDays,
-            'weekly_completion_percent' => min(100, (int) round(($weeklyCompletedDays / 7) * 100)),
-            'weekly_badge' => $badgeLabel,
-            'weekly_reward_claimed' => $rewardClaimed,
-            'weekly_reward_claimable' => $weeklyTotalScore >= $rewardThreshold && !$rewardClaimed,
-            'weekly_reward_threshold' => $rewardThreshold,
-        ];
-    }
-
-    private function shouldShowDailyResetNotice(User $user): bool
+    private function shouldShowDailyResetNotice(\App\Models\User $user): bool
     {
         if ($user->role !== 'student') {
             return false;

@@ -19,6 +19,7 @@ class AuthController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
+        $credentials['email'] = mb_strtolower(trim($credentials['email']));
 
         $attemptPayload = [
             'email' => $credentials['email'],

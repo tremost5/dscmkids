@@ -31,4 +31,8 @@ return [
         ],
     ],
 
+    'whatsapp' => [
+        'broadcast_webhook' => env('WHATSAPP_BROADCAST_WEBHOOK'),
+    ],
+
 ];

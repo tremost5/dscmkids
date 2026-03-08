@@ -2,6 +2,7 @@
 
 return [
     'connection' => env('SCHOOL_DATA_CONNECTION', 'external'),
+    'cache_ttl_seconds' => (int) env('SCHOOL_DATA_CACHE_TTL', 300),
 
     'students' => [
         'table' => env('SCHOOL_STUDENTS_TABLE', 'students'),

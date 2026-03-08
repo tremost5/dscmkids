@@ -9,6 +9,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/css/landing.css',
                 'resources/js/landing.js',
+                'resources/css/admin.css',
                 'resources/css/news.css',
                 'resources/js/news.js',
                 'resources/css/gallery-event.css',

@@ -9,6 +9,15 @@ use Illuminate\Support\Facades\Storage;
 
 class MediaController extends Controller
 {
+    private const ALLOWED_MIME_TYPES = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'image/gif',
+        'video/mp4',
+        'application/pdf',
+    ];
+
     /**
      * Display a listing of the resource.
      */
@@ -34,7 +43,7 @@ class MediaController extends Controller
     {
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'file' => ['required', 'file', 'max:5120'],
+            'file' => ['required', 'file', 'max:5120', 'mimetypes:'.implode(',', self::ALLOWED_MIME_TYPES)],
         ]);
 
         $file = $request->file('file');
@@ -74,7 +83,7 @@ class MediaController extends Controller
     {
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'file' => ['nullable', 'file', 'max:5120'],
+            'file' => ['nullable', 'file', 'max:5120', 'mimetypes:'.implode(',', self::ALLOWED_MIME_TYPES)],
         ]);
 
         $payload = [

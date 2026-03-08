@@ -4,7 +4,7 @@
 
 @section('content')
 <h1 style="margin-top:0;">Kirim Broadcast Notifikasi</h1>
-<p class="muted">Channel email langsung diproses ke akun murid. WhatsApp menggunakan webhook opsional.</p>
+<p class="muted">Broadcast dikirim lewat queue background. Email dikirim per murid, sedangkan WhatsApp menggunakan webhook opsional.</p>
 
 <form method="POST" action="{{ route('admin.notifications.store') }}">
     @csrf
@@ -23,4 +23,3 @@
     </div>
 </form>
 @endsection
-

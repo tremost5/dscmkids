@@ -7,8 +7,12 @@ use App\Models\DailyQuizBank;
 use App\Models\DailyQuizQuestion;
 use App\Models\DailyQuizResult;
 use App\Models\StudentRewardClaim;
+use App\Models\User;
+use App\Services\StudentProgressService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 
@@ -20,7 +24,7 @@ class StudentGameController extends Controller
         if (Schema::hasTable('arcade_game_scores')) {
             $arcadeLeaderboard = ArcadeGameScore::query()
                 ->with('user:id,name')
-                ->whereDate('played_on', now()->toDateString())
+                ->where('played_on', now()->toDateString())
                 ->orderByDesc('score')
                 ->take(12)
                 ->get()
@@ -41,20 +45,16 @@ class StudentGameController extends Controller
         ]);
     }
 
-    public function progress(Request $request)
+    public function progress(Request $request, StudentProgressService $studentProgressService)
     {
         $user = $request->user();
         abort_unless($user && $user->role === 'student', 403);
 
-        $weekStart = now()->startOfWeek()->toDateString();
-        $weekEnd = now()->endOfWeek()->toDateString();
+        [$weekStart, $weekEnd] = $studentProgressService->weekDateRange();
+        $weeklySummary = $studentProgressService->weeklySummary($user);
 
-        $weeklyQuizScore = Schema::hasTable('daily_quiz_results')
-            ? (int) DailyQuizResult::query()->where('user_id', $user->id)->whereBetween('quiz_date', [$weekStart, $weekEnd])->sum('score')
-            : 0;
-        $weeklyQuizDays = Schema::hasTable('daily_quiz_results')
-            ? (int) DailyQuizResult::query()->where('user_id', $user->id)->whereBetween('quiz_date', [$weekStart, $weekEnd])->distinct('quiz_date')->count('quiz_date')
-            : 0;
+        $weeklyQuizScore = (int) $weeklySummary['weekly_total_score'];
+        $weeklyQuizDays = (int) $weeklySummary['weekly_completed_days'];
         $weeklyArcadeScore = Schema::hasTable('arcade_game_scores')
             ? (int) ArcadeGameScore::query()->where('user_id', $user->id)->whereBetween('played_on', [$weekStart, $weekEnd])->sum('score')
             : 0;
@@ -72,7 +72,7 @@ class StudentGameController extends Controller
         ]);
     }
 
-    public function submitDailyQuiz(Request $request): JsonResponse
+    public function submitDailyQuiz(Request $request, StudentProgressService $studentProgressService): JsonResponse
     {
         if (!Schema::hasTable('daily_quiz_results')) {
             return response()->json(['message' => 'Fitur quiz belum siap. Jalankan migrate terlebih dulu.'], 422);
@@ -109,44 +109,53 @@ class StudentGameController extends Controller
 
         $score = $totalQuestions > 0 ? (int) round(($correctAnswers / $totalQuestions) * 100) : 0;
         $today = now()->toDateString();
-        $todayResult = DailyQuizResult::query()->firstOrNew([
-            'user_id' => $user->id,
-            'quiz_date' => $today,
-        ]);
+        [$bestScore, $lockedUser] = DB::transaction(function () use (
+            $user,
+            $today,
+            $quiz,
+            $score,
+            $correctAnswers,
+            $totalQuestions,
+            $submittedAnswers,
+            $studentProgressService
+        ) {
+            $lockedUser = User::query()->lockForUpdate()->findOrFail($user->id);
+            $todayResult = DailyQuizResult::query()
+                ->where('user_id', $lockedUser->id)
+                ->where('quiz_date', $today)
+                ->lockForUpdate()
+                ->first();
 
-        $previousScore = $todayResult->exists ? (int) $todayResult->score : 0;
-        $bestScore = max($previousScore, $score);
-        $scoreDelta = max(0, $bestScore - $previousScore);
+            $previousScore = $todayResult ? (int) $todayResult->score : 0;
+            $bestScore = max($previousScore, $score);
+            $scoreDelta = max(0, $bestScore - $previousScore);
 
-        $todayResult->fill([
-            'quiz_key' => $quiz['key'],
-            'score' => $bestScore,
-            'correct_answers' => $correctAnswers,
-            'total_questions' => $totalQuestions,
-            'badge_awarded' => $this->dailyBadgeLabel($bestScore),
-            'answers' => $submittedAnswers,
-        ])->save();
+            $todayResult ??= new DailyQuizResult([
+                'user_id' => $lockedUser->id,
+                'quiz_date' => $today,
+            ]);
 
-        if ($scoreDelta > 0) {
-            $user->points += $scoreDelta;
-        }
+            $todayResult->fill([
+                'quiz_key' => $quiz['key'],
+                'score' => $bestScore,
+                'correct_answers' => $correctAnswers,
+                'total_questions' => $totalQuestions,
+                'badge_awarded' => $studentProgressService->dailyBadgeLabel($bestScore),
+                'answers' => $submittedAnswers,
+            ])->save();
 
-        $user->streak_days = $this->calculateStreakDays($user->id);
-        $user->last_quiz_played_on = $today;
-        $user->save();
+            if ($scoreDelta > 0) {
+                $lockedUser->points += $scoreDelta;
+            }
 
-        $weekStart = now()->startOfWeek()->toDateString();
-        $weekEnd = now()->endOfWeek()->toDateString();
-        $weeklyTotalScore = (int) DailyQuizResult::query()
-            ->where('user_id', $user->id)
-            ->whereBetween('quiz_date', [$weekStart, $weekEnd])
-            ->sum('score');
+            $lockedUser->streak_days = $studentProgressService->calculateStreakDays($lockedUser->id);
+            $lockedUser->last_quiz_played_on = $today;
+            $lockedUser->save();
 
-        $weeklyCompletedDays = (int) DailyQuizResult::query()
-            ->where('user_id', $user->id)
-            ->whereBetween('quiz_date', [$weekStart, $weekEnd])
-            ->distinct('quiz_date')
-            ->count('quiz_date');
+            return [$bestScore, $lockedUser->fresh()];
+        });
+
+        $weeklySummary = $studentProgressService->weeklySummary($lockedUser);
 
         return response()->json([
             'message' => 'Kuis tersimpan. Mantap, terus bertumbuh dalam firman.',
@@ -154,13 +163,13 @@ class StudentGameController extends Controller
             'best_score_today' => $bestScore,
             'correct_answers' => $correctAnswers,
             'total_questions' => $totalQuestions,
-            'daily_badge' => $this->dailyBadgeLabel($bestScore),
-            'weekly_badge' => $this->weeklyBadgeLabel($weeklyTotalScore),
-            'weekly_total_score' => $weeklyTotalScore,
-            'weekly_completed_days' => $weeklyCompletedDays,
-            'points' => (int) $user->points,
-            'streak_days' => (int) $user->streak_days,
-            'leaderboard' => $this->dailyLeaderboard(),
+            'daily_badge' => $studentProgressService->dailyBadgeLabel($bestScore),
+            'weekly_badge' => $weeklySummary['weekly_badge'],
+            'weekly_total_score' => $weeklySummary['weekly_total_score'],
+            'weekly_completed_days' => $weeklySummary['weekly_completed_days'],
+            'points' => (int) $lockedUser->points,
+            'streak_days' => (int) $lockedUser->streak_days,
+            'leaderboard' => $studentProgressService->dailyLeaderboard(),
         ]);
     }
 
@@ -184,28 +193,40 @@ class StudentGameController extends Controller
         ]);
 
         $today = now()->toDateString();
-        $row = ArcadeGameScore::query()->firstOrNew([
-            'user_id' => $user->id,
-            'game_key' => $validated['game_key'],
-            'played_on' => $today,
-        ]);
+        [$bestScore, $lockedUser] = DB::transaction(function () use ($user, $validated, $today) {
+            $lockedUser = User::query()->lockForUpdate()->findOrFail($user->id);
+            $row = ArcadeGameScore::query()
+                ->where('user_id', $lockedUser->id)
+                ->where('game_key', $validated['game_key'])
+                ->where('played_on', $today)
+                ->lockForUpdate()
+                ->first();
 
-        $oldScore = $row->exists ? (int) $row->score : 0;
-        $newScore = (int) $validated['score'];
-        $bestScore = max($oldScore, $newScore);
-        $delta = max(0, $bestScore - $oldScore);
+            $oldScore = $row ? (int) $row->score : 0;
+            $newScore = (int) $validated['score'];
+            $bestScore = max($oldScore, $newScore);
+            $delta = max(0, $bestScore - $oldScore);
 
-        $row->score = $bestScore;
-        $row->save();
+            $row ??= new ArcadeGameScore([
+                'user_id' => $lockedUser->id,
+                'game_key' => $validated['game_key'],
+                'played_on' => $today,
+            ]);
 
-        if ($delta > 0) {
-            $user->points += (int) round($delta * 0.4);
-            $user->save();
-        }
+            $row->score = $bestScore;
+            $row->save();
+
+            if ($delta > 0) {
+                $lockedUser->points += (int) round($delta * 0.4);
+                $lockedUser->save();
+            }
+
+            return [$bestScore, $lockedUser->fresh()];
+        });
 
         $leaderboard = ArcadeGameScore::query()
             ->with('user:id,name')
-            ->whereDate('played_on', $today)
+            ->where('played_on', $today)
             ->orderByDesc('score')
             ->take(12)
             ->get()
@@ -222,14 +243,14 @@ class StudentGameController extends Controller
         return response()->json([
             'message' => 'Skor arcade tersimpan.',
             'best_score' => $bestScore,
-            'points' => (int) $user->points,
+            'points' => (int) $lockedUser->points,
             'leaderboard' => $leaderboard,
         ]);
     }
 
-    public function claimWeeklyReward(Request $request): JsonResponse
+    public function claimWeeklyReward(Request $request, StudentProgressService $studentProgressService): JsonResponse
     {
-        if (!Schema::hasTable('student_reward_claims') || !Schema::hasTable('daily_quiz_results')) {
+        if (!$studentProgressService->hasRewardClaims() || !$studentProgressService->hasDailyQuizResults()) {
             return response()->json(['message' => 'Fitur reward belum siap. Jalankan migrate terlebih dulu.'], 422);
         }
 
@@ -238,47 +259,53 @@ class StudentGameController extends Controller
             return response()->json(['message' => 'Hanya murid yang bisa klaim reward.'], 403);
         }
 
-        $weekStart = now()->startOfWeek()->toDateString();
-        $weekEnd = now()->endOfWeek()->toDateString();
-        $weeklyTotalScore = (int) DailyQuizResult::query()
-            ->where('user_id', $user->id)
-            ->whereBetween('quiz_date', [$weekStart, $weekEnd])
-            ->sum('score');
+        [$weekStart] = $studentProgressService->weekDateRange();
+        $weeklySummary = $studentProgressService->weeklySummary($user);
+        $weeklyTotalScore = (int) $weeklySummary['weekly_total_score'];
 
-        if ($weeklyTotalScore < 240) {
+        if ($weeklyTotalScore < StudentProgressService::WEEKLY_REWARD_THRESHOLD) {
             return response()->json([
-                'message' => 'Skor mingguan belum cukup untuk klaim. Minimal 240 poin.',
+                'message' => 'Skor mingguan belum cukup untuk klaim. Minimal '.StudentProgressService::WEEKLY_REWARD_THRESHOLD.' poin.',
                 'weekly_total_score' => $weeklyTotalScore,
             ], 422);
         }
 
-        $existingClaim = StudentRewardClaim::query()
-            ->where('user_id', $user->id)
-            ->whereDate('week_start_date', $weekStart)
-            ->first();
-        if ($existingClaim) {
-            return response()->json(['message' => 'Reward minggu ini sudah pernah diklaim.'], 422);
-        }
+        [$rewardPoints, $badgeLabel, $lockedUser] = DB::transaction(function () use ($user, $weekStart, $weeklyTotalScore, $studentProgressService) {
+            $lockedUser = User::query()->lockForUpdate()->findOrFail($user->id);
+            $existingClaim = StudentRewardClaim::query()
+                ->where('user_id', $lockedUser->id)
+                ->where('week_start_date', $weekStart)
+                ->lockForUpdate()
+                ->first();
 
-        $rewardPoints = $this->rewardPointsByWeeklyScore($weeklyTotalScore);
-        $badgeLabel = $this->weeklyBadgeLabel($weeklyTotalScore);
+            if ($existingClaim) {
+                throw new HttpResponseException(
+                    response()->json(['message' => 'Reward minggu ini sudah pernah diklaim.'], 422)
+                );
+            }
 
-        StudentRewardClaim::create([
-            'user_id' => $user->id,
-            'week_start_date' => $weekStart,
-            'reward_points' => $rewardPoints,
-            'reward_label' => $badgeLabel,
-        ]);
+            $rewardPoints = $studentProgressService->rewardPointsByWeeklyScore($weeklyTotalScore);
+            $badgeLabel = $studentProgressService->weeklyBadgeLabel($weeklyTotalScore);
 
-        $user->points += $rewardPoints;
-        $user->last_weekly_claimed_on = $weekStart;
-        $user->save();
+            StudentRewardClaim::create([
+                'user_id' => $lockedUser->id,
+                'week_start_date' => $weekStart,
+                'reward_points' => $rewardPoints,
+                'reward_label' => $badgeLabel,
+            ]);
+
+            $lockedUser->points += $rewardPoints;
+            $lockedUser->last_weekly_claimed_on = $weekStart;
+            $lockedUser->save();
+
+            return [$rewardPoints, $badgeLabel, $lockedUser->fresh()];
+        });
 
         return response()->json([
             'message' => 'Reward mingguan berhasil diklaim.',
             'reward_points' => $rewardPoints,
             'badge' => $badgeLabel,
-            'points' => (int) $user->points,
+            'points' => (int) $lockedUser->points,
         ]);
     }
 
@@ -334,93 +361,5 @@ class StudentGameController extends Controller
             'memory_verse' => (string) ($set['memory_verse'] ?? ''),
             'questions' => is_array($set['questions'] ?? null) ? $set['questions'] : [],
         ];
-    }
-
-    private function calculateStreakDays(int $userId): int
-    {
-        $days = 0;
-        $cursor = now()->startOfDay();
-
-        while (true) {
-            $exists = DailyQuizResult::query()
-                ->where('user_id', $userId)
-                ->whereDate('quiz_date', $cursor->toDateString())
-                ->exists();
-
-            if (!$exists) {
-                break;
-            }
-
-            $days++;
-            $cursor->subDay();
-        }
-
-        return $days;
-    }
-
-    private function dailyBadgeLabel(int $score): string
-    {
-        if ($score >= 90) {
-            return 'Daily Gold';
-        }
-        if ($score >= 70) {
-            return 'Daily Silver';
-        }
-
-        return 'Daily Bronze';
-    }
-
-    private function weeklyBadgeLabel(int $weeklyTotalScore): string
-    {
-        $badges = config('kids_program.weekly_badges', []);
-        $active = 'Faith Starter';
-
-        foreach ($badges as $badge) {
-            $threshold = (int) ($badge['min_score'] ?? 0);
-            if ($weeklyTotalScore >= $threshold) {
-                $active = (string) ($badge['label'] ?? $active);
-            }
-        }
-
-        return $active;
-    }
-
-    private function rewardPointsByWeeklyScore(int $weeklyTotalScore): int
-    {
-        if ($weeklyTotalScore >= 560) {
-            return 120;
-        }
-        if ($weeklyTotalScore >= 420) {
-            return 90;
-        }
-        if ($weeklyTotalScore >= 300) {
-            return 70;
-        }
-
-        return 50;
-    }
-
-    private function dailyLeaderboard(): array
-    {
-        if (!Schema::hasTable('daily_quiz_results')) {
-            return [];
-        }
-
-        $rows = DailyQuizResult::query()
-            ->with('user:id,name,points')
-            ->whereDate('quiz_date', now()->toDateString())
-            ->orderByDesc('score')
-            ->orderBy('updated_at')
-            ->take(10)
-            ->get();
-
-        return $rows->values()->map(function (DailyQuizResult $item, int $index) {
-            return [
-                'rank' => $index + 1,
-                'name' => (string) optional($item->user)->name,
-                'score' => (int) $item->score,
-                'points' => (int) optional($item->user)->points,
-            ];
-        })->all();
     }
 }

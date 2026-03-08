@@ -23,14 +23,16 @@
 </head>
 <body data-page="news-index">
 @php
-    $highlight = function (string $text, string $q): string {
+    $highlight = function (string $text, string $q): \Illuminate\Support\HtmlString {
         $safe = e($text);
         if ($q === '') {
-            return $safe;
+            return new \Illuminate\Support\HtmlString($safe);
         }
 
         $pattern = '/('.preg_quote($q, '/').')/i';
-        return (string) preg_replace($pattern, '<mark>$1</mark>', $safe);
+        $highlighted = (string) preg_replace($pattern, '<mark>$1</mark>', $safe);
+
+        return new \Illuminate\Support\HtmlString($highlighted);
     };
 @endphp
 <div class="news-shell">
@@ -59,9 +61,9 @@
                 $excerptText = $item->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($item->body), 220);
             @endphp
             <article class="news-item">
-                <h2>{!! $highlight($item->title, $query) !!}</h2>
+                <h2>{{ $highlight($item->title, $query) }}</h2>
                 <div class="news-item-meta">{{ optional($item->published_at)->format('d M Y H:i') ?? '-' }}</div>
-                <p class="news-item-excerpt">{!! $highlight($excerptText, $query) !!}</p>
+                <p class="news-item-excerpt">{{ $highlight($excerptText, $query) }}</p>
                 <a class="news-item-link" href="{{ route('news.show', $item->slug) }}">Baca Selengkapnya</a>
             </article>
         @empty
