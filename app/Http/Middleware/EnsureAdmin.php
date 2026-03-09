@@ -18,7 +18,10 @@ class EnsureAdmin
             abort(403, 'Akses hanya untuk admin.');
         }
 
+        if (!$request->user()->is_active) {
+            abort(403, 'Akun admin ini sudah dinonaktifkan.');
+        }
+
         return $next($request);
     }
 }
-

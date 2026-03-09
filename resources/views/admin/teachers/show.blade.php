@@ -3,14 +3,36 @@
 @section('title', 'Detail Guru')
 
 @section('content')
-<h1 style="margin-top:0;">{{ $teacher->name }}</h1>
-@if($teacher->photo_path)
-    <img src="{{ route('teacher.photo', $teacher) }}" alt="{{ $teacher->name }}" style="width:130px;height:130px;object-fit:cover;border-radius:50%;" onerror="this.onerror=null;this.style.display='none';">
-@endif
-<p><strong>{{ $teacher->role }}</strong> {{ $teacher->class_group ? ' - '.$teacher->class_group : '' }}</p>
-<p>{{ $teacher->bio }}</p>
-@if($teacher->instagram_url)
-    <p><a href="{{ $teacher->instagram_url }}" target="_blank">Instagram</a></p>
-@endif
-<div class="actions"><a class="btn btn-secondary" href="{{ route('admin.teachers.edit', $teacher) }}">Edit</a><a class="btn btn-secondary" href="{{ route('admin.teachers.index') }}">Kembali</a></div>
+<div class="page-grid">
+    <div class="page-header">
+        <div class="page-header-copy">
+            <h1>{{ $teacher->name }}</h1>
+            <p class="muted">{{ $teacher->role ?: '-' }}{{ $teacher->class_group ? ' · '.$teacher->class_group : '' }}</p>
+        </div>
+        <div class="toolbar-actions">
+            <a class="btn btn-secondary" href="{{ route('admin.teachers.edit', $teacher) }}">Edit</a>
+            <a class="btn btn-secondary" href="{{ route('admin.teachers.index') }}">Kembali</a>
+        </div>
+    </div>
+
+    <div class="detail-grid">
+        <section class="detail-panel detail-copy">
+            @if($teacher->photo_path)
+                <img src="{{ route('teacher.photo', $teacher) }}" alt="{{ $teacher->name }}" class="detail-media detail-media--avatar" onerror="this.onerror=null;this.style.display='none';">
+            @endif
+            <div class="detail-prose">{{ $teacher->bio }}</div>
+            @if($teacher->instagram_url)
+                <a href="{{ $teacher->instagram_url }}" target="_blank" rel="noopener">Instagram</a>
+            @endif
+        </section>
+
+        <aside class="detail-panel detail-card">
+            <div class="detail-kv">
+                <div class="detail-kv-item"><span>Peran</span><strong>{{ $teacher->role ?: '-' }}</strong></div>
+                <div class="detail-kv-item"><span>Kelas</span><strong>{{ $teacher->class_group ?: '-' }}</strong></div>
+                <div class="detail-kv-item"><span>Status</span><strong>{{ $teacher->is_active ? 'Aktif' : 'Nonaktif' }}</strong></div>
+            </div>
+        </aside>
+    </div>
+</div>
 @endsection

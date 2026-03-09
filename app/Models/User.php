@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Arr;
 
 class User extends Authenticatable
 {
@@ -23,11 +24,13 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'is_active',
         'points',
         'streak_days',
         'last_quiz_played_on',
         'last_daily_reset_seen_on',
         'last_weekly_claimed_on',
+        'last_login_at',
     ];
 
     /**
@@ -49,10 +52,12 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'is_active' => 'boolean',
             'password' => 'hashed',
             'last_quiz_played_on' => 'date',
             'last_daily_reset_seen_on' => 'date',
             'last_weekly_claimed_on' => 'date',
+            'last_login_at' => 'datetime',
         ];
     }
 
@@ -68,6 +73,22 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return in_array($this->role, ['super_admin', 'admin', 'editor'], true);
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        if (!$this->is_active) {
+            return false;
+        }
+
+        $permissions = Arr::get(config('admin_permissions.roles'), $this->role.'.permissions', []);
+
+        return in_array('*', $permissions, true) || in_array($permission, $permissions, true);
+    }
+
+    public function roleLabel(): string
+    {
+        return (string) Arr::get(config('admin_permissions.roles'), $this->role.'.label', ucfirst((string) $this->role));
     }
 }

@@ -59,6 +59,7 @@ class StudentAuthController extends Controller
                 'email' => mb_strtolower(trim($validated['email'])),
                 'password' => Hash::make($validated['password']),
                 'role' => 'student',
+                'is_active' => true,
                 'points' => 0,
                 'streak_days' => 0,
             ]);
@@ -66,6 +67,7 @@ class StudentAuthController extends Controller
 
         Auth::login($student);
         $request->session()->regenerate();
+        $student->forceFill(['last_login_at' => now()])->save();
 
         return redirect()->intended(route('student.arcade'))->with('success', 'Akun murid berhasil dibuat. Selamat bermain dan belajar.');
     }
@@ -90,6 +92,7 @@ class StudentAuthController extends Controller
             'email' => $credentials['email'],
             'password' => $credentials['password'],
             'role' => 'student',
+            'is_active' => true,
         ];
 
         if (!Auth::attempt($attemptPayload, $request->boolean('remember'))) {
@@ -106,6 +109,7 @@ class StudentAuthController extends Controller
         }
 
         $request->session()->regenerate();
+        $request->user()?->forceFill(['last_login_at' => now()])->save();
 
         return redirect()->intended(route('student.arcade'))->with('success', 'Selamat datang kembali.');
     }

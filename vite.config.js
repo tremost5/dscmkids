@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/css/landing.css',
                 'resources/js/landing.js',
                 'resources/css/admin.css',
+                'resources/js/admin.js',
                 'resources/css/news.css',
                 'resources/js/news.js',
                 'resources/css/gallery-event.css',

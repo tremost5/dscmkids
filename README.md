@@ -6,6 +6,9 @@ Website sistem informasi Sekolah Minggu DSCMKids berbasis Laravel 11, dengan:
 - Admin panel CRUD untuk berita, informasi, konten section, dan media.
 - Admin panel CRUD untuk slide header, portfolio guru, dan menu Live Streaming.
 - Admin panel materi edukatif bertingkat + broadcast notifikasi.
+- User management admin dengan role, status akun, bulk action, dan export CSV.
+- System monitor admin untuk queue, broadcast, dan health snapshot.
+- REST API publik (`/api/v1/...`) + admin metrics API.
 - Integrasi database eksternal untuk metrik siswa, kehadiran, dan foto kegiatan.
 - Renungan harian murid di landing page.
 - Galeri khusus "Minggu Ini" dari foto selfie presensi (external DB).
@@ -118,6 +121,22 @@ SCHOOL_WEEKLY_GALLERY_LIMIT=12
 php artisan queue:work
 ```
 
+## Scheduler & Automation
+
+Tambahkan scheduler di server:
+
+```bash
+php artisan schedule:run
+```
+
+Command yang tersedia:
+
+```bash
+php artisan platform:daily-admin-digest
+php artisan platform:remind-inactive-students
+php artisan platform:cleanup-old-activity
+```
+
 ## Broadcast Notifikasi (Opsional WhatsApp)
 
 Set webhook (opsional) di `.env`:
@@ -138,14 +157,22 @@ SCHOOL_DATA_CACHE_TTL=300
 
 - Landing Controller: `app/Http/Controllers/LandingController.php`
 - Service Analytics External: `app/Services/SchoolDataService.php`
+- Service Metrics Platform: `app/Services/PlatformMetricsService.php`
+- Service Progress Murid: `app/Services/StudentProgressService.php`
 - Landing View Premium: `resources/views/landing.blade.php`
 - Admin CRUD Routes: `routes/web.php`
+- API Routes: `routes/api.php`
 - Admin Hero Slide: `/admin/slides`
 - Admin Portfolio Guru: `/admin/teachers`
+- Admin User Management: `/admin/users`
+- Admin System Monitor: `/admin/system-monitor`
 - Admin Live Streaming: `/admin/livestream`
 - Public List Berita: `/berita`
 - Public Detail Berita: `/berita/{slug}`
 - Public Detail Event Galeri: `/galeri/event/{eventSlug}`
+- Public API Dashboard: `/api/v1/dashboard`
+- Public API News: `/api/v1/news`
+- Public API Materials: `/api/v1/materials`
 
 ## Fitur Publik Lanjutan
 

@@ -25,15 +25,45 @@ class AuthController extends Controller
             'email' => $credentials['email'],
             'password' => $credentials['password'],
             'role' => 'admin',
+            'is_active' => true,
         ];
 
         if (!Auth::attempt($attemptPayload, $request->boolean('remember'))) {
+            $fallbackPayload = [
+                'email' => $credentials['email'],
+                'password' => $credentials['password'],
+                'role' => 'super_admin',
+                'is_active' => true,
+            ];
+
+            if (Auth::attempt($fallbackPayload, $request->boolean('remember'))) {
+                $request->session()->regenerate();
+                $request->user()?->forceFill(['last_login_at' => now()])->save();
+
+                return redirect()->route('admin.dashboard');
+            }
+
+            $editorPayload = [
+                'email' => $credentials['email'],
+                'password' => $credentials['password'],
+                'role' => 'editor',
+                'is_active' => true,
+            ];
+
+            if (Auth::attempt($editorPayload, $request->boolean('remember'))) {
+                $request->session()->regenerate();
+                $request->user()?->forceFill(['last_login_at' => now()])->save();
+
+                return redirect()->route('admin.dashboard');
+            }
+
             return back()->withErrors([
                 'email' => 'Email atau password salah.',
             ])->onlyInput('email');
         }
 
         $request->session()->regenerate();
+        $request->user()?->forceFill(['last_login_at' => now()])->save();
 
         return redirect()->route('admin.dashboard');
     }

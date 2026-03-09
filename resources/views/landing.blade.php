@@ -26,14 +26,6 @@
     @if (!app()->environment('testing'))
         @vite(['resources/css/landing.css', 'resources/js/landing.js'])
     @endif
-    <style>
-        /* Mobile override: sembunyikan quick-nav di HP */
-        @media (max-width: 900px) {
-            .quick-nav {
-                display: none !important;
-            }
-        }
-    </style>
 </head>
 <body>
 @php
@@ -104,6 +96,13 @@
         'Lakukan 1 kebaikan tanpa disuruh',
         'Hafalkan 1 ayat minggu ini',
     ];
+    $siteMenuLinks = [
+        ['href' => '#monthly-theme', 'label' => 'Tema'],
+        ['href' => '#kids-zone', 'label' => 'Zona Murid'],
+        ['href' => '#quiz-zone', 'label' => 'Quiz'],
+        ['href' => '#analytics', 'label' => 'Analytics'],
+        ['href' => '#gallery', 'label' => 'Galeri'],
+    ];
 
     $currentDayName = now()->locale('id')->translatedFormat('l');
     $todayReading = collect($readingPlans)->firstWhere('day', $currentDayName) ?? $readingPlans[0];
@@ -111,6 +110,54 @@
 @endphp
 
 <header class="top" id="home">
+    <div class="site-chrome">
+        <a href="#home" class="site-brand">
+            <span class="site-brand-mark">D</span>
+            <span>
+                <strong>DSCMKids</strong>
+                <small>Faith, play, growth</small>
+            </span>
+        </a>
+
+        <nav class="site-nav" aria-label="Primary navigation">
+            @foreach($siteMenuLinks as $item)
+                <a href="{{ $item['href'] }}">{{ $item['label'] }}</a>
+            @endforeach
+            <a href="{{ route('news.index') }}">Berita</a>
+            @if($parentPortalCfg['enabled'])
+                <a href="{{ route('parent.portal') }}">Parent Portal</a>
+            @endif
+        </nav>
+
+        <div class="site-actions">
+            <a href="{{ route('student.arcade') }}" class="site-action-pill">Arcade</a>
+            @guest
+                <a href="{{ route('student.login') }}" class="site-action-pill site-action-pill--strong">Login</a>
+            @endguest
+            <button class="site-menu-toggle" type="button" id="siteMenuToggle" aria-expanded="false" aria-controls="siteMobileMenu">Menu</button>
+        </div>
+    </div>
+
+    <div class="site-mobile-menu" id="siteMobileMenu" hidden>
+        <div class="site-mobile-menu-card">
+            <div class="site-mobile-menu-head">
+                <strong>Navigate</strong>
+                <button class="site-mobile-menu-close" type="button" id="siteMenuClose" aria-label="Close menu">x</button>
+            </div>
+            <div class="site-mobile-menu-links">
+                @foreach($siteMenuLinks as $item)
+                    <a href="{{ $item['href'] }}">{{ $item['label'] }}</a>
+                @endforeach
+                <a href="{{ route('news.index') }}">Berita</a>
+                @if($parentPortalCfg['enabled'])
+                    <a href="{{ route('parent.portal') }}">Parent Portal</a>
+                @endif
+                <a href="{{ route('student.arcade') }}">Arcade</a>
+                <a href="{{ route('admin.login') }}">Admin</a>
+            </div>
+        </div>
+    </div>
+
     @foreach($slidesData as $i => $slide)
         <div class="slide {{ $i === 0 ? 'active' : '' }}" data-slide>
             <img src="{{ $slide['image'] }}" alt="slide {{ $i + 1 }}">
@@ -121,6 +168,20 @@
             <span class="badge">Sekolah Minggu DSCMKids</span>
             <h1 class="hero-title" id="heroTitle">{{ $slidesData[0]['title'] ?? ($sections['hero']->title ?? 'Selamat Datang') }}</h1>
             <p class="hero-sub" id="heroSubtitle">{{ $slidesData[0]['subtitle'] ?? ($sections['hero']->content ?? '') }}</p>
+            <div class="hero-strip">
+                <div class="hero-strip-card">
+                    <span>Aktif minggu ini</span>
+                    <strong>{{ number_format((int) ($metrics['attendance_today'] ?? 0)) }} murid</strong>
+                </div>
+                <div class="hero-strip-card">
+                    <span>Average hadir</span>
+                    <strong>{{ number_format((float) ($metrics['weekly_average'] ?? 0), 1) }}%</strong>
+                </div>
+                <div class="hero-strip-card">
+                    <span>Kelas berjalan</span>
+                    <strong>{{ number_format((int) ($metrics['active_classes'] ?? 0)) }}</strong>
+                </div>
+            </div>
             <div class="hero-actions">
                 <a href="#kids-zone" class="btn btn-light">Zona Murid</a>
                 <a href="#analytics" class="btn btn-light">Lihat Kehadiran</a>
@@ -173,6 +234,13 @@
 </nav>
 
 <main class="container">
+    @if(session('success'))
+        <div class="surface-toast" data-surface-toast>
+            <span>{{ session('success') }}</span>
+            <button type="button" class="surface-toast-close" data-surface-toast-close aria-label="Dismiss">x</button>
+        </div>
+    @endif
+
     @if($dailyResetNotice)
         <section class="section panel reveal" id="dailyResetNotice">
             <strong>Daily Quest Reset</strong>
@@ -674,59 +742,6 @@ if ('serviceWorker' in navigator) {
         });
     });
 }
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    var quickNav = document.querySelector('.quick-nav');
-
-    if (!quickNav) {
-        return;
-    }
-
-    var expandTimer = null;
-
-    function isMobileRail() {
-        return window.matchMedia('(max-width: 900px)').matches;
-    }
-
-    function collapseSoon() {
-        if (expandTimer) {
-            clearTimeout(expandTimer);
-        }
-        expandTimer = setTimeout(function () {
-            quickNav.classList.remove('quick-nav--expanded');
-        }, 2200);
-    }
-
-    function bindMobileRail() {
-        if (!isMobileRail()) {
-            quickNav.classList.remove('quick-nav--expanded');
-            return;
-        }
-
-        quickNav.querySelectorAll('a').forEach(function (link) {
-            link.addEventListener('click', function () {
-                quickNav.classList.add('quick-nav--expanded');
-                collapseSoon();
-            });
-        });
-
-        quickNav.addEventListener('mouseenter', function () {
-            if (!isMobileRail()) {
-                return;
-            }
-            quickNav.classList.add('quick-nav--expanded');
-            collapseSoon();
-        });
-    }
-
-    bindMobileRail();
-    window.addEventListener('resize', function () {
-        if (!isMobileRail()) {
-            quickNav.classList.remove('quick-nav--expanded');
-        }
-    });
-});
 </script>
 <script type="application/ld+json">
 {
