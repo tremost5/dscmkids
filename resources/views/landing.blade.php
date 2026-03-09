@@ -102,6 +102,7 @@
         ['href' => '#quiz-zone', 'label' => 'Quiz'],
         ['href' => '#analytics', 'label' => 'Analytics'],
         ['href' => '#gallery', 'label' => 'Galeri'],
+        ['href' => '#church-radio', 'label' => 'Radio'],
     ];
 
     $currentDayName = now()->locale('id')->translatedFormat('l');
@@ -231,6 +232,7 @@
     <a href="#testimoni" data-short="TS" data-label="Testimoni" title="Testimoni">Testimoni</a>
     <a href="#gallery" data-short="GL" data-label="Galeri" title="Galeri">Galeri</a>
     <a href="#live" data-short="LV" data-label="Live" title="Live">Live</a>
+    <a href="#church-radio" data-short="RD" data-label="Radio" title="Radio">Radio</a>
 </nav>
 
 <main class="container">
@@ -317,6 +319,34 @@
             @else
                 <div class="theater-empty">Link YouTube live belum diatur.<br>Isi di Admin &gt; Konten (`section_key: livestream`, `meta.youtube_url`).</div>
             @endif
+        </div>
+    </section>
+
+    <section class="section panel reveal radio-widget" id="church-radio">
+        <div class="radio-widget-grid">
+            <div class="radio-widget-copy">
+                <div class="radio-widget-kicker">Radio Online Gereja</div>
+                <h2 class="title">Sejahtera FM</h2>
+                <p class="muted">Dengarkan radio online resmi gereja langsung dari website DSCMKids. Sumber player menggunakan stream resmi dari <a href="https://sejahterafm.id/" target="_blank" rel="noopener">sejahterafm.id</a>.</p>
+                <div class="radio-actions">
+                    <a href="https://sejahterafm.id/" target="_blank" rel="noopener" class="btn btn-light">Buka Player Penuh</a>
+                    <a href="https://sejahterafm.id/radio/stream" target="_blank" rel="noopener" class="btn btn-ghost radio-ghost-btn">Buka Stream Langsung</a>
+                </div>
+            </div>
+            <div class="radio-player-card">
+                <div class="radio-player-head">
+                    <img src="https://sejahterafm.id/storage/church/WCPA9zJKdZUYHhMn4tvPr8siq9Jbx7FY1gzRfRJF.png" alt="Sejahtera FM" class="radio-logo" loading="lazy">
+                    <div>
+                        <strong>Sejahterafm.id</strong>
+                        <span>Mitra Solusi Keluarga</span>
+                    </div>
+                </div>
+                <audio class="radio-audio" controls preload="none">
+                    <source src="https://sejahterafm.id/radio/stream" type="audio/mpeg">
+                    Browser ini belum mendukung audio player.
+                </audio>
+                <p class="radio-note">Jika player tidak mulai otomatis, tekan play atau buka situs radio resmi untuk pengalaman penuh.</p>
+            </div>
         </div>
     </section>
 
