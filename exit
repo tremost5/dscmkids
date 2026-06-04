@@ -1,0 +1,16 @@
+[33mcommit 3f2db77915a9a81485cf50f2adf623ff11016228[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: tremostayang5 <tremostayang5@gmail.com>
+Date:   Thu Jun 4 19:00:53 2026 +0700
+
+    WIP PRA 2026 landing and xlsx export
+
+ app/Http/Controllers/Admin/PraEventController.php  |  10 [32m+[m[31m-[m
+ app/Models/EventGallery.php                        |   1 [32m+[m
+ app/Services/EventService.php                      |  76 [32m+++[m[31m---[m
+ app/Services/SimpleXlsxExporter.php                | 145 [32m++++++++++[m
+ ...000_add_group_slug_to_event_galleries_table.php |  31 [32m+++[m
+ resources/css/pra-event.css                        | 129 [32m++++++++[m[31m-[m
+ resources/views/admin/pra/content.blade.php        |  14 [32m+[m[31m-[m
+ resources/views/admin/pra/participants.blade.php   |   6 [32m+[m[31m-[m
+ resources/views/events/pra-2026.blade.php          | 295 [32m++++++++++[m[31m-----------[m
+ 9 files changed, 499 insertions(+), 208 deletions(-)
