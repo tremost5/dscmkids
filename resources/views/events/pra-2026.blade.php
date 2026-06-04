@@ -29,18 +29,22 @@
         [
             'slug' => 'grup-1',
             'name' => 'GRUP 1',
-            'classes' => ['PG', 'TK A', 'TK B', 'SD Kelas 1 - 4'],
+            'class_text' => 'PG • TK • SD Kelas 1-4',
             'location' => 'NICC & KLUB BUNGA Theme Park Hotel',
+            'display_location' => 'NICC & Klub Bunga Theme Park Hotel',
             'group' => $groupOne,
             'accent' => 'coral',
+            'image' => $mediaUrl($groupOneGallery->first()?->image_path) ?: $heroImage,
         ],
         [
             'slug' => 'grup-2',
             'name' => 'GRUP 2',
-            'classes' => ['SD Kelas 5 - 9'],
+            'class_text' => 'SD Kelas 5-9',
             'location' => 'BROMO BENJOR PINE CAMPING GROUND, Tumpang - Malang',
+            'display_location' => 'Bromo Benjor Pine Camping Ground',
             'group' => $groupTwo,
             'accent' => 'teal',
+            'image' => $mediaUrl($groupTwoGallery->first()?->image_path) ?: $heroImage,
         ],
     ]);
 @endphp
@@ -53,10 +57,10 @@
         </a>
         <div class="pra-nav-links" data-pra-auto-collapse-nav>
             <a href="{{ route('landing') }}">Home</a>
-            <a href="#tentang">Tentang</a>
+            <a href="#countdown">Countdown</a>
             <a href="#grup">Grup</a>
-            <a href="#lokasi">Lokasi</a>
             <a href="#galeri-grup-1">Galeri</a>
+            <a href="#pembayaran">Pembayaran</a>
             <a href="#daftar">Daftar</a>
             <div class="pra-more" data-pra-more-menu hidden>
                 <button class="pra-more-toggle" type="button" aria-expanded="false" aria-label="More navigation" data-pra-more-toggle>More</button>
@@ -68,9 +72,8 @@
     <div class="pra-mobile-menu" data-pra-mobile-menu hidden>
         <button class="pra-mobile-close" type="button" data-pra-menu-close aria-label="Tutup menu">x</button>
         <a href="{{ route('landing') }}">Home DSCMKids</a>
-        <a href="#tentang">Tentang PRA</a>
+        <a href="#countdown">Countdown PRA</a>
         <a href="#grup">Informasi Grup</a>
-        <a href="#lokasi">Lokasi</a>
         <a href="#galeri-grup-1">Galeri</a>
         <a href="#pembayaran">Pembayaran</a>
         <a href="#daftar">Daftar Sekarang</a>
@@ -82,7 +85,7 @@
         <p>{{ $banner?->subtitle ?: $event->subtitle }}</p>
         <div class="pra-hero-actions">
             <a class="pra-btn pra-btn-primary" href="#daftar">Daftar Sekarang</a>
-            <a class="pra-btn pra-btn-light" href="#grup">Lihat Grup & Tanggal</a>
+            <a class="pra-btn pra-btn-light" href="#countdown">Lihat Tanggal PRA</a>
         </div>
     </div>
 </header>
@@ -113,12 +116,29 @@
 </div>
 
 <main>
-    <section class="pra-section pra-about" id="tentang">
-        <div>
-            <span class="pra-kicker">Tentang PRA</span>
-            <h2>{{ $event->subtitle ?: 'Petualangan Iman yang Tak Terlupakan' }}</h2>
+    <section class="pra-section pra-countdown" id="countdown">
+        <div class="pra-section-head">
+            <span class="pra-kicker">Hitung Mundur</span>
+            <h2>Hitung Mundur Menuju PRA 2026</h2>
+            <p>Setiap grup memiliki tanggal dan lokasi yang sudah disiapkan sesuai kebutuhan usia peserta.</p>
         </div>
-        <div class="pra-about-copy">
+        <div class="pra-count-grid">
+            @foreach($groupCards as $card)
+                <article class="pra-count-card">
+                    <span>{{ $card['name'] }}</span>
+                    <h3>{{ $card['slug'] === 'grup-1' ? 'Kelas PG TK - 4 SD' : 'Kelas 5 SD - 9 SMP' }}</h3>
+                    <p>{{ optional($card['group']?->starts_on)->translatedFormat('d F Y') }} - {{ optional($card['group']?->ends_on)->translatedFormat('d F Y') }}</p>
+                    <p>{{ $card['location'] }}</p>
+                    <div class="pra-timer" data-countdown="{{ optional($card['group']?->starts_on)->format('Y-m-d') }}">Menyiapkan countdown...</div>
+                </article>
+            @endforeach
+        </div>
+    </section>
+
+    <section class="pra-section pra-group-section" id="grup">
+        <div class="pra-section-head">
+            <span class="pra-kicker">Informasi Singkat Grup</span>
+            <h2>PRA 2026 disusun sesuai tahap usia anak</h2>
             <p>{{ $event->description }}</p>
             <div class="pra-benefit-inline">
                 @foreach($benefits as $benefit)
@@ -126,32 +146,23 @@
                 @endforeach
             </div>
         </div>
-    </section>
-
-    <section class="pra-section pra-group-section" id="grup">
-        <div class="pra-section-head">
-            <span class="pra-kicker">Pembagian Grup</span>
-            <h2>Pilih grup sesuai kelas anak</h2>
-            <p>Setiap grup memiliki lokasi dan tanggal kegiatan yang berbeda agar acara berjalan nyaman, tertata, dan sesuai usia peserta.</p>
-        </div>
         <div class="pra-group-grid">
             @foreach($groupCards as $card)
                 <article class="pra-group-card pra-group-card--{{ $card['accent'] }}">
+                    <img class="pra-group-card-image" src="{{ $card['image'] }}" alt="Lokasi {{ $card['name'] }}" loading="lazy">
                     <div class="pra-group-card-head">
                         <span>{{ $card['name'] }}</span>
-                        <strong>{{ optional($card['group']?->starts_on)->translatedFormat('d F Y') }} - {{ optional($card['group']?->ends_on)->translatedFormat('d F Y') }}</strong>
+                        <strong>{{ $card['class_text'] }}</strong>
                     </div>
-                    <div>
-                        <h3>Kelas</h3>
-                        <div class="pra-class-pills">
-                            @foreach($card['classes'] as $level)
-                                <span>{{ $level }}</span>
-                            @endforeach
+                    <div class="pra-group-card-details">
+                        <div>
+                            <span>Tanggal</span>
+                            <strong>{{ optional($card['group']?->starts_on)->translatedFormat('d F Y') }} - {{ optional($card['group']?->ends_on)->translatedFormat('d F Y') }}</strong>
                         </div>
-                    </div>
-                    <div class="pra-group-location">
-                        <h3>Lokasi</h3>
-                        <p>{{ $card['location'] }}</p>
+                        <div>
+                            <span>Lokasi</span>
+                            <strong>{{ $card['display_location'] }}</strong>
+                        </div>
                     </div>
                     <a class="pra-btn pra-btn-light" href="#daftar">Daftarkan Anak</a>
                 </article>
@@ -159,18 +170,100 @@
         </div>
     </section>
 
-    <section class="pra-section pra-location" id="lokasi">
+    @php($galleryViewerIndex = 0)
+    <section class="pra-section pra-gallery-section" id="galeri-grup-1">
         <div class="pra-section-head">
-            <span class="pra-kicker">Lokasi Kegiatan</span>
-            <h2>Lokasi yang disiapkan untuk pengalaman PRA yang aman dan berkesan</h2>
-            <p>{{ $event->location_description ?: 'Panitia menyiapkan lokasi yang mendukung ibadah anak, kegiatan kelompok, permainan, dan momen kebersamaan dengan pendampingan yang terarah.' }}</p>
+            <span class="pra-kicker">Galeri Lokasi</span>
+            <h2>Galeri PRA Grup 1{{ $groupOneGallery->isNotEmpty() ? ' ('.$groupOneGallery->count().' foto)' : '' }}</h2>
+            <p>Suasana lokasi dan area kegiatan untuk peserta PG, TK A, TK B, dan SD kelas 1-4.</p>
         </div>
-        <div class="pra-location-card-grid">
+        <div class="pra-gallery-grid">
+            @forelse($groupOneGallery as $photo)
+                <img
+                    src="{{ $mediaUrl($photo->image_path) }}"
+                    alt="{{ $photo->title ?: 'Galeri PRA Grup 1' }}"
+                    loading="lazy"
+                    data-pra-gallery-image
+                    data-pra-gallery-index="{{ $galleryViewerIndex }}"
+                >
+                @php($galleryViewerIndex++)
+            @empty
+                <div class="pra-empty pra-gallery-empty">
+                    <strong>Galeri Grup 1 segera hadir.</strong>
+                    <span>Foto lokasi akan tampil di sini setelah panitia menyiapkan dokumentasi resmi.</span>
+                </div>
+            @endforelse
+        </div>
+    </section>
+
+    <section class="pra-section pra-gallery-section" id="galeri-grup-2">
+        <div class="pra-section-head">
+            <span class="pra-kicker">Galeri Lokasi</span>
+            <h2>Galeri PRA Grup 2{{ $groupTwoGallery->isNotEmpty() ? ' ('.$groupTwoGallery->count().' foto)' : '' }}</h2>
+            <p>Suasana lokasi dan area kegiatan untuk peserta SD kelas 5-9.</p>
+        </div>
+        <div class="pra-gallery-grid">
+            @forelse($groupTwoGallery as $photo)
+                <img
+                    src="{{ $mediaUrl($photo->image_path) }}"
+                    alt="{{ $photo->title ?: 'Galeri PRA Grup 2' }}"
+                    loading="lazy"
+                    data-pra-gallery-image
+                    data-pra-gallery-index="{{ $galleryViewerIndex }}"
+                >
+                @php($galleryViewerIndex++)
+            @empty
+                <div class="pra-empty pra-gallery-empty">
+                    <strong>Galeri Grup 2 segera hadir.</strong>
+                    <span>Foto lokasi akan tampil di sini setelah panitia menyiapkan dokumentasi resmi.</span>
+                </div>
+            @endforelse
+        </div>
+    </section>
+
+    <section class="pra-section pra-payment" id="pembayaran">
+        <div class="pra-section-head">
+            <span class="pra-kicker">Informasi Pendaftaran</span>
+            <h2>Informasi Pendaftaran</h2>
+            <p>Untuk informasi pendaftaran lebih lanjut, silakan menghubungi panitia pendaftaran berikut.</p>
+        </div>
+        <div class="pra-contact-grid">
+            @foreach($contacts as $contact)
+                @php($wa = preg_replace('/\D+/', '', $contact['phone']))
+                @if(str_starts_with($wa, '0')) @php($wa = '62'.substr($wa, 1)) @endif
+                <article class="pra-contact-card">
+                    <strong>{{ $contact['name'] }}</strong>
+                    <span>{{ $contact['phone'] }}</span>
+                    <a href="https://wa.me/{{ $wa }}" target="_blank" rel="noopener">WhatsApp</a>
+                </article>
+            @endforeach
+        </div>
+    </section>
+
+    <section class="pra-section pra-participants" id="peserta">
+        <div class="pra-section-head">
+            <span class="pra-kicker">Peserta</span>
+            <h2>Daftar Peserta Yang Sudah Mendaftarkan Diri</h2>
+        </div>
+        <div class="pra-participant-grid">
             @foreach($groupCards as $card)
-                <article class="pra-location-card">
-                    <span>{{ $card['name'] }}</span>
-                    <strong>{{ $card['location'] }}</strong>
-                    <p>{{ $card['slug'] === 'grup-1' ? 'Lokasi kegiatan untuk kelas kecil dan SD 1-4 dengan alur aktivitas yang ramah anak.' : 'Lokasi camp untuk kelas besar dengan suasana alam yang mendukung kebersamaan dan pembentukan karakter.' }}</p>
+                @php($registrations = $registrationsByGroup->get($card['slug'], collect()))
+                <article class="pra-participant-card">
+                    <div class="pra-group-card-head">
+                        <span>{{ $card['name'] }}</span>
+                        <strong>{{ $registrations->count() }} peserta</strong>
+                    </div>
+                    @forelse($registrations->take(8) as $registration)
+                        <div class="pra-participant-row">
+                            <strong>{{ $registration->nickname }}</strong>
+                            <span>Kelas {{ $registration->class_before }}</span>
+                        </div>
+                    @empty
+                        <div class="pra-empty">
+                            <strong>Belum ada peserta yang ditampilkan.</strong>
+                            <span>Nama peserta akan muncul setelah pendaftaran pertama untuk grup ini masuk.</span>
+                        </div>
+                    @endforelse
                 </article>
             @endforeach
         </div>
@@ -288,76 +381,6 @@
             </label>
             <button class="pra-btn pra-btn-primary pra-form-wide" type="submit">Kirim Pendaftaran</button>
         </form>
-    </section>
-
-    @php($galleryViewerIndex = 0)
-    <section class="pra-section pra-gallery-section" id="galeri-grup-1">
-        <div class="pra-section-head">
-            <span class="pra-kicker">Galeri Lokasi</span>
-            <h2>Galeri PRA Grup 1</h2>
-            <p>Suasana lokasi dan area kegiatan untuk peserta PG, TK A, TK B, dan SD kelas 1-4.</p>
-        </div>
-        <div class="pra-gallery-grid">
-            @forelse($groupOneGallery as $photo)
-                <img
-                    src="{{ $mediaUrl($photo->image_path) }}"
-                    alt="{{ $photo->title ?: 'Galeri PRA Grup 1' }}"
-                    loading="lazy"
-                    data-pra-gallery-image
-                    data-pra-gallery-index="{{ $galleryViewerIndex }}"
-                >
-                @php($galleryViewerIndex++)
-            @empty
-                <div class="pra-empty pra-gallery-empty">
-                    <strong>Galeri Grup 1 segera hadir.</strong>
-                    <span>Foto lokasi akan tampil di sini setelah panitia menyiapkan dokumentasi resmi.</span>
-                </div>
-            @endforelse
-        </div>
-    </section>
-
-    <section class="pra-section pra-gallery-section" id="galeri-grup-2">
-        <div class="pra-section-head">
-            <span class="pra-kicker">Galeri Lokasi</span>
-            <h2>Galeri PRA Grup 2</h2>
-            <p>Suasana lokasi dan area kegiatan untuk peserta SD kelas 5-9.</p>
-        </div>
-        <div class="pra-gallery-grid">
-            @forelse($groupTwoGallery as $photo)
-                <img
-                    src="{{ $mediaUrl($photo->image_path) }}"
-                    alt="{{ $photo->title ?: 'Galeri PRA Grup 2' }}"
-                    loading="lazy"
-                    data-pra-gallery-image
-                    data-pra-gallery-index="{{ $galleryViewerIndex }}"
-                >
-                @php($galleryViewerIndex++)
-            @empty
-                <div class="pra-empty pra-gallery-empty">
-                    <strong>Galeri Grup 2 segera hadir.</strong>
-                    <span>Foto lokasi akan tampil di sini setelah panitia menyiapkan dokumentasi resmi.</span>
-                </div>
-            @endforelse
-        </div>
-    </section>
-
-    <section class="pra-section pra-payment" id="pembayaran">
-        <div class="pra-section-head">
-            <span class="pra-kicker">Informasi Pembayaran</span>
-            <h2>Pembayaran</h2>
-            <p>Pembayaran dapat dilakukan melalui transfer atau tunai dengan menghubungi panitia pendaftaran.</p>
-        </div>
-        <div class="pra-contact-grid">
-            @foreach($contacts as $contact)
-                @php($wa = preg_replace('/\D+/', '', $contact['phone']))
-                @if(str_starts_with($wa, '0')) @php($wa = '62'.substr($wa, 1)) @endif
-                <article class="pra-contact-card">
-                    <strong>{{ $contact['name'] }}</strong>
-                    <span>{{ $contact['phone'] }}</span>
-                    <a href="https://wa.me/{{ $wa }}" target="_blank" rel="noopener">WhatsApp</a>
-                </article>
-            @endforeach
-        </div>
     </section>
 </main>
 

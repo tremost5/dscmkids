@@ -37,6 +37,6 @@ class EventGroup extends Model
 
     public function registrations(): HasMany
     {
-        return $this->hasMany(EventRegistration::class);
+        return $this->hasMany(EventRegistration::class, 'event_group_id');
     }
 }

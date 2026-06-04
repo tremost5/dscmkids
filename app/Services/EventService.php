@@ -25,6 +25,7 @@ class EventService
         );
 
         $this->ensurePraDefaults($event);
+        $this->repairRegistrationGroups($event);
 
         return $event->load(['groups', 'banner', 'galleries', 'videos']);
     }
@@ -175,6 +176,25 @@ class EventService
                 'is_active' => true,
             ]
         );
+    }
+
+    private function repairRegistrationGroups(Event $event): void
+    {
+        $groupsBySlug = $event->groups()->get()->keyBy('slug');
+
+        if (!$groupsBySlug->has('grup-1') || !$groupsBySlug->has('grup-2')) {
+            return;
+        }
+
+        $event->registrations()
+            ->whereDoesntHave('group')
+            ->get()
+            ->each(function (EventRegistration $registration) use ($groupsBySlug): void {
+                $targetSlug = in_array($registration->class_before, self::GROUP_ONE_CLASSES, true) ? 'grup-1' : 'grup-2';
+                $registration->forceFill([
+                    'event_group_id' => $groupsBySlug[$targetSlug]->id,
+                ])->save();
+            });
     }
 
     private function defaultPraEventPayload(): array

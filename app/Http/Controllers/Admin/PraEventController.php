@@ -20,7 +20,7 @@ class PraEventController extends Controller
 {
     private const BROADCAST_FILTERS = ['all', 'grup-1', 'grup-2', 'unpaid', 'pending_verification', 'paid'];
     private const OPTIONAL_IMAGE_RULES = ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'];
-    private const REQUIRED_IMAGE_RULES = ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'];
+    private const GALLERY_IMAGE_RULES = ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'];
 
     public function dashboard(EventService $eventService): View
     {
@@ -297,26 +297,37 @@ class PraEventController extends Controller
         $data = $request->validate([
             'group_slug' => ['required', Rule::in(['grup-1', 'grup-2'])],
             'title' => ['nullable', 'string', 'max:255'],
-            'image' => self::REQUIRED_IMAGE_RULES,
+            'images' => ['required', 'array', 'min:1'],
+            'images.*' => self::GALLERY_IMAGE_RULES,
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ], $this->uploadValidationMessages());
 
+        $storedImages = [];
+
         try {
-            $imagePath = $request->file('image')->store('event-galleries', 'public');
+            foreach ($request->file('images', []) as $image) {
+                $storedImages[] = $image->store('event-galleries', 'public');
+            }
         } catch (Throwable) {
+            foreach ($storedImages as $storedImage) {
+                Storage::disk('public')->delete($storedImage);
+            }
+
             return back()
-                ->withErrors(['image' => 'Foto lokasi belum berhasil diupload. Coba gunakan file JPG, PNG, atau WebP maksimal 5MB.'])
+                ->withErrors(['images' => 'Foto lokasi belum berhasil diupload. Coba gunakan file JPG, PNG, atau WebP maksimal 5MB.'])
                 ->withInput();
         }
 
-        $event->galleries()->create([
-            'group_slug' => $data['group_slug'],
-            'title' => $data['title'] ?? null,
-            'image_path' => $imagePath,
-            'sort_order' => (int) ($data['sort_order'] ?? 0),
-        ]);
+        foreach ($storedImages as $index => $imagePath) {
+            $event->galleries()->create([
+                'group_slug' => $data['group_slug'],
+                'title' => $data['title'] ?? null,
+                'image_path' => $imagePath,
+                'sort_order' => (int) ($data['sort_order'] ?? 0) + $index,
+            ]);
+        }
 
-        return back()->with('success', 'Foto lokasi berhasil diupload dan langsung tampil di galeri.');
+        return back()->with('success', count($storedImages).' foto lokasi berhasil diupload dan langsung tampil di galeri.');
     }
 
     public function deleteGallery(EventGallery $gallery): RedirectResponse
@@ -433,11 +444,17 @@ class PraEventController extends Controller
             'background_image.mimes' => 'Background banner harus berformat JPG, JPEG, PNG, atau WebP.',
             'background_image.max' => 'Ukuran background banner maksimal 5MB.',
             'image.required' => 'Pilih foto lokasi terlebih dahulu.',
+            'images.required' => 'Pilih foto lokasi terlebih dahulu.',
+            'images.array' => 'Pilih satu atau beberapa foto lokasi yang valid.',
+            'images.min' => 'Pilih minimal satu foto lokasi.',
             'group_slug.required' => 'Pilih grup galeri terlebih dahulu.',
             'group_slug.in' => 'Grup galeri harus Grup 1 atau Grup 2.',
             'image.image' => 'Foto lokasi harus berupa gambar.',
             'image.mimes' => 'Foto lokasi harus berformat JPG, JPEG, PNG, atau WebP.',
             'image.max' => 'Ukuran foto lokasi maksimal 5MB.',
+            'images.*.image' => 'Setiap foto lokasi harus berupa gambar.',
+            'images.*.mimes' => 'Setiap foto lokasi harus berformat JPG, JPEG, PNG, atau WebP.',
+            'images.*.max' => 'Ukuran setiap foto lokasi maksimal 5MB.',
         ];
     }
 }

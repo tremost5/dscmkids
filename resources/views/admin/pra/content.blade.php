@@ -77,7 +77,7 @@
                 </select>
             </label>
             <label>Judul Foto<input name="title"></label>
-            <label>Foto Lokasi<input type="file" name="image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required></label>
+            <label>Foto Lokasi (bisa pilih beberapa)<input type="file" name="images[]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple required></label>
             <label>Urutan<input type="number" name="sort_order" value="0" min="0"></label>
             <button class="btn btn-primary" type="submit">Tambah Foto</button>
         </form>

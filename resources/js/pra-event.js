@@ -159,6 +159,30 @@ ready(() => {
             const seconds = Math.floor((diff % 60000) / 1000);
             output.textContent = `${days} hari ${hours} jam ${minutes} menit ${seconds} detik`;
         });
+
+        document.querySelectorAll('[data-countdown]').forEach((output) => {
+            const dateValue = output.getAttribute('data-countdown');
+            if (!dateValue) return;
+
+            const target = new Date(`${dateValue}T00:00:00+07:00`).getTime();
+            const diff = target - Date.now();
+
+            if (Number.isNaN(target)) {
+                output.textContent = 'Tanggal PRA sedang disiapkan';
+                return;
+            }
+
+            if (diff <= 0) {
+                output.textContent = 'Event sedang berlangsung / sudah dimulai';
+                return;
+            }
+
+            const days = Math.floor(diff / 86400000);
+            const hours = Math.floor((diff % 86400000) / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            output.textContent = `${days} hari ${hours} jam ${minutes} menit ${seconds} detik`;
+        });
     };
 
     updateCountdowns();
