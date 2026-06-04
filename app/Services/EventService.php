@@ -54,7 +54,7 @@ class EventService
         ];
     }
 
-    public function registrationsQuery(Event $event, ?string $filter = null): Builder
+    public function registrationsQuery(Event $event, ?string $filter = null)
     {
         return $event->registrations()
             ->with(['group', 'paymentProof'])
