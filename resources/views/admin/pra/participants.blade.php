@@ -25,7 +25,7 @@
     <div class="table-scroller">
         <table>
             <thead>
-            <tr><th>Nama</th><th>Nama Panggilan</th><th>Kelas</th><th>Grup</th><th>Asal Sekolah Minggu</th><th>Metode Pembayaran</th><th>Status Pembayaran</th><th>Tanggal Daftar</th></tr>
+            <tr><th>Nama</th><th>Nama Panggilan</th><th>Kelas</th><th>Grup</th><th>Asal Sekolah Minggu</th><th>Metode Pembayaran</th><th>Status Pembayaran</th><th>Tanggal Daftar</th><th>Aksi</th></tr>
             </thead>
             <tbody>
             @forelse($registrations as $registration)
@@ -38,9 +38,10 @@
                     <td>{{ ucfirst($registration->payment_method) }}</td>
                     <td>{{ $registration->paymentStatusLabel() }}</td>
                     <td>{{ optional($registration->registered_at)->format('d M Y H:i') }}</td>
+                    <td><a class="btn btn-secondary" href="{{ route('admin.pra.participants.show', $registration) }}">Detail</a></td>
                 </tr>
             @empty
-                <tr><td colspan="8" class="empty-state">Belum ada peserta.</td></tr>
+                <tr><td colspan="9" class="empty-state">Belum ada peserta.</td></tr>
             @endforelse
             </tbody>
         </table>

@@ -93,6 +93,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::prefix('pra-2026')->name('pra.')->middleware('permission:content.manage')->group(function () {
             Route::get('/', [PraEventController::class, 'dashboard'])->name('dashboard');
             Route::get('/peserta', [PraEventController::class, 'participants'])->name('participants');
+            Route::get('/peserta/{registration}', [PraEventController::class, 'participantDetail'])->name('participants.show');
+            Route::post('/peserta/{registration}/resend-whatsapp', [PraEventController::class, 'resendWhatsappConfirmation'])->name('participants.resend-whatsapp');
             Route::get('/grup-1', [PraEventController::class, 'groupOne'])->name('group-one');
             Route::get('/grup-2', [PraEventController::class, 'groupTwo'])->name('group-two');
             Route::get('/pembayaran', [PraEventController::class, 'payments'])->name('payments');

@@ -6,6 +6,7 @@ use App\Http\Requests\StoreEventRegistrationRequest;
 use App\Models\EventRegistration;
 use App\Models\PaymentProof;
 use App\Services\EventService;
+use App\Services\FonnteService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -31,7 +32,7 @@ class EventLandingController extends Controller
         ]);
     }
 
-    public function register(StoreEventRegistrationRequest $request, EventService $eventService): RedirectResponse
+    public function register(StoreEventRegistrationRequest $request, EventService $eventService, FonnteService $fonnteService): RedirectResponse
     {
         $event = $eventService->pra2026();
         $validated = $request->validated();
@@ -72,6 +73,8 @@ class EventLandingController extends Controller
                 'verification_status' => 'pending',
             ]);
         }
+
+        $fonnteService->sendPraRegistrationNotifications($registration);
 
         return redirect()
             ->route('events.pra-2026')

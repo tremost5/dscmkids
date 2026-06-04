@@ -35,4 +35,17 @@ return [
         'broadcast_webhook' => env('WHATSAPP_BROADCAST_WEBHOOK'),
     ],
 
+    'fonnte' => [
+        'token' => env('FONNTE_TOKEN'),
+        'endpoint' => env('FONNTE_ENDPOINT', 'https://api.fonnte.com/send'),
+        'country_code' => env('FONNTE_COUNTRY_CODE', '62'),
+    ],
+
+    'pra' => [
+        'committee_numbers' => array_values(array_filter(array_map(
+            fn ($number) => trim((string) $number),
+            explode(',', (string) env('PRA_COMMITTEE_NUMBERS', ''))
+        ))),
+    ],
+
 ];

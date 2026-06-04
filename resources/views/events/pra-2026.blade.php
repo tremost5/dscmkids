@@ -222,7 +222,10 @@
                             </div>
                         </article>
                     @empty
-                        <div class="pra-empty">Belum ada peserta di grup ini.</div>
+                        <div class="pra-empty">
+                            <strong>Belum ada peserta di grup ini.</strong>
+                            <span>Yuk, jadi salah satu keluarga pertama yang mendaftarkan anak untuk PRA 2026.</span>
+                        </div>
                     @endforelse
                 </section>
             @endforeach

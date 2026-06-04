@@ -7,6 +7,7 @@ use App\Models\EventGallery;
 use App\Models\EventRegistration;
 use App\Models\EventVideo;
 use App\Services\EventService;
+use App\Services\FonnteService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -49,6 +50,33 @@ class PraEventController extends Controller
         request()->merge(['filter' => 'grup-2']);
 
         return $this->participants(request(), $eventService);
+    }
+
+    public function participantDetail(EventRegistration $registration, EventService $eventService): View
+    {
+        $event = $eventService->pra2026();
+        abort_unless((int) $registration->event_id === (int) $event->id, 404);
+
+        return view('admin.pra.participant-detail', [
+            'event' => $event,
+            'registration' => $registration->load(['group', 'paymentProof']),
+        ]);
+    }
+
+    public function resendWhatsappConfirmation(EventRegistration $registration, EventService $eventService, FonnteService $fonnteService): RedirectResponse
+    {
+        $event = $eventService->pra2026();
+        abort_unless((int) $registration->event_id === (int) $event->id, 404);
+
+        $sent = $fonnteService->sendParentConfirmation($registration->load('group'));
+
+        if ($sent) {
+            return back()->with('success', 'WhatsApp confirmation berhasil dikirim ulang.');
+        }
+
+        return back()->withErrors([
+            'whatsapp' => 'WhatsApp confirmation belum berhasil dikirim. Cek konfigurasi Fonnte atau log aplikasi.',
+        ]);
     }
 
     public function payments(Request $request, EventService $eventService): View
