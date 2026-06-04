@@ -97,6 +97,7 @@
         'Hafalkan 1 ayat minggu ini',
     ];
     $siteMenuLinks = [
+        ['href' => route('events.pra-2026'), 'label' => 'PRA 2026'],
         ['href' => '#monthly-theme', 'label' => 'Tema'],
         ['href' => '#kids-zone', 'label' => 'Zona Murid'],
         ['href' => '#quiz-zone', 'label' => 'Quiz'],
@@ -104,6 +105,9 @@
         ['href' => '#gallery', 'label' => 'Galeri'],
         ['href' => '#church-radio', 'label' => 'Radio'],
     ];
+    $desktopMenuLinks = collect($siteMenuLinks)
+        ->reject(fn ($item) => $item['label'] === 'Radio')
+        ->values();
 
     $currentDayName = now()->locale('id')->translatedFormat('l');
     $todayReading = collect($readingPlans)->firstWhere('day', $currentDayName) ?? $readingPlans[0];
@@ -120,14 +124,15 @@
             </span>
         </a>
 
-        <nav class="site-nav" aria-label="Primary navigation">
-            @foreach($siteMenuLinks as $item)
-                <a href="{{ $item['href'] }}">{{ $item['label'] }}</a>
+        <nav class="site-nav" id="siteNav" aria-label="Primary navigation" data-auto-collapse-nav>
+            @foreach($desktopMenuLinks as $item)
+                <a href="{{ $item['href'] }}" @class(['site-nav-pra' => $loop->first && $item['label'] === 'PRA 2026'])>{{ $item['label'] }}</a>
             @endforeach
             <a href="{{ route('news.index') }}">Berita</a>
-            @if($parentPortalCfg['enabled'])
-                <a href="{{ route('parent.portal') }}">Parent Portal</a>
-            @endif
+            <div class="site-more" data-more-menu hidden>
+                <button class="site-more-toggle" type="button" aria-expanded="false" aria-label="More navigation" data-more-toggle>More</button>
+                <div class="site-more-panel" data-more-panel></div>
+            </div>
         </nav>
 
         <div class="site-actions">
@@ -147,7 +152,7 @@
             </div>
             <div class="site-mobile-menu-links">
                 @foreach($siteMenuLinks as $item)
-                    <a href="{{ $item['href'] }}">{{ $item['label'] }}</a>
+                    <a href="{{ $item['href'] }}" @class(['site-mobile-pra' => $loop->first && $item['label'] === 'PRA 2026'])>{{ $item['label'] }}</a>
                 @endforeach
                 <a href="{{ route('news.index') }}">Berita</a>
                 @if($parentPortalCfg['enabled'])

@@ -15,6 +15,8 @@ export default defineConfig({
                 'resources/js/news.js',
                 'resources/css/gallery-event.css',
                 'resources/js/gallery-event.js',
+                'resources/css/pra-event.css',
+                'resources/js/pra-event.js',
                 'resources/css/student-auth.css',
                 'resources/css/student-arcade.css',
                 'resources/js/student-arcade.js',

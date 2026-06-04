@@ -52,6 +52,7 @@
                     <a href="{{ route('admin.sections.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.sections.')) active @endif" data-close-sidebar-link>Konten</a>
                     <a href="{{ route('admin.media.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.media.')) active @endif" data-close-sidebar-link>Media</a>
                     <a href="{{ route('admin.materials.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.materials.')) active @endif" data-close-sidebar-link>Materi</a>
+                    <a href="{{ route('admin.pra.dashboard') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.pra.')) active @endif" data-close-sidebar-link>PRA 2026</a>
                     <a href="{{ route('admin.slides.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.slides.')) active @endif" data-close-sidebar-link>Slide</a>
                     <a href="{{ route('admin.teachers.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.teachers.')) active @endif" data-close-sidebar-link>Guru</a>
                     <a href="{{ route('admin.testimonials.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.testimonials.')) active @endif" data-close-sidebar-link>Testimoni</a>

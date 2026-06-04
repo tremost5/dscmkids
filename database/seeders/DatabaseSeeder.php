@@ -10,6 +10,7 @@ use App\Models\News;
 use App\Models\PageSection;
 use App\Models\TeacherProfile;
 use App\Models\User;
+use App\Services\EventService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
 
@@ -117,6 +118,7 @@ class DatabaseSeeder extends Seeder
         );
 
         $this->seedDailyQuizBanks();
+        app(EventService::class)->pra2026();
 
     }
 

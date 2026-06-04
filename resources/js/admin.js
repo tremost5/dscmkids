@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function restoreCollapsed() {
         try {
-            if (window.localStorage.getItem(collapsedKey) === '1' && window.innerWidth > 980) {
+            if (window.localStorage.getItem(collapsedKey) === '1' && window.innerWidth > 860) {
                 body.classList.add('admin-sidebar-collapsed');
             }
         } catch (error) {
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     sidebarToggle?.addEventListener('click', () => {
-        if (window.innerWidth <= 980) {
+        if (window.innerWidth <= 860) {
             openSidebar();
             return;
         }
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sidebarBackdrop?.addEventListener('click', closeSidebar);
     document.querySelectorAll('[data-close-sidebar-link]').forEach((link) => {
         link.addEventListener('click', () => {
-            if (window.innerWidth <= 980) {
+            if (window.innerWidth <= 860) {
                 closeSidebar();
             }
         });
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.addEventListener('resize', () => {
-        if (window.innerWidth > 980) {
+        if (window.innerWidth > 860) {
             closeSidebar();
         }
     });

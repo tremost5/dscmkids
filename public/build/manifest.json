@@ -1,6 +1,6 @@
 {
   "resources/css/admin.css": {
-    "file": "assets/admin-CYJ0HUtJ.css",
+    "file": "assets/admin-BUVTYeZp.css",
     "src": "resources/css/admin.css",
     "isEntry": true
   },
@@ -16,13 +16,18 @@
     "isEntry": true
   },
   "resources/css/landing.css": {
-    "file": "assets/landing-D1OyBI4M.css",
+    "file": "assets/landing-D-tVBoBS.css",
     "src": "resources/css/landing.css",
     "isEntry": true
   },
   "resources/css/news.css": {
     "file": "assets/news-Cf1lm5KB.css",
     "src": "resources/css/news.css",
+    "isEntry": true
+  },
+  "resources/css/pra-event.css": {
+    "file": "assets/pra-event-Ba4O5kU5.css",
+    "src": "resources/css/pra-event.css",
     "isEntry": true
   },
   "resources/css/student-arcade.css": {
@@ -36,7 +41,7 @@
     "isEntry": true
   },
   "resources/js/admin.js": {
-    "file": "assets/admin-BeS5rLZj.js",
+    "file": "assets/admin-ctVigwJ7.js",
     "name": "admin",
     "src": "resources/js/admin.js",
     "isEntry": true
@@ -54,7 +59,7 @@
     "isEntry": true
   },
   "resources/js/landing.js": {
-    "file": "assets/landing-DU3z25eV.js",
+    "file": "assets/landing-CzSC6ohP.js",
     "name": "landing",
     "src": "resources/js/landing.js",
     "isEntry": true
@@ -63,6 +68,12 @@
     "file": "assets/news-B7gBJPSp.js",
     "name": "news",
     "src": "resources/js/news.js",
+    "isEntry": true
+  },
+  "resources/js/pra-event.js": {
+    "file": "assets/pra-event-Cx6RwcFQ.js",
+    "name": "pra-event",
+    "src": "resources/js/pra-event.js",
     "isEntry": true
   },
   "resources/js/student-arcade.js": {
