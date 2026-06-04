@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         closeButton?.addEventListener('click', dismiss);
-        window.setTimeout(dismiss, 4200 + (index * 400));
+        window.setTimeout(dismiss, 5000 + (index * 400));
     });
 
     document.querySelectorAll('[data-broadcast-send-form]').forEach((form) => {

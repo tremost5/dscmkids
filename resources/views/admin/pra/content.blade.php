@@ -10,6 +10,8 @@
     $benefitsText = implode("\n", $event->benefits ?: []);
     $scheduleText = collect($event->schedule ?: [])->map(fn ($item) => ($item['time'] ?? '').' | '.($item['title'] ?? '').' | '.($item['description'] ?? ''))->implode("\n");
     $contactsText = collect($paymentInfo['contacts'] ?? [])->map(fn ($item) => ($item['name'] ?? '').' | '.($item['phone'] ?? ''))->implode("\n");
+    $mediaUrl = fn (?string $path) => $path ? route('storage.public', ['path' => $path]) : null;
+    $bannerImageUrl = $mediaUrl($banner?->background_image_path);
 @endphp
 
 <form method="POST" action="{{ route('admin.pra.content.update') }}" enctype="multipart/form-data" class="form-shell">
@@ -17,12 +19,26 @@
     @method('PUT')
     <section class="form-panel">
         <div class="section-head"><h2 class="section-title">Banner Event</h2><p class="section-copy">Judul, subjudul, splash popup, dan background banner.</p></div>
+        @if($bannerImageUrl)
+            <div class="detail-card" style="margin-bottom:16px;">
+                <div class="detail-kv-item">
+                    <span>Background Aktif</span>
+                    <strong>Gambar ini sedang tampil di hero PRA 2026.</strong>
+                </div>
+                <img src="{{ $bannerImageUrl }}" alt="Background banner PRA aktif" class="detail-media">
+            </div>
+        @else
+            <div class="detail-kv-item" style="margin-bottom:16px;">
+                <span>Background Aktif</span>
+                <strong>Belum ada background custom. Halaman publik memakai gambar default.</strong>
+            </div>
+        @endif
         <div class="grid-2">
             <label>Judul Event<input name="banner_title" value="{{ old('banner_title', $banner?->title ?: $event->title) }}" required></label>
             <label>Subjudul Event<input name="banner_subtitle" value="{{ old('banner_subtitle', $banner?->subtitle ?: $event->subtitle) }}"></label>
             <label>Splash Title<input name="splash_title" value="{{ old('splash_title', $banner?->splash_title ?: 'DAFTAR PRA 2026') }}"></label>
             <label>Splash Subtitle<input name="splash_subtitle" value="{{ old('splash_subtitle', $banner?->splash_subtitle) }}"></label>
-            <label>Background Banner<input type="file" name="background_image" accept="image/*"></label>
+            <label>Background Banner<input type="file" name="background_image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></label>
         </div>
     </section>
 
@@ -54,7 +70,7 @@
         <form method="POST" action="{{ route('admin.pra.galleries.store') }}" enctype="multipart/form-data" class="form-shell">
             @csrf
             <label>Judul Foto<input name="title"></label>
-            <label>Foto Lokasi<input type="file" name="image" accept="image/*" required></label>
+            <label>Foto Lokasi<input type="file" name="image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required></label>
             <label>Urutan<input type="number" name="sort_order" value="0" min="0"></label>
             <button class="btn btn-primary" type="submit">Tambah Foto</button>
         </form>
@@ -64,10 +80,10 @@
                 <tbody>
                 @forelse($event->galleries as $photo)
                     <tr>
-                        <td><img class="thumb" src="{{ asset('storage/'.$photo->image_path) }}" alt="{{ $photo->title }}"></td>
+                        <td><img class="thumb" src="{{ $mediaUrl($photo->image_path) }}" alt="{{ $photo->title ?: 'Foto lokasi PRA' }}"></td>
                         <td>{{ $photo->title ?: '-' }}</td>
                         <td>
-                            <form method="POST" action="{{ route('admin.pra.galleries.destroy', $photo) }}">
+                            <form method="POST" action="{{ route('admin.pra.galleries.destroy', $photo) }}" onsubmit="return confirm('Hapus foto lokasi ini?')">
                                 @csrf
                                 @method('DELETE')
                                 <button class="btn btn-danger" type="submit">Hapus</button>
@@ -100,9 +116,17 @@
                 @forelse($event->videos as $video)
                     <tr>
                         <td>{{ $video->title ?: '-' }}</td>
-                        <td>{{ $video->video_url ?: ($video->video_path ? 'Upload file' : '-') }}</td>
                         <td>
-                            <form method="POST" action="{{ route('admin.pra.videos.destroy', $video) }}">
+                            @if($video->video_url)
+                                <a href="{{ $video->video_url }}" target="_blank" rel="noopener">Buka link video</a>
+                            @elseif($video->video_path)
+                                <a href="{{ $mediaUrl($video->video_path) }}" target="_blank" rel="noopener">Buka video upload</a>
+                            @else
+                                -
+                            @endif
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ route('admin.pra.videos.destroy', $video) }}" onsubmit="return confirm('Hapus video lokasi ini?')">
                                 @csrf
                                 @method('DELETE')
                                 <button class="btn btn-danger" type="submit">Hapus</button>

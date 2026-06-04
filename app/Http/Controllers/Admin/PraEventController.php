@@ -14,10 +14,13 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 class PraEventController extends Controller
 {
     private const BROADCAST_FILTERS = ['all', 'grup-1', 'grup-2', 'unpaid', 'pending_verification', 'paid'];
+    private const OPTIONAL_IMAGE_RULES = ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'];
+    private const REQUIRED_IMAGE_RULES = ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'];
 
     public function dashboard(EventService $eventService): View
     {
@@ -231,8 +234,20 @@ class PraEventController extends Controller
             'banner_subtitle' => ['nullable', 'string', 'max:255'],
             'splash_title' => ['nullable', 'string', 'max:255'],
             'splash_subtitle' => ['nullable', 'string', 'max:255'],
-            'background_image' => ['nullable', 'image', 'max:4096'],
-        ]);
+            'background_image' => self::OPTIONAL_IMAGE_RULES,
+        ], $this->uploadValidationMessages());
+
+        $newBackgroundPath = null;
+        $backgroundUploaded = $request->hasFile('background_image');
+        if ($backgroundUploaded) {
+            try {
+                $newBackgroundPath = $request->file('background_image')->store('event-banners', 'public');
+            } catch (Throwable) {
+                return back()
+                    ->withErrors(['background_image' => 'Background banner belum berhasil diupload. Coba gunakan file JPG, PNG, atau WebP maksimal 5MB.'])
+                    ->withInput();
+            }
+        }
 
         $event->update([
             'title' => $data['title'],
@@ -258,17 +273,22 @@ class PraEventController extends Controller
         ];
 
         $banner = $event->banner ?: $event->banners()->create($bannerPayload);
-        if ($request->hasFile('background_image')) {
+        if ($newBackgroundPath) {
             if ($banner->background_image_path) {
                 Storage::disk('public')->delete($banner->background_image_path);
             }
 
-            $bannerPayload['background_image_path'] = $request->file('background_image')->store('event-banners', 'public');
+            $bannerPayload['background_image_path'] = $newBackgroundPath;
         }
 
         $banner->update($bannerPayload);
 
-        return back()->with('success', 'Konten landing page PRA diperbarui.');
+        return back()->with(
+            'success',
+            $backgroundUploaded
+                ? 'Konten PRA dan background banner berhasil diperbarui.'
+                : 'Konten landing page PRA berhasil diperbarui.'
+        );
     }
 
     public function storeGallery(Request $request, EventService $eventService): RedirectResponse
@@ -276,17 +296,25 @@ class PraEventController extends Controller
         $event = $eventService->pra2026();
         $data = $request->validate([
             'title' => ['nullable', 'string', 'max:255'],
-            'image' => ['required', 'image', 'max:4096'],
+            'image' => self::REQUIRED_IMAGE_RULES,
             'sort_order' => ['nullable', 'integer', 'min:0'],
-        ]);
+        ], $this->uploadValidationMessages());
+
+        try {
+            $imagePath = $request->file('image')->store('event-galleries', 'public');
+        } catch (Throwable) {
+            return back()
+                ->withErrors(['image' => 'Foto lokasi belum berhasil diupload. Coba gunakan file JPG, PNG, atau WebP maksimal 5MB.'])
+                ->withInput();
+        }
 
         $event->galleries()->create([
             'title' => $data['title'] ?? null,
-            'image_path' => $request->file('image')->store('event-galleries', 'public'),
+            'image_path' => $imagePath,
             'sort_order' => (int) ($data['sort_order'] ?? 0),
         ]);
 
-        return back()->with('success', 'Foto lokasi ditambahkan.');
+        return back()->with('success', 'Foto lokasi berhasil diupload dan langsung tampil di galeri.');
     }
 
     public function deleteGallery(EventGallery $gallery): RedirectResponse
@@ -294,7 +322,7 @@ class PraEventController extends Controller
         Storage::disk('public')->delete($gallery->image_path);
         $gallery->delete();
 
-        return back()->with('success', 'Foto lokasi dihapus.');
+        return back()->with('success', 'Foto lokasi berhasil dihapus dari galeri.');
     }
 
     public function storeVideo(Request $request, EventService $eventService): RedirectResponse
@@ -306,21 +334,35 @@ class PraEventController extends Controller
             'video_file' => ['nullable', 'file', 'max:10240', 'mimetypes:video/mp4,video/webm,video/quicktime'],
             'description' => ['nullable', 'string'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
+        ], [
+            'video_url.url' => 'Link video harus berupa URL yang valid.',
+            'video_file.max' => 'Ukuran video maksimal 10MB.',
+            'video_file.mimetypes' => 'Format video harus MP4, WebM, atau QuickTime.',
         ]);
 
         if (!$request->hasFile('video_file') && empty($data['video_url'])) {
             return back()->withErrors(['video_url' => 'Isi link video atau upload file video.'])->withInput();
         }
 
+        try {
+            $videoPath = $request->hasFile('video_file')
+                ? $request->file('video_file')->store('event-videos', 'public')
+                : null;
+        } catch (Throwable) {
+            return back()
+                ->withErrors(['video_file' => 'Video lokasi belum berhasil diupload. Coba gunakan file MP4/WebM maksimal 10MB.'])
+                ->withInput();
+        }
+
         $event->videos()->create([
             'title' => $data['title'] ?? null,
             'video_url' => $data['video_url'] ?? null,
-            'video_path' => $request->hasFile('video_file') ? $request->file('video_file')->store('event-videos', 'public') : null,
+            'video_path' => $videoPath,
             'description' => $data['description'] ?? null,
             'sort_order' => (int) ($data['sort_order'] ?? 0),
         ]);
 
-        return back()->with('success', 'Video lokasi ditambahkan.');
+        return back()->with('success', 'Video lokasi berhasil ditambahkan.');
     }
 
     public function deleteVideo(EventVideo $video): RedirectResponse
@@ -331,7 +373,7 @@ class PraEventController extends Controller
 
         $video->delete();
 
-        return back()->with('success', 'Video lokasi dihapus.');
+        return back()->with('success', 'Video lokasi berhasil dihapus.');
     }
 
     public function export(Request $request, EventService $eventService): StreamedResponse
@@ -380,5 +422,18 @@ class PraEventController extends Controller
             ->filter(fn (array $contact) => $contact['name'] !== '' && $contact['phone'] !== '')
             ->values()
             ->all();
+    }
+
+    private function uploadValidationMessages(): array
+    {
+        return [
+            'background_image.image' => 'Background banner harus berupa gambar.',
+            'background_image.mimes' => 'Background banner harus berformat JPG, JPEG, PNG, atau WebP.',
+            'background_image.max' => 'Ukuran background banner maksimal 5MB.',
+            'image.required' => 'Pilih foto lokasi terlebih dahulu.',
+            'image.image' => 'Foto lokasi harus berupa gambar.',
+            'image.mimes' => 'Foto lokasi harus berformat JPG, JPEG, PNG, atau WebP.',
+            'image.max' => 'Ukuran foto lokasi maksimal 5MB.',
+        ];
     }
 }

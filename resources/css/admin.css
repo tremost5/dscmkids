@@ -285,6 +285,18 @@ a {
     color: #9f1239;
 }
 
+.admin-toast--warning {
+    border: 1px solid rgba(245, 158, 11, 0.24);
+    background: rgba(255, 251, 235, 0.96);
+    color: #92400e;
+}
+
+.admin-toast--info {
+    border: 1px solid rgba(14, 165, 233, 0.24);
+    background: rgba(240, 249, 255, 0.96);
+    color: #075985;
+}
+
 .admin-toast-close,
 .admin-icon-btn {
     display: inline-flex;

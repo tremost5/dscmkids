@@ -101,12 +101,14 @@
 
         <main class="admin-shell">
             <div class="admin-toast-stack" id="adminToastStack">
-                @if(session('success'))
-                    <div class="admin-toast admin-toast--success" data-toast>
-                        <div>{{ session('success') }}</div>
-                        <button type="button" class="admin-toast-close" data-toast-close aria-label="Close">x</button>
-                    </div>
-                @endif
+                @foreach(['success', 'error', 'warning', 'info'] as $flashType)
+                    @if(session($flashType))
+                        <div class="admin-toast admin-toast--{{ $flashType }}" data-toast role="status">
+                            <div>{{ session($flashType) }}</div>
+                            <button type="button" class="admin-toast-close" data-toast-close aria-label="Close">x</button>
+                        </div>
+                    @endif
+                @endforeach
 
                 @if($errors->any())
                     <div class="admin-toast admin-toast--error" data-toast>

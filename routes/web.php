@@ -28,7 +28,15 @@ use App\Http\Controllers\StudentWalletController;
 use App\Http\Controllers\TestimonialSubmissionController;
 use App\Http\Controllers\ParentPortalController;
 use App\Http\Controllers\TeacherPhotoController;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/storage/{path}', function (string $path) {
+    abort_if(str_contains($path, '..'), 404);
+    abort_unless(Storage::disk('public')->exists($path), 404);
+
+    return Storage::disk('public')->response($path);
+})->where('path', '.*')->name('storage.public');
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/berita', [LandingController::class, 'newsIndex'])->name('news.index');

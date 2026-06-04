@@ -14,8 +14,9 @@
     @endif
 </head>
 @php
+    $mediaUrl = fn (?string $path) => $path ? route('storage.public', ['path' => $path]) : null;
     $heroImage = $banner?->background_image_path
-        ? asset('storage/'.$banner->background_image_path)
+        ? $mediaUrl($banner->background_image_path)
         : 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?q=80&w=1800&auto=format&fit=crop';
     $paymentInfo = is_array($event->payment_info) ? $event->payment_info : [];
     $contacts = collect($paymentInfo['contacts'] ?? [])->filter(fn ($item) => !empty($item['name']) && !empty($item['phone']))->values();
@@ -127,7 +128,7 @@
         <div class="pra-location-grid">
             <div class="pra-slider" data-pra-slider>
                 @forelse($event->galleries as $photo)
-                    <img class="{{ $loop->first ? 'active' : '' }}" src="{{ asset('storage/'.$photo->image_path) }}" alt="{{ $photo->title ?: 'Foto lokasi PRA' }}">
+                    <img class="{{ $loop->first ? 'active' : '' }}" src="{{ $mediaUrl($photo->image_path) }}" alt="{{ $photo->title ?: 'Foto lokasi PRA' }}">
                 @empty
                     <img class="active" src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=1200&auto=format&fit=crop" alt="Anak-anak berkegiatan bersama">
                     <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200&auto=format&fit=crop" alt="Ruang kegiatan anak">
@@ -140,7 +141,7 @@
                         <strong>{{ $video->title ?: 'Preview lokasi' }}</strong>
                         <p>{{ $video->description ?: 'Video singkat suasana lokasi kegiatan.' }}</p>
                         @if($video->video_path)
-                            <video controls src="{{ asset('storage/'.$video->video_path) }}"></video>
+                            <video controls src="{{ $mediaUrl($video->video_path) }}"></video>
                         @elseif($video->video_url)
                             <a class="pra-btn pra-btn-light" href="{{ $video->video_url }}" target="_blank" rel="noopener">Buka Video</a>
                         @endif
@@ -156,7 +157,7 @@
         </div>
         <div class="pra-gallery-strip">
             @forelse($event->galleries->take(6) as $photo)
-                <img src="{{ asset('storage/'.$photo->image_path) }}" alt="{{ $photo->title ?: 'Galeri PRA' }}">
+                <img src="{{ $mediaUrl($photo->image_path) }}" alt="{{ $photo->title ?: 'Galeri PRA' }}">
             @empty
                 <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=500&auto=format&fit=crop" alt="Galeri kegiatan anak">
                 <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=500&auto=format&fit=crop" alt="Anak belajar bersama">
