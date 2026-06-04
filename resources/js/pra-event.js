@@ -176,6 +176,103 @@ ready(() => {
         }, 3600);
     });
 
+    const galleryViewer = document.querySelector('[data-pra-gallery-viewer]');
+    const galleryActiveImage = galleryViewer?.querySelector('[data-pra-gallery-active]');
+    const galleryCaption = galleryViewer?.querySelector('[data-pra-gallery-caption]');
+    const galleryCounter = galleryViewer?.querySelector('[data-pra-gallery-counter]');
+    const galleryImages = [...document.querySelectorAll('[data-pra-gallery-image]')];
+    const galleryItems = [...galleryImages.reduce((items, image) => {
+        const itemIndex = Number.parseInt(image.getAttribute('data-pra-gallery-index') || `${items.size}`, 10);
+        if (!items.has(itemIndex)) {
+            items.set(itemIndex, {
+                src: image.currentSrc || image.src,
+                alt: image.getAttribute('alt') || 'Foto PRA 2026',
+            });
+        }
+        return items;
+    }, new Map()).entries()]
+        .sort(([left], [right]) => left - right)
+        .map(([, item]) => item);
+    let galleryIndex = 0;
+    let galleryHistoryPushed = false;
+    let previousBodyOverflow = '';
+    let touchStartX = 0;
+
+    const renderGallery = () => {
+        if (!galleryActiveImage || !galleryCaption || !galleryCounter || galleryItems.length === 0) return;
+        const item = galleryItems[galleryIndex];
+        galleryActiveImage.src = item.src;
+        galleryActiveImage.alt = item.alt;
+        galleryCaption.textContent = item.alt;
+        galleryCounter.textContent = `${galleryIndex + 1} / ${galleryItems.length}`;
+    };
+
+    const closeGallery = (fromHistory = false) => {
+        if (!galleryViewer || galleryViewer.hidden) return;
+
+        if (!fromHistory && galleryHistoryPushed) {
+            window.history.back();
+            return;
+        }
+
+        galleryViewer.hidden = true;
+        document.body.style.overflow = previousBodyOverflow;
+        galleryHistoryPushed = false;
+    };
+
+    const openGallery = (index) => {
+        if (!galleryViewer || galleryItems.length === 0) return;
+        previousBodyOverflow = document.body.style.overflow;
+        galleryIndex = Math.max(0, Math.min(index, galleryItems.length - 1));
+        renderGallery();
+        galleryViewer.hidden = false;
+        document.body.style.overflow = 'hidden';
+
+        if (!galleryHistoryPushed) {
+            window.history.pushState({ praGallery: true }, '', window.location.href);
+            galleryHistoryPushed = true;
+        }
+    };
+
+    const moveGallery = (direction) => {
+        if (galleryItems.length === 0) return;
+        galleryIndex = (galleryIndex + direction + galleryItems.length) % galleryItems.length;
+        renderGallery();
+    };
+
+    galleryImages.forEach((image) => {
+        image.addEventListener('click', () => {
+            const imageIndex = Number.parseInt(image.getAttribute('data-pra-gallery-index') || '0', 10);
+            const foundIndex = galleryItems.findIndex((item) => item.src === (image.currentSrc || image.src));
+            openGallery(foundIndex >= 0 ? foundIndex : imageIndex);
+        });
+    });
+
+    galleryViewer?.querySelector('[data-pra-gallery-close]')?.addEventListener('click', () => closeGallery());
+    galleryViewer?.querySelector('[data-pra-gallery-prev]')?.addEventListener('click', () => moveGallery(-1));
+    galleryViewer?.querySelector('[data-pra-gallery-next]')?.addEventListener('click', () => moveGallery(1));
+    galleryViewer?.addEventListener('pointerdown', (event) => {
+        touchStartX = event.clientX;
+    });
+    galleryViewer?.addEventListener('pointerup', (event) => {
+        const diff = event.clientX - touchStartX;
+        if (Math.abs(diff) < 44) return;
+        moveGallery(diff > 0 ? -1 : 1);
+    });
+
+    window.addEventListener('popstate', () => {
+        if (galleryViewer && !galleryViewer.hidden) {
+            closeGallery(true);
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (!galleryViewer || galleryViewer.hidden) return;
+        if (event.key === 'Escape') closeGallery();
+        if (event.key === 'ArrowLeft') moveGallery(-1);
+        if (event.key === 'ArrowRight') moveGallery(1);
+    });
+
     const form = document.querySelector('[data-pra-form]');
     if (!form) return;
 

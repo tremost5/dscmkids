@@ -5,6 +5,14 @@
 @section('content')
 @include('admin.pra.partials.nav')
 
+@php
+    $groupCount = $recipients->pluck('group')->filter()->unique()->count();
+    $estimateSeconds = max(1, $recipients->count());
+    $estimateText = $estimateSeconds < 60
+        ? 'sekitar '.$estimateSeconds.' detik'
+        : 'sekitar '.ceil($estimateSeconds / 60).' menit';
+@endphp
+
 <div class="grid-2">
     <section class="form-panel">
         <div class="section-head">
@@ -43,29 +51,34 @@
             <button class="btn btn-success" type="submit" form="broadcastSendForm">Kirim Broadcast WA</button>
         </div>
     </section>
-    <section class="table-shell">
+    <section class="table-shell broadcast-preview-shell">
         <div class="table-toolbar">
             <div>
-                <h2 class="section-title">{{ $recipients->count() }} penerima</h2>
-                <p class="section-copy">Data nomor sudah dinormalisasi ke format internasional jika memungkinkan.</p>
+                <h2 class="section-title">Preview Penerima</h2>
+                <p class="section-copy">Nomor sudah dinormalisasi ke format internasional.</p>
             </div>
         </div>
-        <div class="table-scroller">
-            <table>
-                <thead><tr><th>Orang Tua</th><th>Anak</th><th>WA</th><th>Grup</th></tr></thead>
-                <tbody>
-                @forelse($recipients as $recipient)
-                    <tr>
-                        <td>{{ $recipient['name'] }}</td>
-                        <td>{{ $recipient['child'] }}</td>
-                        <td>{{ $recipient['phone'] }}</td>
-                        <td>{{ $recipient['group'] }}</td>
-                    </tr>
-                @empty
-                    <tr><td colspan="4" class="empty-state">Tidak ada penerima untuk filter ini.</td></tr>
-                @endforelse
-                </tbody>
-            </table>
+
+        <div class="broadcast-summary-grid">
+            <div class="broadcast-summary-card"><span>Total Penerima</span><strong>{{ $recipients->count() }}</strong></div>
+            <div class="broadcast-summary-card"><span>Grup Terlibat</span><strong>{{ $groupCount }}</strong></div>
+            <div class="broadcast-summary-card"><span>Estimasi Kirim</span><strong>{{ $estimateText }}</strong></div>
+        </div>
+
+        <div class="broadcast-recipient-list">
+            @forelse($recipients as $recipient)
+                <article class="broadcast-recipient-card">
+                    <span class="broadcast-recipient-check">✓</span>
+                    <div>
+                        <strong>{{ $recipient['name'] }}</strong>
+                        <span>{{ $recipient['child'] }}</span>
+                        <code>{{ $recipient['phone'] }}</code>
+                        <em>{{ $recipient['group'] ?: 'Tanpa grup' }}</em>
+                    </div>
+                </article>
+            @empty
+                <div class="empty-state">Tidak ada penerima untuk filter ini.</div>
+            @endforelse
         </div>
     </section>
 </div>
@@ -84,10 +97,14 @@
     </section>
 @endif
 
-@if($message !== '')
-    <section class="form-panel" style="margin-top:16px;">
-        <h2 class="section-title">Payload siap integrasi</h2>
-        <pre class="code-block">{{ json_encode(['filter' => $filter, 'message' => $message, 'recipients' => $recipients], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
-    </section>
-@endif
+<div class="admin-modal" data-broadcast-confirm-modal hidden>
+    <div class="admin-modal-card">
+        <h2>Kirim Broadcast WA?</h2>
+        <p>Kirim pesan ini ke <strong data-broadcast-confirm-count>{{ $recipients->count() }}</strong> penerima?</p>
+        <div class="form-actions">
+            <button class="btn btn-secondary" type="button" data-broadcast-cancel>Batal</button>
+            <button class="btn btn-success" type="button" data-broadcast-confirm>Kirim Sekarang</button>
+        </div>
+    </div>
+</div>
 @endsection

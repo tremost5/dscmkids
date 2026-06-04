@@ -69,10 +69,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('[data-broadcast-send-form]').forEach((form) => {
         form.addEventListener('submit', (event) => {
+            if (form.dataset.broadcastConfirmed === '1') {
+                return;
+            }
+
             const filterSource = document.querySelector('[data-broadcast-filter-source]');
             const messageSource = document.querySelector('[data-broadcast-message-source]');
             const filterField = form.querySelector('[data-broadcast-filter-field]');
             const messageField = form.querySelector('[data-broadcast-message-field]');
+            const modal = document.querySelector('[data-broadcast-confirm-modal]');
+            const confirmCount = modal?.querySelector('[data-broadcast-confirm-count]');
+            const confirmButton = modal?.querySelector('[data-broadcast-confirm]');
+            const cancelButton = modal?.querySelector('[data-broadcast-cancel]');
 
             if (filterSource instanceof HTMLSelectElement && filterField instanceof HTMLInputElement) {
                 if (filterSource.value !== filterField.value) {
@@ -90,15 +98,43 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const recipientCount = form.getAttribute('data-broadcast-count') || '0';
-            if (!window.confirm(`Kirim pesan ke ${recipientCount} peserta?`)) {
-                event.preventDefault();
-                loadingLayer?.classList.remove('is-visible');
+
+            if (!modal || !confirmButton || !cancelButton) {
+                if (!window.confirm(`Kirim pesan ke ${recipientCount} peserta?`)) {
+                    event.preventDefault();
+                    loadingLayer?.classList.remove('is-visible');
+                }
+                return;
             }
+
+            event.preventDefault();
+            if (confirmCount) confirmCount.textContent = recipientCount;
+            modal.hidden = false;
+
+            const closeModal = () => {
+                modal.hidden = true;
+            };
+
+            const confirmSend = () => {
+                form.dataset.broadcastConfirmed = '1';
+                closeModal();
+                form.requestSubmit();
+            };
+
+            cancelButton.onclick = closeModal;
+            modal.onclick = (modalEvent) => {
+                if (modalEvent.target === modal) closeModal();
+            };
+            confirmButton.onclick = confirmSend;
         });
     });
 
     document.querySelectorAll('form[data-loading-form], form:not([method="GET"])').forEach((form) => {
-        form.addEventListener('submit', () => {
+        form.addEventListener('submit', (event) => {
+            if (event.defaultPrevented) {
+                return;
+            }
+
             loadingLayer?.classList.add('is-visible');
         });
     });

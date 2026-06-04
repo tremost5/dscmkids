@@ -128,11 +128,18 @@
         <div class="pra-location-grid">
             <div class="pra-slider" data-pra-slider>
                 @forelse($event->galleries as $photo)
-                    <img class="{{ $loop->first ? 'active' : '' }}" src="{{ $mediaUrl($photo->image_path) }}" alt="{{ $photo->title ?: 'Foto lokasi PRA' }}">
+                    <img
+                        class="{{ $loop->first ? 'active' : '' }}"
+                        src="{{ $mediaUrl($photo->image_path) }}"
+                        alt="{{ $photo->title ?: 'Foto lokasi PRA' }}"
+                        loading="lazy"
+                        data-pra-gallery-image
+                        data-pra-gallery-index="{{ $loop->index }}"
+                    >
                 @empty
-                    <img class="active" src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=1200&auto=format&fit=crop" alt="Anak-anak berkegiatan bersama">
-                    <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200&auto=format&fit=crop" alt="Ruang kegiatan anak">
-                    <img src="https://images.unsplash.com/photo-1529390079861-591de354faf5?q=80&w=1200&auto=format&fit=crop" alt="Aktivitas kelompok anak">
+                    <img class="active" src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=1200&auto=format&fit=crop" alt="Anak-anak berkegiatan bersama" loading="lazy" data-pra-gallery-image data-pra-gallery-index="0">
+                    <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200&auto=format&fit=crop" alt="Ruang kegiatan anak" loading="lazy" data-pra-gallery-image data-pra-gallery-index="1">
+                    <img src="https://images.unsplash.com/photo-1529390079861-591de354faf5?q=80&w=1200&auto=format&fit=crop" alt="Aktivitas kelompok anak" loading="lazy" data-pra-gallery-image data-pra-gallery-index="2">
                 @endforelse
             </div>
             <div class="pra-video-stack">
@@ -157,11 +164,17 @@
         </div>
         <div class="pra-gallery-strip">
             @forelse($event->galleries->take(6) as $photo)
-                <img src="{{ $mediaUrl($photo->image_path) }}" alt="{{ $photo->title ?: 'Galeri PRA' }}">
+                <img
+                    src="{{ $mediaUrl($photo->image_path) }}"
+                    alt="{{ $photo->title ?: 'Galeri PRA' }}"
+                    loading="lazy"
+                    data-pra-gallery-image
+                    data-pra-gallery-index="{{ $loop->index }}"
+                >
             @empty
-                <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=500&auto=format&fit=crop" alt="Galeri kegiatan anak">
-                <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=500&auto=format&fit=crop" alt="Anak belajar bersama">
-                <img src="https://images.unsplash.com/photo-1472162072942-cd5147eb3902?q=80&w=500&auto=format&fit=crop" alt="Aktivitas kreatif">
+                <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=500&auto=format&fit=crop" alt="Galeri kegiatan anak" loading="lazy" data-pra-gallery-image data-pra-gallery-index="3">
+                <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=500&auto=format&fit=crop" alt="Anak belajar bersama" loading="lazy" data-pra-gallery-image data-pra-gallery-index="4">
+                <img src="https://images.unsplash.com/photo-1472162072942-cd5147eb3902?q=80&w=500&auto=format&fit=crop" alt="Aktivitas kreatif" loading="lazy" data-pra-gallery-image data-pra-gallery-index="5">
             @endforelse
         </div>
     </section>
@@ -366,6 +379,19 @@
         </form>
     </section>
 </main>
+
+<div class="pra-gallery-viewer" data-pra-gallery-viewer hidden>
+    <button class="pra-gallery-close" type="button" data-pra-gallery-close aria-label="Tutup galeri">x</button>
+    <button class="pra-gallery-arrow pra-gallery-arrow--prev" type="button" data-pra-gallery-prev aria-label="Foto sebelumnya">‹</button>
+    <figure class="pra-gallery-stage">
+        <img src="" alt="" data-pra-gallery-active>
+        <figcaption>
+            <span data-pra-gallery-caption></span>
+            <strong data-pra-gallery-counter>1 / 1</strong>
+        </figcaption>
+    </figure>
+    <button class="pra-gallery-arrow pra-gallery-arrow--next" type="button" data-pra-gallery-next aria-label="Foto berikutnya">›</button>
+</div>
 
 <footer class="pra-footer">
     <strong>DSCMKids</strong>

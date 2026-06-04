@@ -195,8 +195,8 @@ class PraEventController extends Controller
 
         if ($broadcastLog->success_count > 0) {
             $message = $broadcastLog->failed_count > 0
-                ? "Broadcast terkirim ke {$broadcastLog->success_count} peserta, gagal {$broadcastLog->failed_count} peserta."
-                : "Broadcast berhasil dikirim ke {$broadcastLog->success_count} peserta.";
+                ? "Broadcast terkirim. {$broadcastLog->success_count} berhasil, {$broadcastLog->failed_count} gagal."
+                : "Broadcast berhasil dikirim. {$broadcastLog->success_count} berhasil, 0 gagal.";
 
             return $redirect->with('success', $message);
         }

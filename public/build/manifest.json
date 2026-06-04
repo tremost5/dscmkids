@@ -1,6 +1,6 @@
 {
   "resources/css/admin.css": {
-    "file": "assets/admin-rehZcd4J.css",
+    "file": "assets/admin-B-_0jX4G.css",
     "src": "resources/css/admin.css",
     "isEntry": true
   },
@@ -26,7 +26,7 @@
     "isEntry": true
   },
   "resources/css/pra-event.css": {
-    "file": "assets/pra-event-BbtVwgH1.css",
+    "file": "assets/pra-event-DJOnk__x.css",
     "src": "resources/css/pra-event.css",
     "isEntry": true
   },
@@ -41,7 +41,7 @@
     "isEntry": true
   },
   "resources/js/admin.js": {
-    "file": "assets/admin-pP4UUjks.js",
+    "file": "assets/admin-DH6UHX-8.js",
     "name": "admin",
     "src": "resources/js/admin.js",
     "isEntry": true
@@ -71,7 +71,7 @@
     "isEntry": true
   },
   "resources/js/pra-event.js": {
-    "file": "assets/pra-event-BblTPWKC.js",
+    "file": "assets/pra-event-DRk9u8ti.js",
     "name": "pra-event",
     "src": "resources/js/pra-event.js",
     "isEntry": true

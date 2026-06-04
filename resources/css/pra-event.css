@@ -410,6 +410,7 @@ a {
     height: 100%;
     object-fit: cover;
     opacity: 0;
+    cursor: zoom-in;
     transition: opacity 0.4s ease;
 }
 
@@ -466,6 +467,98 @@ a {
     aspect-ratio: 4 / 3;
     object-fit: cover;
     border-radius: 8px;
+    cursor: zoom-in;
+}
+
+.pra-gallery-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr) 72px;
+    align-items: center;
+    gap: 10px;
+    padding: 22px;
+    background: rgba(6, 12, 24, 0.94);
+    color: #fff;
+}
+
+.pra-gallery-viewer[hidden] {
+    display: none;
+}
+
+.pra-gallery-stage {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    height: min(86vh, 920px);
+    margin: 0;
+}
+
+.pra-gallery-stage img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    touch-action: pan-x pan-y pinch-zoom;
+    user-select: none;
+}
+
+.pra-gallery-stage figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    color: rgba(255, 255, 255, 0.84);
+    font-weight: 800;
+}
+
+.pra-gallery-stage figcaption span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pra-gallery-stage figcaption strong {
+    flex: 0 0 auto;
+}
+
+.pra-gallery-close,
+.pra-gallery-arrow {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 900;
+    backdrop-filter: blur(10px);
+}
+
+.pra-gallery-close {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 82;
+    width: 46px;
+    height: 46px;
+}
+
+.pra-gallery-arrow {
+    width: 56px;
+    height: 56px;
+    justify-self: center;
+    font-size: 2.4rem;
+    line-height: 1;
+}
+
+.pra-gallery-close:hover,
+.pra-gallery-arrow:hover,
+.pra-gallery-close:focus-visible,
+.pra-gallery-arrow:focus-visible {
+    outline: none;
+    background: rgba(255, 255, 255, 0.22);
 }
 
 .pra-benefit-grid {
@@ -1196,6 +1289,37 @@ main {
     .pra-bank-detail button,
     .pra-payment-contact-list div {
         width: 100%;
+    }
+
+    .pra-gallery-viewer {
+        grid-template-columns: 1fr;
+        padding: 12px;
+    }
+
+    .pra-gallery-stage {
+        height: 84vh;
+    }
+
+    .pra-gallery-arrow {
+        position: fixed;
+        top: 50%;
+        z-index: 82;
+        width: 46px;
+        height: 46px;
+        font-size: 1.8rem;
+        transform: translateY(-50%);
+    }
+
+    .pra-gallery-arrow--prev {
+        left: 10px;
+    }
+
+    .pra-gallery-arrow--next {
+        right: 10px;
+    }
+
+    .pra-gallery-stage figcaption {
+        padding-inline: 6px;
     }
 }
 
