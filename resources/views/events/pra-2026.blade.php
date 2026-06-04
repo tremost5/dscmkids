@@ -314,22 +314,50 @@
             <label>Metode Pembayaran *
                 <select name="payment_method" required data-payment-select>
                     <option value="">Pilih</option>
-                    <option value="cash" @selected(old('payment_method') === 'cash')>Cash</option>
+                    <option value="cash" @selected(old('payment_method') === 'cash')>Tunai</option>
                     <option value="transfer" @selected(old('payment_method') === 'transfer')>Transfer</option>
                 </select>
             </label>
+            <div class="pra-payment-info-card pra-payment-info-card--cash pra-form-wide" data-cash-info hidden>
+                <div class="pra-payment-info-head">
+                    <span>Tunai</span>
+                    <strong>Pembayaran Tunai</strong>
+                </div>
+                <p>Silakan melakukan pembayaran dan konfirmasikan kepada panitia:</p>
+                <div class="pra-payment-contact-list">
+                    <div><strong>Kak Santi</strong><span>081334001127</span></div>
+                    <div><strong>Kak Arie</strong><span>081334977979</span></div>
+                    <div><strong>Kak Wenny</strong><span>085233107075</span></div>
+                </div>
+            </div>
+            <div class="pra-payment-info-card pra-payment-info-card--transfer pra-form-wide" data-transfer-info hidden>
+                <div class="pra-payment-info-head">
+                    <span class="pra-bca-logo" aria-label="Bank BCA">BCA</span>
+                    <strong>Transfer Bank BCA</strong>
+                </div>
+                <div class="pra-bank-detail">
+                    <span>No. Rekening</span>
+                    <div>
+                        <strong data-account-number>4000299613</strong>
+                        <button type="button" data-copy-account>Copy Nomor Rekening</button>
+                    </div>
+                </div>
+                <div class="pra-bank-detail">
+                    <span>a/n</span>
+                    <strong>Tri Ratna Setiyowati</strong>
+                </div>
+                <div class="pra-transfer-note">
+                    <strong>Informasi Transfer</strong>
+                    <p>Pada keterangan transfer mohon tuliskan:</p>
+                    <code>PRA - Nama Anak - Kelas</code>
+                    <p>Contoh:</p>
+                    <code>PRA - Samuel - Kelas 3</code>
+                    <p>Setelah melakukan transfer, mohon upload bukti pembayaran pada form pendaftaran.</p>
+                </div>
+            </div>
             <label data-proof-field hidden>Upload Bukti Pembayaran *
                 <input type="file" name="payment_proof" accept=".jpg,.jpeg,.png,.webp,.pdf">
             </label>
-            <div class="pra-cash-info pra-form-wide" data-cash-info hidden>
-                <strong>Pembayaran Tunai</strong>
-                <p>{{ $paymentInfo['cash_note'] ?? 'Silahkan melakukan pembayaran dan konfirmasikan ke bagian informasi pembayaran berikut:' }}</p>
-                <div class="pra-mini-contacts">
-                    @foreach($contacts as $contact)
-                        <span>{{ $contact['name'] }} - {{ $contact['phone'] }}</span>
-                    @endforeach
-                </div>
-            </div>
             <button class="pra-btn pra-btn-primary pra-form-wide" type="submit">Kirim Pendaftaran</button>
         </form>
     </section>

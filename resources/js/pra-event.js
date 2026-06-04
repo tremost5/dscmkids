@@ -185,6 +185,9 @@ ready(() => {
     const proofField = form.querySelector('[data-proof-field]');
     const proofInput = proofField?.querySelector('input');
     const cashInfo = form.querySelector('[data-cash-info]');
+    const transferInfo = form.querySelector('[data-transfer-info]');
+    const copyAccountButton = form.querySelector('[data-copy-account]');
+    const accountNumber = form.querySelector('[data-account-number]')?.textContent?.trim() || '';
 
     const syncAllergy = () => {
         const show = allergySelect?.value === 'yes';
@@ -198,10 +201,37 @@ ready(() => {
         if (proofField) proofField.hidden = !isTransfer;
         if (proofInput) proofInput.required = isTransfer;
         if (cashInfo) cashInfo.hidden = method !== 'cash';
+        if (transferInfo) transferInfo.hidden = !isTransfer;
+    };
+
+    const copyAccountNumber = async () => {
+        if (!copyAccountButton || !accountNumber) return;
+
+        try {
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(accountNumber);
+            } else {
+                const tempInput = document.createElement('input');
+                tempInput.value = accountNumber;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                tempInput.remove();
+            }
+
+            const originalText = copyAccountButton.textContent;
+            copyAccountButton.textContent = 'Nomor Disalin';
+            window.setTimeout(() => {
+                copyAccountButton.textContent = originalText;
+            }, 1800);
+        } catch (error) {
+            copyAccountButton.textContent = accountNumber;
+        }
     };
 
     allergySelect?.addEventListener('change', syncAllergy);
     paymentSelect?.addEventListener('change', syncPayment);
+    copyAccountButton?.addEventListener('click', copyAccountNumber);
     syncAllergy();
     syncPayment();
 });
