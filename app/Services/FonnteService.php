@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\BroadcastLog;
 use App\Models\EventRegistration;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -49,18 +51,78 @@ class FonnteService
 
     public function sendMessage(string $target, string $message, array $context = []): bool
     {
+        return $this->sendMessageWithResult($target, $message, $context)['success'];
+    }
+
+    public function sendBroadcast(Collection $recipients, string $message, ?int $adminId, string $filter): BroadcastLog
+    {
+        $broadcastLog = BroadcastLog::create([
+            'admin_id' => $adminId,
+            'filter' => $filter,
+            'message' => $message,
+            'total_recipients' => $recipients->count(),
+            'success_count' => 0,
+            'failed_count' => 0,
+        ]);
+
+        $successCount = 0;
+        $failedCount = 0;
+
+        foreach ($recipients as $recipient) {
+            $phone = (string) ($recipient['phone'] ?? '');
+            $result = $this->sendMessageWithResult($phone, $message, [
+                'type' => 'pra_broadcast',
+                'broadcast_log_id' => $broadcastLog->id,
+                'recipient_name' => $recipient['name'] ?? null,
+            ]);
+
+            if ($result['success']) {
+                $successCount++;
+            } else {
+                $failedCount++;
+            }
+
+            $broadcastLog->recipients()->create([
+                'phone' => (string) ($result['target'] ?: $phone),
+                'recipient_name' => (string) ($recipient['name'] ?? ''),
+                'status' => $result['success'] ? 'success' : 'failed',
+                'response' => $result['response'],
+            ]);
+        }
+
+        $broadcastLog->update([
+            'success_count' => $successCount,
+            'failed_count' => $failedCount,
+        ]);
+
+        return $broadcastLog->refresh();
+    }
+
+    public function hasToken(): bool
+    {
+        return trim((string) config('services.fonnte.token')) !== '';
+    }
+
+    public function sendMessageWithResult(string $target, string $message, array $context = []): array
+    {
         $token = trim((string) config('services.fonnte.token'));
         $endpoint = trim((string) config('services.fonnte.endpoint', 'https://api.fonnte.com/send'));
         $target = $this->normalizeTargets($target);
 
         if ($token === '' || $endpoint === '' || $target === '') {
+            $response = 'Configuration or target is missing.';
             Log::warning('Fonnte WhatsApp message skipped: configuration or target is missing.', $context + [
                 'has_token' => $token !== '',
                 'has_endpoint' => $endpoint !== '',
                 'has_target' => $target !== '',
             ]);
 
-            return false;
+            return [
+                'success' => false,
+                'target' => $target,
+                'status' => null,
+                'response' => $response,
+            ];
         }
 
         try {
@@ -75,25 +137,41 @@ class FonnteService
                 ]);
 
             if (!$response->successful() || $response->json('status') === false) {
+                $responseBody = mb_substr($response->body(), 0, 2000);
                 Log::warning('Fonnte WhatsApp message failed.', $context + [
                     'target' => $target,
                     'status' => $response->status(),
-                    'response' => mb_substr($response->body(), 0, 2000),
+                    'response' => $responseBody,
                 ]);
 
-                return false;
+                return [
+                    'success' => false,
+                    'target' => $target,
+                    'status' => $response->status(),
+                    'response' => $responseBody,
+                ];
             }
 
             Log::info('Fonnte WhatsApp message sent.', $context + ['target' => $target]);
 
-            return true;
+            return [
+                'success' => true,
+                'target' => $target,
+                'status' => $response->status(),
+                'response' => mb_substr($response->body(), 0, 2000),
+            ];
         } catch (Throwable $exception) {
             Log::warning('Fonnte WhatsApp message exception.', $context + [
                 'target' => $target,
                 'error' => $exception->getMessage(),
             ]);
 
-            return false;
+            return [
+                'success' => false,
+                'target' => $target,
+                'status' => null,
+                'response' => $exception->getMessage(),
+            ];
         }
     }
 

@@ -362,6 +362,12 @@ a {
     box-shadow: 0 14px 26px rgba(15, 118, 110, 0.2);
 }
 
+.btn-success {
+    background: linear-gradient(135deg, #16a34a, #059669);
+    color: #fff;
+    box-shadow: 0 14px 26px rgba(22, 163, 74, 0.2);
+}
+
 .btn-secondary {
     border-color: var(--admin-line);
     background: rgba(255, 255, 255, 0.82);

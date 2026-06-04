@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PraEventController extends Controller
 {
+    private const BROADCAST_FILTERS = ['all', 'grup-1', 'grup-2', 'unpaid', 'pending_verification', 'paid'];
+
     public function dashboard(EventService $eventService): View
     {
         $event = $eventService->pra2026();
@@ -142,10 +144,63 @@ class PraEventController extends Controller
     {
         $event = $eventService->pra2026();
         $filter = (string) $request->query('filter', 'all');
+        $filter = in_array($filter, self::BROADCAST_FILTERS, true) ? $filter : 'all';
         $message = (string) $request->query('message', '');
         $recipients = $eventService->broadcastRecipients($event, $filter);
+        $broadcastResult = session('broadcast_result');
 
-        return view('admin.pra.broadcast', compact('event', 'filter', 'message', 'recipients'));
+        return view('admin.pra.broadcast', compact('event', 'filter', 'message', 'recipients', 'broadcastResult'));
+    }
+
+    public function sendBroadcast(Request $request, EventService $eventService, FonnteService $fonnteService): RedirectResponse
+    {
+        $data = $request->validate([
+            'filter' => ['required', Rule::in(self::BROADCAST_FILTERS)],
+            'message' => ['required', 'string', 'max:4000'],
+        ]);
+
+        $filter = (string) $data['filter'];
+        $message = trim((string) $data['message']);
+        $redirectPayload = ['filter' => $filter, 'message' => $message];
+
+        if (!$fonnteService->hasToken()) {
+            return redirect()
+                ->route('admin.pra.broadcast', $redirectPayload)
+                ->withErrors(['fonnte' => 'FONNTE_TOKEN belum diisi. Broadcast WhatsApp belum dapat dikirim.']);
+        }
+
+        $event = $eventService->pra2026();
+        $recipients = $eventService->broadcastRecipients($event, $filter);
+
+        if ($recipients->isEmpty()) {
+            return redirect()
+                ->route('admin.pra.broadcast', $redirectPayload)
+                ->withErrors(['recipients' => 'Tidak ada penerima untuk filter ini.']);
+        }
+
+        $broadcastLog = $fonnteService->sendBroadcast($recipients, $message, $request->user()?->id, $filter);
+
+        $result = [
+            'total' => $broadcastLog->total_recipients,
+            'success' => $broadcastLog->success_count,
+            'failed' => $broadcastLog->failed_count,
+        ];
+
+        $redirect = redirect()
+            ->route('admin.pra.broadcast', $redirectPayload)
+            ->with('broadcast_result', $result);
+
+        if ($broadcastLog->success_count > 0) {
+            $message = $broadcastLog->failed_count > 0
+                ? "Broadcast terkirim ke {$broadcastLog->success_count} peserta, gagal {$broadcastLog->failed_count} peserta."
+                : "Broadcast berhasil dikirim ke {$broadcastLog->success_count} peserta.";
+
+            return $redirect->with('success', $message);
+        }
+
+        return $redirect->withErrors([
+            'broadcast' => "Broadcast gagal dikirim. Berhasil 0 peserta, gagal {$broadcastLog->failed_count} peserta.",
+        ]);
     }
 
     public function content(EventService $eventService): View

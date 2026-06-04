@@ -67,6 +67,36 @@ document.addEventListener('DOMContentLoaded', () => {
         window.setTimeout(dismiss, 4200 + (index * 400));
     });
 
+    document.querySelectorAll('[data-broadcast-send-form]').forEach((form) => {
+        form.addEventListener('submit', (event) => {
+            const filterSource = document.querySelector('[data-broadcast-filter-source]');
+            const messageSource = document.querySelector('[data-broadcast-message-source]');
+            const filterField = form.querySelector('[data-broadcast-filter-field]');
+            const messageField = form.querySelector('[data-broadcast-message-field]');
+
+            if (filterSource instanceof HTMLSelectElement && filterField instanceof HTMLInputElement) {
+                if (filterSource.value !== filterField.value) {
+                    event.preventDefault();
+                    window.alert('Klik Preview Penerima setelah mengubah filter sebelum mengirim broadcast.');
+                    loadingLayer?.classList.remove('is-visible');
+                    return;
+                }
+
+                filterField.value = filterSource.value;
+            }
+
+            if (messageSource instanceof HTMLTextAreaElement && messageField instanceof HTMLInputElement) {
+                messageField.value = messageSource.value;
+            }
+
+            const recipientCount = form.getAttribute('data-broadcast-count') || '0';
+            if (!window.confirm(`Kirim pesan ke ${recipientCount} peserta?`)) {
+                event.preventDefault();
+                loadingLayer?.classList.remove('is-visible');
+            }
+        });
+    });
+
     document.querySelectorAll('form[data-loading-form], form:not([method="GET"])').forEach((form) => {
         form.addEventListener('submit', () => {
             loadingLayer?.classList.add('is-visible');

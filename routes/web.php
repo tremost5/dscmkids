@@ -102,6 +102,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/kehadiran', [PraEventController::class, 'attendance'])->name('attendance');
             Route::patch('/kehadiran/{registration}', [PraEventController::class, 'updateAttendance'])->name('attendance.update');
             Route::get('/broadcast-wa', [PraEventController::class, 'broadcast'])->name('broadcast');
+            Route::post('/broadcast-wa/send', [PraEventController::class, 'sendBroadcast'])->name('broadcast.send');
             Route::get('/konten', [PraEventController::class, 'content'])->name('content');
             Route::put('/konten', [PraEventController::class, 'updateContent'])->name('content.update');
             Route::post('/galeri', [PraEventController::class, 'storeGallery'])->name('galleries.store');
