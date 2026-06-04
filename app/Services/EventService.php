@@ -8,7 +8,7 @@ use App\Models\EventGroup;
 use App\Models\EventRegistration;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class EventService
 {
@@ -79,46 +79,42 @@ class EventService
             ->values();
     }
 
-    public function exportRegistrations(Event $event, ?string $filter, string $filename): StreamedResponse
+    public function exportRegistrations(Event $event, ?string $filter, string $filename): BinaryFileResponse
     {
-        $query = $this->registrationsQuery($event, $filter);
+        $headers = [
+            'No',
+            'Nama Anak',
+            'Nama Panggilan',
+            'Kelas',
+            'Grup',
+            'Sekolah Minggu',
+            'Nama Orang Tua',
+            'WhatsApp',
+            'Metode Pembayaran',
+            'Status Pembayaran',
+            'Kehadiran',
+            'Tanggal Daftar',
+        ];
 
-        return response()->streamDownload(function () use ($query) {
-            $handle = fopen('php://output', 'w');
-            fputcsv($handle, [
-                'Nama',
-                'Nama Panggilan',
-                'Kelas',
-                'Grup',
-                'Sekolah Minggu',
-                'Orang Tua',
-                'WhatsApp',
-                'Metode Pembayaran',
-                'Status Pembayaran',
-                'Kehadiran',
-                'Tanggal Daftar',
-            ]);
+        $rows = $this->registrationsQuery($event, $filter)
+            ->get()
+            ->map(fn (EventRegistration $registration, int $index) => [
+                $index + 1,
+                $registration->full_name,
+                $registration->nickname,
+                $registration->class_before,
+                $registration->group?->name ?: '-',
+                $registration->church_branch,
+                $registration->parent_name,
+                $registration->whatsapp_number,
+                $registration->payment_method === 'cash' ? 'Tunai' : 'Transfer',
+                $registration->paymentStatusLabel(),
+                $registration->attendanceStatusLabel(),
+                optional($registration->registered_at)->format('d M Y H:i') ?: '-',
+            ])
+            ->all();
 
-            $query->chunk(200, function ($registrations) use ($handle) {
-                foreach ($registrations as $registration) {
-                    fputcsv($handle, [
-                        $registration->full_name,
-                        $registration->nickname,
-                        $registration->class_before,
-                        $registration->group?->name,
-                        $registration->church_branch,
-                        $registration->parent_name,
-                        $registration->whatsapp_number,
-                        ucfirst($registration->payment_method),
-                        $registration->paymentStatusLabel(),
-                        $registration->attendanceStatusLabel(),
-                        optional($registration->registered_at)->format('Y-m-d H:i:s'),
-                    ]);
-                }
-            });
-
-            fclose($handle);
-        }, $filename, ['Content-Type' => 'text/csv']);
+        return app(SimpleXlsxExporter::class)->download($headers, $rows, $filename);
     }
 
     public function normalizeWhatsapp(string $number): string

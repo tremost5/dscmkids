@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Throwable;
 
 class PraEventController extends Controller
@@ -295,6 +295,7 @@ class PraEventController extends Controller
     {
         $event = $eventService->pra2026();
         $data = $request->validate([
+            'group_slug' => ['required', Rule::in(['grup-1', 'grup-2'])],
             'title' => ['nullable', 'string', 'max:255'],
             'image' => self::REQUIRED_IMAGE_RULES,
             'sort_order' => ['nullable', 'integer', 'min:0'],
@@ -309,6 +310,7 @@ class PraEventController extends Controller
         }
 
         $event->galleries()->create([
+            'group_slug' => $data['group_slug'],
             'title' => $data['title'] ?? null,
             'image_path' => $imagePath,
             'sort_order' => (int) ($data['sort_order'] ?? 0),
@@ -376,7 +378,7 @@ class PraEventController extends Controller
         return back()->with('success', 'Video lokasi berhasil dihapus.');
     }
 
-    public function export(Request $request, EventService $eventService): StreamedResponse
+    public function export(Request $request, EventService $eventService): BinaryFileResponse
     {
         $event = $eventService->pra2026();
         $type = (string) $request->query('type', 'all');
@@ -387,7 +389,7 @@ class PraEventController extends Controller
             default => null,
         };
 
-        return $eventService->exportRegistrations($event, $filter, 'pra-2026-'.$type.'.csv');
+        return $eventService->exportRegistrations($event, $filter, 'pra-2026-peserta-'.now()->format('Y-m-d').'.xlsx');
     }
 
     private function lines(string $value): array
@@ -431,6 +433,8 @@ class PraEventController extends Controller
             'background_image.mimes' => 'Background banner harus berformat JPG, JPEG, PNG, atau WebP.',
             'background_image.max' => 'Ukuran background banner maksimal 5MB.',
             'image.required' => 'Pilih foto lokasi terlebih dahulu.',
+            'group_slug.required' => 'Pilih grup galeri terlebih dahulu.',
+            'group_slug.in' => 'Grup galeri harus Grup 1 atau Grup 2.',
             'image.image' => 'Foto lokasi harus berupa gambar.',
             'image.mimes' => 'Foto lokasi harus berformat JPG, JPEG, PNG, atau WebP.',
             'image.max' => 'Ukuran foto lokasi maksimal 5MB.',

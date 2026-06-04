@@ -66,9 +66,16 @@
 
 <div class="grid-2" style="margin-top:16px;">
     <section class="form-panel">
-        <h2 class="section-title">Galeri Foto Lokasi</h2>
+        <h2 class="section-title">Galeri Foto PRA</h2>
         <form method="POST" action="{{ route('admin.pra.galleries.store') }}" enctype="multipart/form-data" class="form-shell">
             @csrf
+            <label>Grup Galeri
+                <select name="group_slug" required>
+                    <option value="">Pilih grup</option>
+                    <option value="grup-1" @selected(old('group_slug') === 'grup-1')>Grup 1</option>
+                    <option value="grup-2" @selected(old('group_slug') === 'grup-2')>Grup 2</option>
+                </select>
+            </label>
             <label>Judul Foto<input name="title"></label>
             <label>Foto Lokasi<input type="file" name="image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required></label>
             <label>Urutan<input type="number" name="sort_order" value="0" min="0"></label>
@@ -76,11 +83,12 @@
         </form>
         <div class="table-scroller">
             <table>
-                <thead><tr><th>Foto</th><th>Judul</th><th>Aksi</th></tr></thead>
+                <thead><tr><th>Foto</th><th>Grup</th><th>Judul</th><th>Aksi</th></tr></thead>
                 <tbody>
                 @forelse($event->galleries as $photo)
                     <tr>
                         <td><img class="thumb" src="{{ $mediaUrl($photo->image_path) }}" alt="{{ $photo->title ?: 'Foto lokasi PRA' }}"></td>
+                        <td>{{ $photo->group_slug === 'grup-2' ? 'Grup 2' : ($photo->group_slug === 'grup-1' ? 'Grup 1' : 'Belum dipilih') }}</td>
                         <td>{{ $photo->title ?: '-' }}</td>
                         <td>
                             <form method="POST" action="{{ route('admin.pra.galleries.destroy', $photo) }}" onsubmit="return confirm('Hapus foto lokasi ini?')">
@@ -91,7 +99,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="3" class="empty-state">Belum ada foto.</td></tr>
+                    <tr><td colspan="4" class="empty-state">Belum ada foto.</td></tr>
                 @endforelse
                 </tbody>
             </table>

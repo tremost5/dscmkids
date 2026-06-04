@@ -12,6 +12,7 @@ class EventGallery extends Model
 
     protected $fillable = [
         'event_id',
+        'group_slug',
         'title',
         'image_path',
         'sort_order',

@@ -15,9 +15,9 @@
         <button class="btn btn-primary" type="submit">Filter</button>
     </form>
     <div class="toolbar-actions">
-        <a class="btn btn-secondary" href="{{ route('admin.pra.export', ['type' => 'all']) }}">Export Semua Peserta</a>
-        <a class="btn btn-secondary" href="{{ route('admin.pra.export', ['type' => 'group-1']) }}">Export Grup 1</a>
-        <a class="btn btn-secondary" href="{{ route('admin.pra.export', ['type' => 'group-2']) }}">Export Grup 2</a>
+        <a class="btn btn-secondary" href="{{ route('admin.pra.export', ['type' => 'all']) }}">Export Excel Semua Peserta</a>
+        <a class="btn btn-secondary" href="{{ route('admin.pra.export', ['type' => 'group-1']) }}">Export Excel Grup 1</a>
+        <a class="btn btn-secondary" href="{{ route('admin.pra.export', ['type' => 'group-2']) }}">Export Excel Grup 2</a>
     </div>
 </div>
 

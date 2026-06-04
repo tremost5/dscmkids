@@ -338,6 +338,77 @@ a {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.pra-group-grid,
+.pra-location-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.pra-group-card,
+.pra-location-card {
+    display: grid;
+    gap: 18px;
+    padding: 24px;
+    border: 1px solid var(--pra-line);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 14px 30px rgba(23, 32, 51, 0.08);
+}
+
+.pra-group-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.pra-group-card::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 6px;
+    background: var(--pra-coral);
+}
+
+.pra-group-card--teal::before {
+    background: var(--pra-teal);
+}
+
+.pra-group-card-head {
+    display: grid;
+    gap: 8px;
+}
+
+.pra-group-card-head span,
+.pra-location-card span {
+    color: var(--pra-muted);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.pra-group-card-head strong {
+    font-size: 1.2rem;
+    line-height: 1.35;
+}
+
+.pra-group-card h3,
+.pra-group-location h3 {
+    margin: 0 0 10px;
+    font-size: 0.92rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.pra-group-location p,
+.pra-location-card p {
+    margin: 0;
+}
+
+.pra-location-card strong {
+    font-size: 1.28rem;
+    line-height: 1.35;
+}
+
 .pra-count-card {
     display: grid;
     gap: 14px;
@@ -389,6 +460,26 @@ a {
     grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.2fr);
     gap: 24px;
     align-items: start;
+}
+
+.pra-about-copy {
+    display: grid;
+    gap: 16px;
+}
+
+.pra-benefit-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pra-benefit-inline span {
+    display: inline-flex;
+    padding: 8px 11px;
+    border-radius: 999px;
+    background: #fff7ed;
+    color: #9a3412;
+    font-weight: 900;
 }
 
 .pra-location-grid {
@@ -468,6 +559,36 @@ a {
     object-fit: cover;
     border-radius: 8px;
     cursor: zoom-in;
+}
+
+.pra-gallery-section {
+    background: linear-gradient(145deg, #ffffff, #f8fbff);
+}
+
+.pra-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.pra-gallery-grid img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: zoom-in;
+    box-shadow: 0 14px 26px rgba(23, 32, 51, 0.10);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.pra-gallery-grid img:hover,
+.pra-gallery-grid img:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 34px rgba(23, 32, 51, 0.16);
+}
+
+.pra-gallery-empty {
+    grid-column: 1 / -1;
 }
 
 .pra-gallery-viewer {
@@ -1187,7 +1308,8 @@ main {
     }
 
     .pra-benefit-grid,
-    .pra-contact-grid {
+    .pra-contact-grid,
+    .pra-gallery-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
@@ -1195,7 +1317,9 @@ main {
 @media (max-width: 860px) {
     .pra-about,
     .pra-location-grid,
-    .pra-participant-grid {
+    .pra-participant-grid,
+    .pra-group-grid,
+    .pra-location-card-grid {
         grid-template-columns: 1fr;
     }
 
@@ -1259,6 +1383,7 @@ main {
 
     .pra-benefit-grid,
     .pra-count-grid,
+    .pra-gallery-grid,
     .pra-stats,
     .pra-form,
     .pra-gallery-strip {
