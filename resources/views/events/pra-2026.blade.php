@@ -29,9 +29,11 @@
         [
             'slug' => 'grup-1',
             'name' => 'GRUP 1',
-            'class_text' => 'PG • TK • SD Kelas 1-4',
+            'class_text' => 'PG � TK � SD Kelas 1-4',
             'location' => 'NICC & KLUB BUNGA Theme Park Hotel',
             'display_location' => 'NICC & Klub Bunga Theme Park Hotel',
+            'date_text' => '26-27 Juni 2026',
+            'early_bird' => 'Biaya berlaku sebelum 21 Juni 2026',
             'group' => $groupOne,
             'accent' => 'coral',
             'image' => $mediaUrl($groupOneGallery->first()?->image_path) ?: $heroImage,
@@ -42,6 +44,8 @@
             'class_text' => 'SD Kelas 5-9',
             'location' => 'BROMO BENJOR PINE CAMPING GROUND, Tumpang - Malang',
             'display_location' => 'Bromo Benjor Pine Camping Ground',
+            'date_text' => '03-04 Juli 2026',
+            'early_bird' => 'Biaya berlaku sebelum 28 Juni 2026',
             'group' => $groupTwo,
             'accent' => 'teal',
             'image' => $mediaUrl($groupTwoGallery->first()?->image_path) ?: $heroImage,
@@ -136,39 +140,57 @@
     </section>
 
     <section class="pra-section pra-group-section" id="grup">
-        <div class="pra-section-head">
-            <span class="pra-kicker">Informasi Singkat Grup</span>
-            <h2>PRA 2026 disusun sesuai tahap usia anak</h2>
-            <p>{{ $event->description }}</p>
-            <div class="pra-benefit-inline">
-                @foreach($benefits as $benefit)
-                    <span>{{ $benefit }}</span>
-                @endforeach
-            </div>
-        </div>
-        <div class="pra-group-grid">
-            @foreach($groupCards as $card)
-                <article class="pra-group-card pra-group-card--{{ $card['accent'] }}">
-                    <img class="pra-group-card-image" src="{{ $card['image'] }}" alt="Lokasi {{ $card['name'] }}" loading="lazy">
-                    <div class="pra-group-card-head">
-                        <span>{{ $card['name'] }}</span>
-                        <strong>{{ $card['class_text'] }}</strong>
-                    </div>
-                    <div class="pra-group-card-details">
-                        <div>
-                            <span>Tanggal</span>
-                            <strong>{{ optional($card['group']?->starts_on)->translatedFormat('d F Y') }} - {{ optional($card['group']?->ends_on)->translatedFormat('d F Y') }}</strong>
-                        </div>
-                        <div>
-                            <span>Lokasi</span>
-                            <strong>{{ $card['display_location'] }}</strong>
-                        </div>
-                    </div>
-                    <a class="pra-btn pra-btn-light" href="#daftar">Daftarkan Anak</a>
-                </article>
+    <div class="pra-section-head">
+        <span class="pra-kicker">Informasi Singkat Grup</span>
+        <h2>PRA 2026 disusun sesuai tahap usia anak</h2>
+        <p>{{ $event->description }}</p>
+
+        <div class="pra-benefit-inline">
+            @foreach($benefits as $benefit)
+                <span>{{ $benefit }}</span>
             @endforeach
         </div>
-    </section>
+    </div>
+
+    <div class="pra-group-grid">
+        @foreach($groupCards as $card)
+            <article class="pra-group-card pra-group-card--{{ $card['accent'] }}">
+                <img
+                    class="pra-group-card-image"
+                    src="{{ $card['image'] }}"
+                    alt="Lokasi {{ $card['name'] }}"
+                    loading="lazy"
+                >
+
+                <div class="pra-group-card-head">
+                    <span>{{ $card['name'] }}</span>
+                    <strong>{{ $card['class_text'] }}</strong>
+                </div>
+
+                <div class="pra-group-card-meta">
+                    <div class="pra-group-meta-item">
+                        <span class="pra-group-meta-icon" aria-hidden="true">T</span>
+                        <strong>{{ $card['date_text'] }}</strong>
+                    </div>
+                    <div class="pra-group-meta-item">
+                        <span class="pra-group-meta-icon" aria-hidden="true">L</span>
+                        <strong>{{ $card['display_location'] }}</strong>
+                    </div>
+                    <div class="pra-group-meta-item pra-group-meta-item--price">
+                        <span class="pra-group-meta-icon" aria-hidden="true">Rp</span>
+                        <strong>Rp 175.000</strong>
+                    </div>
+                </div>
+
+                <p class="pra-group-early">{{ $card['early_bird'] }}</p>
+
+                <a class="pra-btn pra-btn-light" href="#daftar">
+                    Daftarkan Anak
+                </a>
+            </article>
+        @endforeach
+    </div>
+</section>
 
     @php($galleryViewerIndex = 0)
     <section class="pra-section pra-gallery-section" id="galeri-grup-1">

@@ -368,50 +368,70 @@ a {
 .pra-location-card-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
+    gap: 18px;
 }
 
 .pra-group-card,
 .pra-location-card {
     display: grid;
-    gap: 18px;
-    padding: 24px;
+    gap: 14px;
+    padding: 18px;
     border: 1px solid var(--pra-line);
-    border-radius: 8px;
+    border-radius: 12px;
     background: #fff;
-    box-shadow: 0 14px 30px rgba(23, 32, 51, 0.08);
+    box-shadow: 0 16px 34px rgba(23, 32, 51, 0.08);
 }
 
 .pra-group-card {
     position: relative;
     overflow: hidden;
     align-content: start;
+    border-color: rgba(239, 71, 111, 0.18);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
 .pra-group-card::before {
     content: '';
     position: absolute;
     inset: 0 0 auto;
-    height: 6px;
-    background: var(--pra-coral);
+    z-index: 1;
+    height: 5px;
+    background: linear-gradient(90deg, var(--pra-coral), #f97316);
 }
 
 .pra-group-card--teal::before {
-    background: var(--pra-teal);
+    background: linear-gradient(90deg, var(--pra-teal), var(--pra-blue));
+}
+
+.pra-group-card--teal {
+    border-color: rgba(6, 168, 158, 0.2);
+}
+
+.pra-group-card:hover,
+.pra-group-card:focus-within {
+    transform: translateY(-4px);
+    border-color: rgba(239, 71, 111, 0.34);
+    box-shadow: 0 22px 48px rgba(239, 71, 111, 0.12), 0 18px 42px rgba(23, 32, 51, 0.10);
+}
+
+.pra-group-card--teal:hover,
+.pra-group-card--teal:focus-within {
+    border-color: rgba(6, 168, 158, 0.34);
+    box-shadow: 0 22px 48px rgba(6, 168, 158, 0.12), 0 18px 42px rgba(23, 32, 51, 0.10);
 }
 
 .pra-group-card-image {
-    width: calc(100% + 48px);
+    width: calc(100% + 36px);
     max-width: none;
     aspect-ratio: 16 / 9;
     object-fit: cover;
-    margin: -24px -24px 2px;
-    border-radius: 8px 8px 0 0;
+    margin: -18px -18px 0;
+    border-radius: 12px 12px 0 0;
 }
 
 .pra-group-card-head {
     display: grid;
-    gap: 8px;
+    gap: 5px;
 }
 
 .pra-group-card-head span,
@@ -423,35 +443,70 @@ a {
 }
 
 .pra-group-card-head strong {
-    font-size: 1.2rem;
+    font-size: 1.12rem;
     line-height: 1.35;
 }
 
-.pra-group-card-details {
+.pra-group-card-meta {
     display: grid;
+    gap: 9px;
+}
+
+.pra-group-meta-item {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    align-items: center;
     gap: 10px;
-    padding: 14px;
-    border-radius: 8px;
-    background: #f8fbff;
-    border: 1px solid var(--pra-line);
 }
 
-.pra-group-card-details div {
-    display: grid;
-    gap: 3px;
-}
-
-.pra-group-card-details span {
-    color: var(--pra-muted);
+.pra-group-meta-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(239, 71, 111, 0.1);
+    color: var(--pra-coral);
     font-size: 0.78rem;
     font-weight: 900;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
 }
 
-.pra-group-card-details strong {
+.pra-group-card--teal .pra-group-meta-icon {
+    background: rgba(6, 168, 158, 0.1);
+    color: var(--pra-teal);
+}
+
+.pra-group-meta-item strong {
     color: var(--pra-ink);
+    font-size: 0.98rem;
     line-height: 1.35;
+}
+
+.pra-group-meta-item--price strong {
+    color: #dc2626;
+    font-size: 1.08rem;
+}
+
+.pra-group-early {
+    margin: -2px 0 2px;
+    color: #15803d;
+    font-size: 0.92rem;
+    font-weight: 900;
+    line-height: 1.45;
+}
+
+.pra-group-card > .pra-btn {
+    justify-self: start;
+    margin-top: 2px;
+    background: linear-gradient(135deg, var(--pra-coral), #f97316);
+    color: #fff;
+    box-shadow: 0 12px 24px rgba(239, 71, 111, 0.18);
+}
+
+.pra-group-card--teal > .pra-btn {
+    background: linear-gradient(135deg, var(--pra-teal), var(--pra-blue));
+    color: #fff;
+    box-shadow: 0 12px 24px rgba(6, 168, 158, 0.18);
 }
 
 .pra-group-card h3,
@@ -460,6 +515,40 @@ a {
     font-size: 0.92rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+}
+
+.pra-price-box{
+    background:linear-gradient(
+        135deg,
+        #fff7ed 0%,
+        #fef3c7 100%
+    );
+    border:1px solid #fbbf24 !important;
+}
+
+.pra-price-box span{
+    color:#92400e;
+    font-weight:700;
+    text-transform:uppercase;
+    font-size:.75rem;
+    letter-spacing:.08em;
+}
+
+.pra-price-box strong{
+    display:block;
+    margin-top:6px;
+    color:#dc2626;
+    font-size:1.35rem;
+    font-weight:800;
+}
+
+.pra-price-box small{
+    display:block;
+    margin-top:8px;
+    color:#15803d;
+    font-size:.85rem;
+    font-weight:700;
+    line-height:1.5;
 }
 
 .pra-group-location p,

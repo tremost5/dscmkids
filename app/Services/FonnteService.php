@@ -191,7 +191,15 @@ telah berhasil kami terima.
 
 Terima kasih telah mendaftarkan putra/putri Anda pada Pekan Rohani Anak 2026.
 
-Informasi selanjutnya mengenai kelompok, perlengkapan yang perlu dibawa, jadwal keberangkatan, dan informasi kegiatan akan kami sampaikan melalui WhatsApp ini.
+Informasi selanjutnya mengenai kelompok, perlengkapan yang perlu dibawa, jadwal dan informasi lainnya akan kami sampaikan melalui WA Group peserta. 
+
+Silahkan bergabung dalam grup peserta sesuai dengan kelompok kelas
+
+Kelas Kecil - PG TK s/d 4 SD
+https://chat.whatsapp.com/J6P9coLWW0W14AgJfRGAGX
+
+Kelas Besar - 5 SD s/d 9 SMP
+https://chat.whatsapp.com/BSFRoPcCQevB2V2fgu7Mko
 
 Tuhan Yesus memberkati.
 
