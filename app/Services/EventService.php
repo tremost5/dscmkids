@@ -83,36 +83,53 @@ class EventService
     public function exportRegistrations(Event $event, ?string $filter, string $filename): BinaryFileResponse
     {
         $headers = [
-            'No',
-            'Nama Anak',
-            'Nama Panggilan',
-            'Kelas',
-            'Grup',
-            'Sekolah Minggu',
-            'Nama Orang Tua',
-            'WhatsApp',
-            'Metode Pembayaran',
-            'Status Pembayaran',
-            'Kehadiran',
-            'Tanggal Daftar',
-        ];
+    'No',
+    'Nama Anak',
+    'Nama Panggilan',
+    'Jenis Kelamin',
+    'Kelas',
+    'Grup',
+    'Sekolah Minggu',
+    'Nama Orang Tua',
+    'WhatsApp',
+    'Alergi',
+    'Catatan Alergi',
+    'Metode Pembayaran',
+    'Status Pembayaran',
+    'Catatan Pembayaran',
+    'Kehadiran',
+    'Tanggal Daftar',
+];
 
         $rows = $this->registrationsQuery($event, $filter)
             ->get()
             ->map(fn (EventRegistration $registration, int $index) => [
-                $index + 1,
-                $registration->full_name,
-                $registration->nickname,
-                $registration->class_before,
-                $registration->group?->name ?: '-',
-                $registration->church_branch,
-                $registration->parent_name,
-                $registration->whatsapp_number,
-                $registration->payment_method === 'cash' ? 'Tunai' : 'Transfer',
-                $registration->paymentStatusLabel(),
-                $registration->attendanceStatusLabel(),
-                optional($registration->registered_at)->format('d M Y H:i') ?: '-',
-            ])
+    $index + 1,
+    $registration->full_name,
+    $registration->nickname,
+    $registration->gender,
+    $registration->class_before,
+    $registration->group?->name ?: '-',
+    $registration->church_branch,
+    $registration->parent_name,
+    $registration->whatsapp_number,
+
+    $registration->has_allergy ? 'YA' : 'Tidak',
+    $registration->allergy_notes ?: '-',
+
+    $registration->payment_method === 'cash'
+        ? 'Tunai'
+        : 'Transfer',
+
+    $registration->paymentStatusLabel(),
+
+    $registration->payment_notes ?: '-',
+
+    $registration->attendanceStatusLabel(),
+
+    optional($registration->registered_at)
+        ->format('d M Y H:i') ?: '-',
+])
             ->all();
 
         return app(SimpleXlsxExporter::class)->download($headers, $rows, $filename);

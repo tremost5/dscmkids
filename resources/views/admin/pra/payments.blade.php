@@ -28,40 +28,164 @@
 <section class="table-shell">
     <div class="table-scroller">
         <table>
-            <thead><tr><th>Nama</th><th>Grup</th><th>Metode</th><th>Bukti</th><th>Status</th><th>Aksi</th></tr></thead>
+            <thead>
+<tr>
+    <th>Nama</th>
+    <th>Grup</th>
+    <th>Metode</th>
+    <th>Bukti</th>
+    <th>Status</th>
+    <th>Aksi</th>
+    <th>Keterangan</th>
+</tr>
+</thead>
             <tbody>
             @forelse($registrations as $registration)
                 <tr>
                     <td><strong>{{ $registration->full_name }}</strong><br><span class="muted">{{ $registration->parent_name }} - {{ $registration->whatsapp_number }}</span></td>
                     <td>{{ $registration->group?->name }}</td>
-                    <td>{{ ucfirst($registration->payment_method) }}</td>
                     <td>
-                        @if($registration->paymentProof)
-                            <a href="{{ asset('storage/'.$registration->paymentProof->file_path) }}" target="_blank" rel="noopener">Lihat bukti</a>
-                        @else
-                            <span class="muted">Tidak ada upload</span>
-                        @endif
-                    </td>
-                    <td>{{ $registration->paymentStatusLabel() }}</td>
-                    <td>
-                        <form method="POST" action="{{ route('admin.pra.payments.update', $registration) }}" class="inline-form">
-                            @csrf
-                            @method('PATCH')
-                            <select name="payment_status">
-                                <option value="unpaid" @selected($registration->payment_status === 'unpaid')>Belum Bayar</option>
-                                <option value="pending_verification" @selected($registration->payment_status === 'pending_verification')>Menunggu Verifikasi</option>
-                                <option value="paid" @selected($registration->payment_status === 'paid')>Lunas</option>
-                            </select>
-                            <button class="btn btn-primary" type="submit">Simpan</button>
-                        </form>
-                    </td>
+    <select
+        name="payment_method"
+        form="payment-form-{{ $registration->id }}"
+        onchange="toggleProofUpload({{ $registration->id }}, this.value)"
+    >
+        <option value="cash" @selected($registration->payment_method === 'cash')>
+            Cash
+        </option>
+
+        <option value="transfer" @selected($registration->payment_method === 'transfer')>
+            Transfer
+        </option>
+    </select>
+</td>
+
+<td style="min-width:220px;">
+
+    @if($registration->paymentProof)
+
+        <a
+            href="{{ asset('storage/'.$registration->paymentProof->file_path) }}"
+            target="_blank">
+            Lihat Bukti
+        </a>
+
+        <br><br>
+
+        <img
+            src="{{ asset('storage/'.$registration->paymentProof->file_path) }}"
+            style="max-width:180px;border-radius:8px;display:block;margin-bottom:10px;">
+
+    @endif
+
+    <div
+        id="proof-upload-{{ $registration->id }}"
+        style="{{ $registration->payment_method === 'transfer' ? '' : 'display:none;' }}"
+    >
+
+        @if(!$registration->paymentProof)
+            <span style="color:red;font-weight:bold;">
+                Belum upload bukti transfer
+            </span>
+
+            <br><br>
+        @endif
+
+        <input
+            type="file"
+            name="payment_proof"
+            form="payment-form-{{ $registration->id }}"
+            accept=".jpg,.jpeg,.png,.webp">
+
+    </div>
+
+    @if($registration->payment_method === 'cash')
+        <span class="muted">
+            Pembayaran Cash
+        </span>
+    @endif
+
+</td>
+
+<td>
+
+@if(
+    $registration->payment_method === 'transfer'
+    && !$registration->paymentProof
+)
+
+    <span style="color:red;font-weight:bold;">
+        Menunggu Bukti
+    </span>
+
+@else
+
+    {{ $registration->paymentStatusLabel() }}
+
+@endif
+
+</td>
+
+    <td>
+    <form
+    id="payment-form-{{ $registration->id }}"
+    method="POST"
+    enctype="multipart/form-data"
+        action="{{ route('admin.pra.payments.update', $registration) }}"
+        class="inline-form"
+    >
+        @csrf
+        @method('PATCH')
+
+        <select name="payment_status">
+            <option value="unpaid" @selected($registration->payment_status === 'unpaid')>
+                Belum Bayar
+            </option>
+
+            <option value="pending_verification" @selected($registration->payment_status === 'pending_verification')>
+                Menunggu Verifikasi
+            </option>
+
+            <option value="paid" @selected($registration->payment_status === 'paid')>
+                Lunas
+            </option>
+        </select>
+
+        <button class="btn btn-primary" type="submit">
+            Simpan
+        </button>
+    </form>
+</td>
+
+<td style="min-width:220px;">
+    <textarea
+        name="payment_notes"
+        form="payment-form-{{ $registration->id }}"
+        rows="2"
+        placeholder="Catatan pembayaran..."
+    >{{ $registration->payment_notes }}</textarea>
+</td>
                 </tr>
             @empty
-                <tr><td colspan="6" class="empty-state">Belum ada data pembayaran.</td></tr>
+                <tr><td colspan="7" class="empty-state">Belum ada data pembayaran.</td></tr>
             @endforelse
             </tbody>
         </table>
     </div>
     {{ $registrations->links() }}
 </section>
+<script>
+function toggleProofUpload(id, value)
+{
+    const el = document.getElementById('proof-upload-' + id);
+
+    if (!el) return;
+
+    if (value === 'transfer') {
+        el.style.display = 'block';
+    } else {
+        el.style.display = 'none';
+    }
+}
+</script>
 @endsection

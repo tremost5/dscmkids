@@ -189,9 +189,10 @@ a {
 }
 
 .admin-sidebar-footer {
-    gap: 10px;
     margin-top: auto;
-    flex-wrap: wrap;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .admin-stage {
@@ -1280,4 +1281,27 @@ label {
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
     }
+}
+
+
+/* PATCH: prevent decorative elements leaking outside cards */
+.admin-card,
+.card,
+.table-shell,
+.info-panel,
+.surface-panel {
+    position: relative;
+    overflow: hidden;
+}
+
+/* PATCH: sidebar scroll + fixed footer */
+.admin-sidebar {
+    overflow-y: auto;
+}
+
+.admin-sidebar-footer {
+    position: sticky;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(7,18,32,0), rgba(7,18,32,0.95) 25%);
+    padding-top: 12px;
 }

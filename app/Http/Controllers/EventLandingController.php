@@ -13,24 +13,50 @@ use Illuminate\View\View;
 class EventLandingController extends Controller
 {
     public function show(EventService $eventService): View
-    {
-        $event = $eventService->pra2026();
-        $stats = $eventService->stats($event);
-        $registrationsByGroup = $event->registrations()
-            ->with('group')
-            ->latest('registered_at')
-            ->latest('id')
-            ->get()
-            ->groupBy(fn (EventRegistration $registration) => $registration->group?->slug ?: 'unknown');
+{
+    $event = $eventService->pra2026();
+    $stats = $eventService->stats($event);
 
-        return view('events.pra-2026', [
-            'event' => $event,
-            'banner' => $event->banner,
-            'groups' => $event->groups,
-            'stats' => $stats,
-            'registrationsByGroup' => $registrationsByGroup,
-        ]);
-    }
+    $order = [
+        'PG'  => 0,
+        'TKA' => 1,
+        'TKB' => 2,
+        '1'   => 3,
+        '2'   => 4,
+        '3'   => 5,
+        '4'   => 6,
+        '5'   => 7,
+        '6'   => 8,
+        '7'   => 9,
+        '8'   => 10,
+        '9'   => 11,
+    ];
+
+    $registrationsByGroup = $event->registrations()
+        ->with('group')
+        ->get()
+        ->sortBy(function (EventRegistration $registration) use ($order) {
+
+            $classOrder = $order[$registration->class_before] ?? 99;
+
+            return sprintf(
+                '%02d-%s',
+                $classOrder,
+                strtolower($registration->nickname)
+            );
+        })
+        ->groupBy(fn (EventRegistration $registration) =>
+            $registration->group?->slug ?: 'unknown'
+        );
+
+    return view('events.pra-2026', [
+        'event' => $event,
+        'banner' => $event->banner,
+        'groups' => $event->groups,
+        'stats' => $stats,
+        'registrationsByGroup' => $registrationsByGroup,
+    ]);
+}
 
     public function register(StoreEventRegistrationRequest $request, EventService $eventService, FonnteService $fonnteService): RedirectResponse
     {

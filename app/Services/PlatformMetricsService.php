@@ -88,8 +88,11 @@ class PlatformMetricsService
             'hourly_quiz' => $hourlyQuiz,
             'top_classes' => $topClasses,
             'recent_admin_activities' => Schema::hasTable('admin_activity_logs')
-                ? AdminActivityLog::query()->latest('id')->take(8)->get()
-                : collect(),
+    ? AdminActivityLog::with('user')
+        ->latest('id')
+        ->take(8)
+        ->get()
+    : collect(),
             'recent_news' => News::latest()->take(5)->get(),
         ];
     }

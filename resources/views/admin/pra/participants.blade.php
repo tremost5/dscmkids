@@ -6,19 +6,55 @@
 @include('admin.pra.partials.nav')
 
 <div class="toolbar">
-    <form method="GET" class="toolbar-actions">
+
+    <form method="GET" id="searchForm" class="toolbar-actions">
+
+        <input
+            type="text"
+            id="searchInput"
+            name="search"
+            class="input-compact"
+            placeholder="Cari nama, ortu, WA, sekolah minggu..."
+            value="{{ request('search') }}"
+            style="min-width:280px;">
+
         <select name="filter" class="select-compact">
             <option value="">Semua</option>
-            <option value="grup-1" @selected($filter === 'grup-1')>Grup 1</option>
-            <option value="grup-2" @selected($filter === 'grup-2')>Grup 2</option>
+
+            <option value="grup-1"
+                @selected($filter === 'grup-1')>
+                Grup 1
+            </option>
+
+            <option value="grup-2"
+                @selected($filter === 'grup-2')>
+                Grup 2
+            </option>
         </select>
-        <button class="btn btn-primary" type="submit">Filter</button>
+
+        <button class="btn btn-primary" type="submit">
+            Filter
+        </button>
+
     </form>
+
     <div class="toolbar-actions">
-        <a class="btn btn-secondary" href="{{ route('admin.pra.export', ['type' => 'all']) }}">Export Excel Semua Peserta</a>
-        <a class="btn btn-secondary" href="{{ route('admin.pra.export', ['type' => 'group-1']) }}">Export Excel Grup 1</a>
-        <a class="btn btn-secondary" href="{{ route('admin.pra.export', ['type' => 'group-2']) }}">Export Excel Grup 2</a>
+        <a class="btn btn-secondary"
+           href="{{ route('admin.pra.export', ['type' => 'all']) }}">
+            Export Excel Semua Peserta
+        </a>
+
+        <a class="btn btn-secondary"
+           href="{{ route('admin.pra.export', ['type' => 'group-1']) }}">
+            Export Excel Grup 1
+        </a>
+
+        <a class="btn btn-secondary"
+           href="{{ route('admin.pra.export', ['type' => 'group-2']) }}">
+            Export Excel Grup 2
+        </a>
     </div>
+
 </div>
 
 <section class="table-shell">
@@ -48,4 +84,19 @@
     </div>
     {{ $registrations->links() }}
 </section>
+<script>
+let searchTimer;
+
+document
+    .getElementById('searchInput')
+    ?.addEventListener('keyup', function () {
+
+        clearTimeout(searchTimer);
+
+        searchTimer = setTimeout(() => {
+            document.getElementById('searchForm').submit();
+        }, 500);
+
+    });
+</script>
 @endsection

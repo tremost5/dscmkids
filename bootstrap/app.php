@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,5 +21,24 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
-    })->create();
+
+        $exceptions->render(function (
+            TokenMismatchException $e,
+            Request $request
+        ) {
+
+            if ($request->is('admin/*')) {
+
+                return redirect()
+                    ->route('admin.login')
+                    ->with('warning', 'Sesi telah berakhir. Silakan login kembali.');
+            }
+
+            return redirect()->back()->with(
+                'warning',
+                'Halaman telah kadaluarsa. Silakan coba lagi.'
+            );
+        });
+
+    })
+    ->create();

@@ -31,35 +31,73 @@
             <div class="admin-sidebar-label">Core</div>
             <nav class="admin-sidebar-nav">
                 @if(auth()->user()?->hasPermission('dashboard.view'))
-                    <a href="{{ route('admin.dashboard') }}" class="admin-nav-link @if($currentRoute === 'admin.dashboard') active @endif" data-close-sidebar-link>Dashboard</a>
-                @endif
-                @if(auth()->user()?->hasPermission('users.manage'))
-                    <a href="{{ route('admin.users.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.users.')) active @endif" data-close-sidebar-link>Users</a>
-                @endif
-                @if(auth()->user()?->hasPermission('monitoring.view'))
-                    <a href="{{ route('admin.system.index') }}" class="admin-nav-link @if($currentRoute === 'admin.system.index') active @endif" data-close-sidebar-link>System Monitor</a>
-                @endif
-            </nav>
+    <a href="{{ route('admin.dashboard') }}"
+       class="admin-nav-link @if($currentRoute === 'admin.dashboard') active @endif"
+       data-close-sidebar-link>
+        Dashboard
+    </a>
+@endif
+
+@if(auth()->user()?->hasPermission('users.manage'))
+    <a href="{{ route('admin.users.index') }}"
+       class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.users.')) active @endif"
+       data-close-sidebar-link>
+        Users
+    </a>
+@endif
+
+@if(auth()->user()?->hasPermission('monitoring.view'))
+    <a href="{{ route('admin.system.index') }}"
+       class="admin-nav-link @if($currentRoute === 'admin.system.index') active @endif"
+       data-close-sidebar-link>
+        System Monitor
+    </a>
+
+    <a href="{{ route('admin.audit.index') }}"
+       class="admin-nav-link @if($currentRoute === 'admin.audit.index') active @endif"
+       data-close-sidebar-link>
+        Audit Log
+    </a>
+@endif
+        </nav>
         </div>
 
         @if(auth()->user()?->hasPermission('content.manage'))
             <div class="admin-sidebar-section">
                 <div class="admin-sidebar-label">Content</div>
                 <nav class="admin-sidebar-nav">
-                    <a href="{{ route('admin.news.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.news.')) active @endif" data-close-sidebar-link>Berita</a>
-                    <a href="{{ route('admin.announcements.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.announcements.')) active @endif" data-close-sidebar-link>Informasi</a>
-                    <a href="{{ route('admin.quiz-banks.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.quiz-banks.')) active @endif" data-close-sidebar-link>Bank Soal</a>
-                    <a href="{{ route('admin.sections.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.sections.')) active @endif" data-close-sidebar-link>Konten</a>
-                    <a href="{{ route('admin.media.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.media.')) active @endif" data-close-sidebar-link>Media</a>
-                    <a href="{{ route('admin.materials.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.materials.')) active @endif" data-close-sidebar-link>Materi</a>
-                    <a href="{{ route('admin.pra.dashboard') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.pra.')) active @endif" data-close-sidebar-link>PRA 2026</a>
-                    <a href="{{ route('admin.slides.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.slides.')) active @endif" data-close-sidebar-link>Slide</a>
-                    <a href="{{ route('admin.teachers.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.teachers.')) active @endif" data-close-sidebar-link>Guru</a>
-                    <a href="{{ route('admin.testimonials.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.testimonials.')) active @endif" data-close-sidebar-link>Testimoni</a>
-                    <a href="{{ route('admin.livestream.edit') }}" class="admin-nav-link @if($currentRoute === 'admin.livestream.edit') active @endif" data-close-sidebar-link>Live</a>
-                    <a href="{{ route('admin.spiritual.edit') }}" class="admin-nav-link @if($currentRoute === 'admin.spiritual.edit') active @endif" data-close-sidebar-link>Tema & Renungan</a>
-                    <a href="{{ route('admin.parent-portal.edit') }}" class="admin-nav-link @if($currentRoute === 'admin.parent-portal.edit') active @endif" data-close-sidebar-link>Parent Portal</a>
-                </nav>
+
+    @if(auth()->user()->role === 'super_admin')
+        <a href="{{ route('admin.news.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.news.')) active @endif" data-close-sidebar-link>Berita</a>
+
+        <a href="{{ route('admin.announcements.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.announcements.')) active @endif" data-close-sidebar-link>Informasi</a>
+
+        <a href="{{ route('admin.quiz-banks.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.quiz-banks.')) active @endif" data-close-sidebar-link>Bank Soal</a>
+
+        <a href="{{ route('admin.sections.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.sections.')) active @endif" data-close-sidebar-link>Konten</a>
+
+        <a href="{{ route('admin.media.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.media.')) active @endif" data-close-sidebar-link>Media</a>
+
+        <a href="{{ route('admin.materials.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.materials.')) active @endif" data-close-sidebar-link>Materi</a>
+    @endif
+
+    <a href="{{ route('admin.pra.dashboard') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.pra.')) active @endif" data-close-sidebar-link>PRA 2026</a>
+
+    @if(auth()->user()->role === 'super_admin')
+        <a href="{{ route('admin.slides.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.slides.')) active @endif" data-close-sidebar-link>Slide</a>
+
+        <a href="{{ route('admin.teachers.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.teachers.')) active @endif" data-close-sidebar-link>Guru</a>
+
+        <a href="{{ route('admin.testimonials.index') }}" class="admin-nav-link @if(\Illuminate\Support\Str::startsWith((string) $currentRoute, 'admin.testimonials.')) active @endif" data-close-sidebar-link>Testimoni</a>
+
+        <a href="{{ route('admin.livestream.edit') }}" class="admin-nav-link @if($currentRoute === 'admin.livestream.edit') active @endif" data-close-sidebar-link>Live</a>
+
+        <a href="{{ route('admin.spiritual.edit') }}" class="admin-nav-link @if($currentRoute === 'admin.spiritual.edit') active @endif" data-close-sidebar-link>Tema & Renungan</a>
+
+        <a href="{{ route('admin.parent-portal.edit') }}" class="admin-nav-link @if($currentRoute === 'admin.parent-portal.edit') active @endif" data-close-sidebar-link>Parent Portal</a>
+    @endif
+
+</nav>
             </div>
         @endif
 

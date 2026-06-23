@@ -2,15 +2,41 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>{{ $event->title }} | DSCMKids</title>
-    <meta name="description" content="{{ $event->subtitle ?: 'Pendaftaran Pekan Rohani Anak 2026 DSCMKids.' }}">
+
+    <meta
+        name="description"
+        content="{{ $event->subtitle ?: 'Pendaftaran Pekan Rohani Anak 2026 DSCMKids.' }}"
+    >
+
+    <!-- Anti Cache -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
     @if (!app()->environment('testing'))
-        @vite(['resources/css/pra-event.css', 'resources/js/pra-event.js'])
+        @vite([
+            'resources/css/pra-event.css',
+            'resources/js/pra-event.js'
+        ])
     @endif
 </head>
 @php
@@ -95,15 +121,30 @@
 </header>
 
 @if(session('registration_success'))
-    <div class="pra-modal is-visible" data-success-modal>
-        <div class="pra-modal-card">
-            <button type="button" class="pra-modal-close" data-modal-close aria-label="Tutup">x</button>
-            <span class="pra-modal-mark">OK</span>
-            <h2>Pendaftaran Berhasil</h2>
-            <p>Terima kasih telah mendaftar PRA 2026. Kami akan menghubungi melalui WhatsApp untuk informasi lebih lanjut.</p>
-            <strong>Tuhan Yesus Memberkati.</strong>
-        </div>
+<script>
+    localStorage.removeItem('pra2026_registration_draft');
+</script>
+
+<div class="pra-modal is-visible" data-success-modal>
+    <div class="pra-modal-card">
+        <button type="button"
+                class="pra-modal-close"
+                data-modal-close
+                aria-label="Tutup">x</button>
+
+        <span class="pra-modal-mark">OK</span>
+
+        <h2>Pendaftaran Berhasil</h2>
+
+        <p>
+            Terima kasih telah mendaftar PRA 2026.
+            Kami akan menghubungi melalui WhatsApp
+            untuk informasi lebih lanjut.
+        </p>
+
+        <strong>Tuhan Yesus Memberkati.</strong>
     </div>
+</div>
 @endif
 
 <div class="pra-modal" data-splash-modal>
@@ -263,19 +304,24 @@
     </section>
 
     <section class="pra-section pra-participants" id="peserta">
-        <div class="pra-section-head">
-            <span class="pra-kicker">Peserta</span>
-            <h2>Daftar Peserta Yang Sudah Mendaftarkan Diri</h2>
-        </div>
-        <div class="pra-participant-grid">
-            @foreach($groupCards as $card)
-                @php($registrations = $registrationsByGroup->get($card['slug'], collect()))
-                <article class="pra-participant-card">
-                    <div class="pra-group-card-head">
-                        <span>{{ $card['name'] }}</span>
-                        <strong>{{ $registrations->count() }} peserta</strong>
-                    </div>
-                    @forelse($registrations->take(8) as $registration)
+    <div class="pra-section-head">
+        <span class="pra-kicker">Peserta</span>
+        <h2>Daftar Peserta Yang Sudah Mendaftarkan Diri</h2>
+    </div>
+
+    <div class="pra-participant-grid">
+        @foreach($groupCards as $card)
+            @php($registrations = $registrationsByGroup->get($card['slug'], collect()))
+
+            <article class="pra-participant-card">
+
+                <div class="pra-group-card-head">
+                    <span>{{ $card['name'] }}</span>
+                    <strong>{{ $registrations->count() }} peserta</strong>
+                </div>
+
+                <div class="pra-participant-scroll">
+                    @forelse($registrations as $registration)
                         <div class="pra-participant-row">
                             <strong>{{ $registration->nickname }}</strong>
                             <span>Kelas {{ $registration->class_before }}</span>
@@ -283,13 +329,18 @@
                     @empty
                         <div class="pra-empty">
                             <strong>Belum ada peserta yang ditampilkan.</strong>
-                            <span>Nama peserta akan muncul setelah pendaftaran pertama untuk grup ini masuk.</span>
+                            <span>
+                                Nama peserta akan muncul setelah pendaftaran
+                                pertama untuk grup ini masuk.
+                            </span>
                         </div>
                     @endforelse
-                </article>
-            @endforeach
-        </div>
-    </section>
+                </div>
+
+            </article>
+        @endforeach
+    </div>
+</section>
 
     <section class="pra-section pra-form-section" id="daftar">
         <div class="pra-section-head">
@@ -398,11 +449,88 @@
                     <p>Setelah melakukan transfer, mohon upload bukti pembayaran pada form pendaftaran.</p>
                 </div>
             </div>
-            <label data-proof-field hidden>Upload Bukti Pembayaran *
-                <input type="file" name="payment_proof" accept=".jpg,.jpeg,.png,.webp,.pdf">
-            </label>
-            <button class="pra-btn pra-btn-primary pra-form-wide" type="submit">Kirim Pendaftaran</button>
+            <label data-proof-field hidden>
+    Upload Bukti Pembayaran *
+    <input type="file"
+           name="payment_proof"
+           accept=".jpg,.jpeg,.png,.webp,.pdf">
+</label>
+
+<p class="pra-form-wide" style="font-size:12px;opacity:.8;">
+    Data formulir disimpan otomatis pada perangkat ini.
+</p>
+
+<button class="pra-btn pra-btn-primary pra-form-wide" type="submit">
+    Kirim Pendaftaran
+</button>
         </form>
+        <script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const form = document.querySelector('[data-pra-form]');
+
+    if (!form) return;
+
+    const storageKey = 'pra2026_registration_draft';
+
+    /*
+    |--------------------------------------------------------------------------
+    | Restore Draft
+    |--------------------------------------------------------------------------
+    */
+    try {
+        const saved = localStorage.getItem(storageKey);
+
+        if (saved) {
+            const data = JSON.parse(saved);
+
+            form.querySelectorAll('input, select, textarea')
+                .forEach(field => {
+
+                    if (!field.name) return;
+                    if (field.type === 'file') return;
+
+                    if (data[field.name] !== undefined) {
+                        field.value = data[field.name];
+                    }
+                });
+            
+             // jalankan ulang UI dinamis
+            form.dispatchEvent(new Event('change'));   
+        }
+    } catch (e) {
+        console.log(e);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Auto Save
+    |--------------------------------------------------------------------------
+    */
+    function saveDraft() {
+
+        const data = {};
+
+        form.querySelectorAll('input, select, textarea')
+            .forEach(field => {
+
+                if (!field.name) return;
+                if (field.type === 'file') return;
+
+                data[field.name] = field.value;
+            });
+
+        localStorage.setItem(
+            storageKey,
+            JSON.stringify(data)
+        );
+    }
+
+    form.addEventListener('input', saveDraft);
+    form.addEventListener('change', saveDraft);
+   
+});
+</script>
     </section>
 </main>
 
@@ -423,5 +551,28 @@
     <strong>DSCMKids</strong>
     <span>PRA 2026 - Pekan Rohani Anak</span>
 </footer>
+<style>
+.pra-participant-card{
+    display:flex !important;
+    flex-direction:column !important;
+    height:480px !important;
+    overflow:hidden !important;
+}
+
+.pra-participant-scroll{
+    flex:1 !important;
+    max-height:380px !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+
+    display:flex !important;
+    flex-direction:column !important;
+    gap:8px !important;
+
+    padding-right:6px !important;
+
+    border:2px solid white !important;
+}
+</style>
 </body>
 </html>

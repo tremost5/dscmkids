@@ -200,33 +200,86 @@
                 </div>
             </section>
 
-            <section class="table-shell">
-                <div class="table-toolbar">
-                    <div>
-                        <h2 class="section-title">Audit admin terbaru</h2>
-                        <p class="section-copy">Jejak aktivitas request admin paling akhir.</p>
-                    </div>
-                </div>
-                <div class="table-scroller">
-                    <table>
-                        <thead>
-                        <tr><th>Waktu</th><th>Method</th><th>Path</th><th>IP</th></tr>
-                        </thead>
-                        <tbody>
-                        @forelse($recentAdminActivities as $log)
-                            <tr>
-                                <td>{{ optional($log->created_at)->format('d M H:i') }}</td>
-                                <td>{{ $log->method }}</td>
-                                <td>{{ $log->path }}</td>
-                                <td>{{ $log->ip_address ?: '-' }}</td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="4" class="empty-state">Audit log belum tersedia.</td></tr>
-                        @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+            @if(auth()->user()?->hasPermission('monitoring.view'))
+<section class="table-shell">
+    <div class="table-toolbar">
+        <div>
+            <h2 class="section-title">Audit admin terbaru</h2>
+            <p class="section-copy">Jejak aktivitas request admin paling akhir.</p>
+        </div>
+    </div>
+
+    <div class="table-scroller">
+        <table>
+            <thead>
+<tr>
+    <th>Waktu</th>
+    <th>Admin</th>
+    <th>Aksi</th>
+    <th>IP</th>
+</tr>
+</thead>
+
+<tbody>
+@forelse($recentAdminActivities as $log)
+<tr>
+
+    <td>
+        {{ optional($log->created_at)->format('d M H:i') }}
+    </td>
+
+    <td>
+        {{ $log->user->name ?? 'Unknown' }}
+    </td>
+
+    <td>
+
+        @if(str_contains($log->path, '/peserta'))
+            Edit Peserta
+
+        @elseif(str_contains($log->path, '/pembayaran'))
+            Update Pembayaran
+
+        @elseif(str_contains($log->path, '/broadcast-wa'))
+            Broadcast WhatsApp
+
+        @elseif(str_contains($log->path, '/konten'))
+            Update Landing Page
+
+        @elseif(str_contains($log->path, '/galeri'))
+            Kelola Galeri
+
+        @elseif(str_contains($log->path, '/video'))
+            Kelola Video
+
+        @elseif(str_contains($log->path, '/users'))
+            Kelola User
+
+        @else
+            {{ $log->method }}
+        @endif
+
+    </td>
+
+    <td>
+        {{ $log->ip_address ?: '-' }}
+    </td>
+
+</tr>
+@empty
+
+<tr>
+    <td colspan="4" class="empty-state">
+        Audit log belum tersedia.
+    </td>
+</tr>
+
+@endforelse
+</tbody>
+        </table>
+    </div>
+</section>
+@endif
         </div>
     </div>
 </div>

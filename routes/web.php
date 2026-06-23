@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\PageSectionController;
 use App\Http\Controllers\Admin\ParentPortalController as AdminParentPortalController;
 use App\Http\Controllers\Admin\PraEventController;
 use App\Http\Controllers\Admin\SystemMonitorController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\TeacherProfileController;
 use App\Http\Controllers\Admin\LiveStreamController;
 use App\Http\Controllers\Admin\SpiritualContentController;
@@ -30,6 +31,13 @@ use App\Http\Controllers\ParentPortalController;
 use App\Http\Controllers\TeacherPhotoController;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/clear-cache', function () {
+    Artisan::call('optimize:clear');
+
+    return nl2br(Artisan::output());
+});
 
 Route::get('/storage/{path}', function (string $path) {
     abort_if(str_contains($path, '..'), 404);
@@ -102,6 +110,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/', [PraEventController::class, 'dashboard'])->name('dashboard');
             Route::get('/peserta', [PraEventController::class, 'participants'])->name('participants');
             Route::get('/peserta/{registration}', [PraEventController::class, 'participantDetail'])->name('participants.show');
+            Route::patch('/peserta/{registration}', [PraEventController::class, 'updateParticipant'])->name('participant.update');
             Route::post('/peserta/{registration}/resend-whatsapp', [PraEventController::class, 'resendWhatsappConfirmation'])->name('participants.resend-whatsapp');
             Route::get('/grup-1', [PraEventController::class, 'groupOne'])->name('group-one');
             Route::get('/grup-2', [PraEventController::class, 'groupTwo'])->name('group-two');
@@ -135,6 +144,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('users/bulk', [UserManagementController::class, 'bulkUpdate'])->middleware('permission:users.manage')->name('users.bulk');
         Route::get('users/{user}/edit', [UserManagementController::class, 'edit'])->middleware('permission:users.manage')->name('users.edit');
         Route::put('users/{user}', [UserManagementController::class, 'update'])->middleware('permission:users.manage')->name('users.update');
+        Route::get('audit-log', [AuditLogController::class, 'index'])->middleware('permission:monitoring.view')->name('audit.index');
         Route::get('system-monitor', [SystemMonitorController::class, 'index'])->middleware('permission:monitoring.view')->name('system.index');
     });
 });

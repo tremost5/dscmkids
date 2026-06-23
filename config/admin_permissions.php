@@ -11,11 +11,8 @@ return [
             'permissions' => [
                 'dashboard.view',
                 'content.manage',
-                'users.manage',
                 'reports.view',
-                'monitoring.view',
                 'notifications.manage',
-                'api.admin',
             ],
         ],
         'editor' => [

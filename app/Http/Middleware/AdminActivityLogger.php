@@ -18,9 +18,15 @@ class AdminActivityLogger
             if (
                 $request->user()
                 && $request->user()->isAdmin()
-                && $request->isMethodSafe() === false
+                && !$request->isMethodSafe()
                 && Schema::hasTable('admin_activity_logs')
             ) {
+
+                // PATCH sudah dicatat manual dengan detail
+                if ($request->method() === 'PATCH') {
+                    return $response;
+                }
+
                 AdminActivityLog::create([
                     'user_id' => $request->user()->id,
                     'method' => $request->method(),
@@ -30,7 +36,7 @@ class AdminActivityLogger
                 ]);
             }
         } catch (\Throwable) {
-            // Never block admin actions when audit logging fails on shared hosting.
+            // Never block admin actions when audit logging fails.
         }
 
         return $response;

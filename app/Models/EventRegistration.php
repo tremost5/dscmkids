@@ -33,6 +33,7 @@ class EventRegistration extends Model
         'whatsapp_number',
         'address',
         'payment_method',
+        'payment_notes',
         'payment_status',
         'attendance_status',
         'registered_at',

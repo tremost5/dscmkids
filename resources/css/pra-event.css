@@ -360,8 +360,15 @@ a {
     gap: 14px;
 }
 
-.pra-count-grid {
+.pra-participant-grid {
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    align-items: start;
+}
+
+.pra-participant-grid > * {
+    min-height: 0;
 }
 
 .pra-group-grid,
@@ -432,6 +439,7 @@ a {
 .pra-group-card-head {
     display: grid;
     gap: 5px;
+    margin-bottom: 12px;
 }
 
 .pra-group-card-head span,
@@ -443,8 +451,9 @@ a {
 }
 
 .pra-group-card-head strong {
-    font-size: 1.12rem;
+    font-size: 1rem;
     line-height: 1.35;
+    color: var(--pra-ink);
 }
 
 .pra-group-card-meta {
@@ -923,6 +932,7 @@ a {
 
 .pra-participant-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
 }
 
 .pra-participant-column {
@@ -936,11 +946,15 @@ a {
 
 .pra-participant-card {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 12px;
-    padding: 12px;
-    border-radius: 8px;
+
+    padding: 20px;
+    border-radius: 16px;
     background: #f7fbff;
+
+    height: 520px;
+    overflow: hidden;
 }
 
 .pra-participant-card + .pra-participant-card {
@@ -970,10 +984,24 @@ a {
 }
 
 .pra-participants .pra-participant-card {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     align-items: stretch;
+    gap: 12px;
+}
+
+.pra-participant-scroll {
+    flex: 1;
+    max-height: 420px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    display: flex;
+    flex-direction: column;
     gap: 10px;
-    padding: 16px;
+
+    padding-right: 8px;
 }
 
 .pra-participant-row {
@@ -981,17 +1009,34 @@ a {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+
     padding: 10px 12px;
     border-radius: 8px;
-    background: #ffffff;
-    border: 1px solid var(--pra-line);
+
+    
+}
+
+.pra-participant-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.pra-participant-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.pra-participant-scroll::-webkit-scrollbar-thumb{
+    background:#cbd5e1;
+    border-radius:999px;
+}
+
+.pra-participant-scroll::-webkit-scrollbar-thumb:hover{
+    background:#94a3b8;
 }
 
 .pra-participant-row strong,
 .pra-participant-row span {
     overflow-wrap: anywhere;
 }
-
 .pra-empty,
 .pra-alert {
     padding: 14px;
@@ -1528,8 +1573,13 @@ main::before {
     font-size: 1.95rem;
 }
 
-.pra-participant-card {
-    background: linear-gradient(135deg, #f7fbff, #ffffff);
+.pra-participant-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.pra-participant-scroll::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,.2);
+    border-radius: 999px;
 }
 
 .pra-empty {

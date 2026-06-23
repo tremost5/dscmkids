@@ -32,16 +32,42 @@ class PraEventController extends Controller
     }
 
     public function participants(Request $request, EventService $eventService): View
-    {
-        $event = $eventService->pra2026();
-        $filter = $request->query('filter');
-        $registrations = $eventService->registrationsQuery($event, is_string($filter) ? $filter : null)
-            ->paginate(20)
-            ->withQueryString();
-        $stats = $eventService->stats($event);
+{
+    $event = $eventService->pra2026();
 
-        return view('admin.pra.participants', compact('event', 'registrations', 'filter', 'stats'));
+    $filter = $request->query('filter');
+    $search = trim((string) $request->query('search', ''));
+
+    $query = $eventService->registrationsQuery(
+        $event,
+        is_string($filter) ? $filter : null
+    );
+
+    if ($search !== '') {
+        $query->where(function ($q) use ($search) {
+            $q->where('full_name', 'like', "%{$search}%")
+            ->orWhere('nickname', 'like', "%{$search}%")
+            ->orWhere('parent_name', 'like', "%{$search}%")
+            ->orWhere('whatsapp_number', 'like', "%{$search}%")
+            ->orWhere('church_branch', 'like', "%{$search}%")
+            ->orWhere('class_before', 'like', "%{$search}%");
+        });
     }
+
+    $registrations = $query
+        ->paginate(20)
+        ->withQueryString();
+
+    $stats = $eventService->stats($event);
+
+    return view('admin.pra.participants', compact(
+        'event',
+        'registrations',
+        'filter',
+        'stats',
+        'search'
+    ));
+}
 
     public function groupOne(EventService $eventService): View
     {
@@ -84,6 +110,121 @@ class PraEventController extends Controller
         ]);
     }
 
+public function updateParticipant(Request $request, EventRegistration $registration): RedirectResponse
+{
+    $oldData = [
+        'full_name' => $registration->full_name,
+        'nickname' => $registration->nickname,
+        'class_before' => $registration->class_before,
+        'church_branch' => $registration->church_branch,
+        'parent_name' => $registration->parent_name,
+        'whatsapp_number' => $registration->whatsapp_number,
+        'address' => $registration->address,
+        'event_group_id' => $registration->event_group_id,
+    ];
+
+    $data = $request->validate([
+        'full_name' => ['required', 'string', 'max:255'],
+        'nickname' => ['nullable', 'string', 'max:255'],
+        'gender' => ['nullable', 'string', 'max:50'],
+        'birth_date' => ['nullable', 'date'],
+        'class_before' => ['nullable', 'string', 'max:100'],
+        'church_branch' => ['nullable', 'string', 'max:255'],
+        'event_group_id' => ['required', 'integer'],
+        'has_allergy' => ['nullable', 'boolean'],
+        'allergy_notes' => ['nullable', 'string'],
+        'parent_name' => ['required', 'string', 'max:255'],
+        'whatsapp_number' => ['required', 'string', 'max:50'],
+        'address' => ['nullable', 'string'],
+    ]);
+
+    $registration->update([
+        'full_name' => $data['full_name'],
+        'nickname' => $data['nickname'] ?? null,
+        'gender' => $data['gender'] ?? null,
+        'birth_date' => $data['birth_date'] ?? null,
+        'class_before' => $data['class_before'] ?? null,
+        'church_branch' => $data['church_branch'] ?? null,
+        'event_group_id' => $data['event_group_id'],
+        'has_allergy' => (bool) ($data['has_allergy'] ?? false),
+        'allergy_notes' => $data['allergy_notes'] ?? null,
+        'parent_name' => $data['parent_name'],
+        'whatsapp_number' => $data['whatsapp_number'],
+        'address' => $data['address'] ?? null,
+    ]);
+
+    $changes = [];
+
+    if ($oldData['full_name'] !== $registration->full_name) {
+        $changes[] =
+            'Nama: '
+            .$oldData['full_name']
+            .' → '
+            .$registration->full_name;
+    }
+
+    if (($oldData['nickname'] ?? '') !== ($registration->nickname ?? '')) {
+        $changes[] =
+            'Panggilan: '
+            .($oldData['nickname'] ?: '-')
+            .' → '
+            .($registration->nickname ?: '-');
+    }
+
+    if (($oldData['class_before'] ?? '') !== ($registration->class_before ?? '')) {
+        $changes[] =
+            'Kelas: '
+            .($oldData['class_before'] ?: '-')
+            .' → '
+            .($registration->class_before ?: '-');
+    }
+
+    if (($oldData['church_branch'] ?? '') !== ($registration->church_branch ?? '')) {
+        $changes[] =
+            'Sekolah Minggu: '
+            .($oldData['church_branch'] ?: '-')
+            .' → '
+            .($registration->church_branch ?: '-');
+    }
+
+    if (($oldData['parent_name'] ?? '') !== ($registration->parent_name ?? '')) {
+        $changes[] =
+            'Ortu: '
+            .$oldData['parent_name']
+            .' → '
+            .$registration->parent_name;
+    }
+
+    if (($oldData['whatsapp_number'] ?? '') !== ($registration->whatsapp_number ?? '')) {
+        $changes[] =
+            'WA: '
+            .$oldData['whatsapp_number']
+            .' → '
+            .$registration->whatsapp_number;
+    }
+
+    if (($oldData['address'] ?? '') !== ($registration->address ?? '')) {
+        $changes[] = 'Alamat diperbarui';
+    }
+
+    if ($oldData['event_group_id'] != $registration->event_group_id) {
+        $changes[] = 'Grup PRA dipindahkan';
+    }
+
+    \App\Models\AdminActivityLog::create([
+        'user_id' => $request->user()->id,
+        'method' => 'AUDIT',
+        'path' => '/admin/pra-2026/peserta/'.$registration->id,
+        'action' => 'Edit Peserta - '.$registration->full_name,
+        'description' => count($changes)
+            ? implode(' | ', $changes)
+            : 'Tidak ada perubahan data',
+        'ip_address' => $request->ip(),
+        'user_agent' => substr((string) $request->userAgent(), 0, 500),
+    ]);
+
+    return back()->with('success', 'Data peserta berhasil diperbarui.');
+}
     public function payments(Request $request, EventService $eventService): View
     {
         $event = $eventService->pra2026();
@@ -98,27 +239,153 @@ class PraEventController extends Controller
     }
 
     public function updatePayment(Request $request, EventRegistration $registration): RedirectResponse
-    {
-        $data = $request->validate([
-            'payment_status' => ['required', Rule::in([
+{
+    $oldMethod = $registration->payment_method;
+    $oldStatus = $registration->payment_status;
+    $oldNotes = $registration->payment_notes;
+
+    $data = $request->validate([
+        'payment_status' => [
+            'required',
+            Rule::in([
                 EventRegistration::PAYMENT_UNPAID,
                 EventRegistration::PAYMENT_PENDING,
                 EventRegistration::PAYMENT_PAID,
-            ])],
-        ]);
+            ]),
+        ],
 
-        $registration->update(['payment_status' => $data['payment_status']]);
+        'payment_method' => [
+            'required',
+            Rule::in(['cash', 'transfer']),
+        ],
+
+        'payment_notes' => [
+            'nullable',
+            'string',
+            'max:500',
+        ],
+
+        'payment_proof' => [
+            'nullable',
+            'image',
+            'mimes:jpg,jpeg,png,webp',
+            'max:5120',
+        ],
+    ]);
+
+    $registration->update([
+        'payment_status' => $data['payment_status'],
+        'payment_method' => $data['payment_method'],
+        'payment_notes' => $data['payment_notes'] ?? null,
+    ]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Upload / Ganti Bukti Transfer
+    |--------------------------------------------------------------------------
+    */
+    if ($request->hasFile('payment_proof')) {
+
+        $file = $request->file('payment_proof');
+
+        $path = $file->store('payment-proofs', 'public');
 
         if ($registration->paymentProof) {
+
+            if ($registration->paymentProof->file_path) {
+                Storage::disk('public')
+                    ->delete($registration->paymentProof->file_path);
+            }
+
             $registration->paymentProof->update([
-                'verification_status' => $data['payment_status'] === EventRegistration::PAYMENT_PAID ? 'verified' : 'pending',
-                'verified_by' => $data['payment_status'] === EventRegistration::PAYMENT_PAID ? $request->user()?->id : null,
-                'verified_at' => $data['payment_status'] === EventRegistration::PAYMENT_PAID ? now() : null,
+                'file_path' => $path,
+                'mime_type' => $file->getMimeType(),
+                'file_size' => $file->getSize(),
+                'verification_status' => 'pending',
+                'verified_by' => null,
+                'verified_at' => null,
+            ]);
+
+        } else {
+
+            $registration->paymentProof()->create([
+                'file_path' => $path,
+                'mime_type' => $file->getMimeType(),
+                'file_size' => $file->getSize(),
+                'verification_status' => 'pending',
+                'verified_by' => null,
+                'verified_at' => null,
             ]);
         }
-
-        return back()->with('success', 'Status pembayaran diperbarui.');
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Jika Transfer + Masih Belum Bayar
+    |--------------------------------------------------------------------------
+    */
+    if (
+        $registration->payment_method === 'transfer'
+        && $registration->payment_status === EventRegistration::PAYMENT_UNPAID
+        && $registration->paymentProof
+    ) {
+        $registration->update([
+            'payment_status' => EventRegistration::PAYMENT_PENDING,
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sinkronisasi Status Verifikasi Bukti
+    |--------------------------------------------------------------------------
+    */
+    if ($registration->paymentProof) {
+
+        $registration->paymentProof->update([
+            'verification_status' =>
+                $registration->payment_status === EventRegistration::PAYMENT_PAID
+                    ? 'verified'
+                    : 'pending',
+
+            'verified_by' =>
+                $registration->payment_status === EventRegistration::PAYMENT_PAID
+                    ? $request->user()?->id
+                    : null,
+
+            'verified_at' =>
+                $registration->payment_status === EventRegistration::PAYMENT_PAID
+                    ? now()
+                    : null,
+        ]);
+    }
+$changes = [];
+
+if ($oldMethod !== $registration->payment_method) {
+    $changes[] = "Metode: {$oldMethod} → {$registration->payment_method}";
+}
+
+if ($oldStatus !== $registration->payment_status) {
+    $changes[] = "Status: {$oldStatus} → {$registration->payment_status}";
+}
+
+if (($oldNotes ?? '') !== ($registration->payment_notes ?? '')) {
+    $changes[] = "Catatan pembayaran diperbarui";
+}
+
+\App\Models\AdminActivityLog::create([
+    'user_id' => $request->user()->id,
+    'method' => 'AUDIT',
+    'path' => '/admin/pra-2026/pembayaran/'.$registration->id,
+    'action' => 'Update Pembayaran - '.$registration->full_name,
+    'description' => implode(' | ', $changes),
+    'ip_address' => $request->ip(),
+    'user_agent' => substr((string) $request->userAgent(), 0, 500),
+]);
+    return back()->with(
+        'success',
+        'Data pembayaran berhasil diperbarui.'
+    );
+}
 
     public function attendance(EventService $eventService): View
     {
