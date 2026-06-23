@@ -11,7 +11,9 @@
         <a class="btn btn-secondary" href="{{ route('admin.pra.group-two') }}">Grup 2</a>
         <a class="btn btn-secondary" href="{{ route('admin.pra.payments') }}">Pembayaran</a>
         <a class="btn btn-secondary" href="{{ route('admin.pra.attendance') }}">Kehadiran</a>
+        <a class="btn btn-secondary" href="{{ route('admin.pra.companions') }}">Pendamping</a>
         <a class="btn btn-secondary" href="{{ route('admin.pra.broadcast') }}">Broadcast WA</a>
+        <a class="btn btn-secondary" href="{{ route('admin.pra.export-companions') }}">Export Pendamping</a>
         <a class="btn btn-primary" href="{{ route('admin.pra.content') }}">Konten Landing Page</a>
         <a class="btn btn-secondary" href="{{ route('events.pra-2026') }}" target="_blank" rel="noopener">Lihat Halaman</a>
     </div>

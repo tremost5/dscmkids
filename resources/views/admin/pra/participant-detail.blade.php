@@ -196,6 +196,32 @@
         </div>
 
     </div>
+
+    <div class="section-head" style="margin-top:20px;">
+        <h2 class="section-title">Pendamping</h2>
+        <p class="section-copy">Daftar pendamping yang terhubung dengan peserta ini.</p>
+    </div>
+
+    <div class="detail-kv">
+        <div class="detail-kv-item" style="grid-column:1/-1;">
+            <span>Data Pendamping</span>
+            <strong style="display:block;">
+                @forelse($registration->companions as $companion)
+                    <div style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08);">
+                        <div><strong>{{ $companion->companion_name }}</strong></div>
+                        <div class="muted">{{ $companion->whatsapp_number }}</div>
+                        <div class="muted">{{ $companion->attendanceDatesLabel() }}</div>
+                        <div class="muted">
+                            Murid:
+                            {{ $companion->registrations->pluck('nickname')->filter()->implode(', ') ?: '-' }}
+                        </div>
+                    </div>
+                @empty
+                    Belum ada pendamping yang terdaftar.
+                @endforelse
+            </strong>
+        </div>
+    </div>
     </aside>
 </div>
 </form>

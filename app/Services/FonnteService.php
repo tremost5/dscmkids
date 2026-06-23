@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\BroadcastLog;
 use App\Models\EventRegistration;
+use App\Models\PraCompanion;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -17,6 +18,17 @@ class FonnteService
 
         $this->sendParentConfirmation($registration);
         $this->sendCommitteeNotification($registration);
+    }
+
+    public function sendPraCompanionNotification(PraCompanion $companion): bool
+    {
+        $companion->loadMissing('registrations');
+
+        return $this->sendMessage(
+            $companion->whatsapp_number,
+            $this->companionConfirmationMessage($companion),
+            ['type' => 'pra_companion_confirmation', 'companion_id' => $companion->id]
+        );
     }
 
     public function sendParentConfirmation(EventRegistration $registration): bool
@@ -228,6 +240,57 @@ Grup PRA: {$groupName}
 
 Silakan cek Dashboard Admin PRA 2026.
 MESSAGE;
+    }
+
+    private function companionConfirmationMessage(PraCompanion $companion): string
+    {
+        $studentNames = $companion->registrations
+            ->pluck('nickname')
+            ->filter()
+            ->values();
+
+        $attendanceDates = [];
+
+        if ($companion->attend_26_june) {
+            $attendanceDates[] = '✓ 26 Juni 2026';
+        }
+
+        if ($companion->attend_27_june) {
+            $attendanceDates[] = '✓ 27 Juni 2026';
+        }
+
+        $paymentStatus = $companion->paymentStatusLabel();
+        $studentList = $this->formatBulletList($studentNames->all());
+        $attendanceList = $this->formatBulletList($attendanceDates);
+
+        return <<<MESSAGE
+Shalom,
+
+Pendaftaran Pendamping PRA 2026 berhasil.
+
+Nama Pendamping:
+{$companion->companion_name}
+
+Murid:
+{$studentList}
+
+Tanggal Hadir:
+{$attendanceList}
+
+Status Pembayaran:
+{$paymentStatus}
+
+Tuhan Yesus Memberkati.
+MESSAGE;
+    }
+
+    private function formatBulletList(array $items): string
+    {
+        if ($items === []) {
+            return '-';
+        }
+
+        return implode("\n", array_map(fn (string $item) => '- '.$item, $items));
     }
 
     private function committeeNumbers(): array

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -61,6 +62,12 @@ class EventRegistration extends Model
     public function paymentProof(): HasOne
     {
         return $this->hasOne(PaymentProof::class);
+    }
+
+    public function companions(): BelongsToMany
+    {
+        return $this->belongsToMany(PraCompanion::class, 'pra_companion_students')
+            ->withTimestamps();
     }
 
     public function paymentStatusLabel(): string

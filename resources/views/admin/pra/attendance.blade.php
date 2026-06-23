@@ -11,6 +11,20 @@
     <div class="stat-card"><div class="stat-label">Belum Hadir</div><strong>{{ $stats['absent'] }}</strong></div>
 </div>
 
+<div class="toolbar" style="margin-top:16px;">
+    <form method="GET" class="toolbar-actions">
+        <input
+            type="text"
+            name="search"
+            class="input-compact"
+            placeholder="Cari nama, ortu, WA, kelas..."
+            value="{{ $search ?? '' }}"
+            style="min-width:280px;">
+
+        <button class="btn btn-primary" type="submit">Filter</button>
+    </form>
+</div>
+
 <section class="table-shell" style="margin-top:16px;">
     <div class="table-scroller">
         <table>
@@ -39,4 +53,17 @@
     </div>
     {{ $registrations->links() }}
 </section>
+<script>
+let attendanceSearchTimer;
+
+document
+    .querySelector('input[name="search"]')
+    ?.addEventListener('keyup', function () {
+        clearTimeout(attendanceSearchTimer);
+
+        attendanceSearchTimer = setTimeout(() => {
+            this.form?.submit();
+        }, 400);
+    });
+</script>
 @endsection

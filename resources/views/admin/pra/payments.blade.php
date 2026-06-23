@@ -14,6 +14,14 @@
 
 <div class="toolbar" style="margin-top:16px;">
     <form method="GET" class="toolbar-actions">
+        <input
+            type="text"
+            name="search"
+            class="input-compact"
+            placeholder="Cari nama, ortu, WA, kelas..."
+            value="{{ $search ?? '' }}"
+            style="min-width:280px;">
+
         <select name="filter" class="select-compact">
             <option value="">Semua</option>
             <option value="unpaid" @selected($filter === 'unpaid')>Belum Bayar</option>
@@ -175,6 +183,18 @@
     {{ $registrations->links() }}
 </section>
 <script>
+let paymentSearchTimer;
+
+document
+    .querySelector('input[name="search"]')
+    ?.addEventListener('keyup', function () {
+        clearTimeout(paymentSearchTimer);
+
+        paymentSearchTimer = setTimeout(() => {
+            this.form?.submit();
+        }, 400);
+    });
+
 function toggleProofUpload(id, value)
 {
     const el = document.getElementById('proof-upload-' + id);

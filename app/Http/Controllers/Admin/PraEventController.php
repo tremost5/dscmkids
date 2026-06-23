@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\EventGallery;
 use App\Models\EventRegistration;
 use App\Models\EventVideo;
+use App\Models\PraCompanion;
 use App\Services\EventService;
 use App\Services\FonnteService;
 use Illuminate\Http\RedirectResponse;
@@ -52,6 +53,10 @@ class PraEventController extends Controller
             ->orWhere('church_branch', 'like', "%{$search}%")
             ->orWhere('class_before', 'like', "%{$search}%");
         });
+
+        $query->reorder('full_name')
+            ->orderBy('nickname')
+            ->orderBy('id');
     }
 
     $registrations = $query
@@ -90,7 +95,7 @@ class PraEventController extends Controller
 
         return view('admin.pra.participant-detail', [
             'event' => $event,
-            'registration' => $registration->load(['group', 'paymentProof']),
+            'registration' => $registration->load(['group', 'paymentProof', 'companions.registrations']),
         ]);
     }
 
@@ -229,13 +234,29 @@ public function updateParticipant(Request $request, EventRegistration $registrat
     {
         $event = $eventService->pra2026();
         $filter = $request->query('filter');
-        $registrations = $eventService->registrationsQuery($event, is_string($filter) ? $filter : null)
-            ->whereIn('payment_method', ['cash', 'transfer'])
-            ->paginate(20)
-            ->withQueryString();
+        $search = trim((string) $request->query('search', ''));
+        $query = $eventService->registrationsQuery($event, is_string($filter) ? $filter : null)
+            ->whereIn('payment_method', ['cash', 'transfer']);
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%")
+                    ->orWhere('nickname', 'like', "%{$search}%")
+                    ->orWhere('parent_name', 'like', "%{$search}%")
+                    ->orWhere('whatsapp_number', 'like', "%{$search}%")
+                    ->orWhere('church_branch', 'like', "%{$search}%")
+                    ->orWhere('class_before', 'like', "%{$search}%");
+            });
+
+            $query->reorder('full_name')
+                ->orderBy('nickname')
+                ->orderBy('id');
+        }
+
+        $registrations = $query->paginate(20)->withQueryString();
         $stats = $eventService->stats($event);
 
-        return view('admin.pra.payments', compact('event', 'registrations', 'filter', 'stats'));
+        return view('admin.pra.payments', compact('event', 'registrations', 'filter', 'stats', 'search'));
     }
 
     public function updatePayment(Request $request, EventRegistration $registration): RedirectResponse
@@ -387,13 +408,72 @@ if (($oldNotes ?? '') !== ($registration->payment_notes ?? '')) {
     );
 }
 
-    public function attendance(EventService $eventService): View
+    public function attendance(Request $request, EventService $eventService): View
     {
         $event = $eventService->pra2026();
         $stats = $eventService->stats($event);
-        $registrations = $eventService->registrationsQuery($event)->paginate(30);
+        $search = trim((string) $request->query('search', ''));
+        $query = $eventService->registrationsQuery($event);
 
-        return view('admin.pra.attendance', compact('event', 'stats', 'registrations'));
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%")
+                    ->orWhere('nickname', 'like', "%{$search}%")
+                    ->orWhere('parent_name', 'like', "%{$search}%")
+                    ->orWhere('whatsapp_number', 'like', "%{$search}%")
+                    ->orWhere('church_branch', 'like', "%{$search}%")
+                    ->orWhere('class_before', 'like', "%{$search}%");
+            });
+
+            $query->reorder('full_name')
+                ->orderBy('nickname')
+                ->orderBy('id');
+        }
+
+        $registrations = $query->paginate(30)->withQueryString();
+
+        return view('admin.pra.attendance', compact('event', 'stats', 'registrations', 'search'));
+    }
+
+    public function companions(Request $request, EventService $eventService): View
+    {
+        $event = $eventService->pra2026();
+        $stats = [
+            'total' => PraCompanion::query()->count(),
+            'unpaid' => PraCompanion::query()->where('payment_status', PraCompanion::PAYMENT_UNPAID)->count(),
+            'pending' => PraCompanion::query()->where('payment_status', PraCompanion::PAYMENT_PENDING)->count(),
+            'paid' => PraCompanion::query()->where('payment_status', PraCompanion::PAYMENT_PAID)->count(),
+        ];
+
+        $search = trim((string) $request->query('search', ''));
+        $filter = (string) $request->query('filter', 'all');
+        $filter = in_array($filter, [PraCompanion::PAYMENT_UNPAID, PraCompanion::PAYMENT_PENDING, PraCompanion::PAYMENT_PAID, 'all'], true)
+            ? $filter
+            : 'all';
+
+        $query = PraCompanion::query()->with('registrations');
+
+        if ($filter !== 'all') {
+            $query->where('payment_status', $filter);
+        }
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('companion_name', 'like', "%{$search}%")
+                    ->orWhere('whatsapp_number', 'like', "%{$search}%")
+                    ->orWhereHas('registrations', function ($studentQuery) use ($search) {
+                        $studentQuery->where('nickname', 'like', "%{$search}%")
+                            ->orWhere('class_before', 'like', "%{$search}%");
+                    });
+            });
+
+            $query->reorder('companion_name')
+                ->orderBy('id');
+        }
+
+        $companions = $query->latest('id')->paginate(20)->withQueryString();
+
+        return view('admin.pra.companions', compact('event', 'stats', 'search', 'filter', 'companions'));
     }
 
     public function updateAttendance(Request $request, EventRegistration $registration): RedirectResponse
@@ -668,6 +748,13 @@ if (($oldNotes ?? '') !== ($registration->payment_notes ?? '')) {
         };
 
         return $eventService->exportRegistrations($event, $filter, 'pra-2026-peserta-'.now()->format('Y-m-d').'.xlsx');
+    }
+
+    public function exportCompanions(EventService $eventService): BinaryFileResponse
+    {
+        $event = $eventService->pra2026();
+
+        return $eventService->exportCompanions($event, 'pra-2026-pendamping-'.now()->format('Y-m-d').'.xlsx');
     }
 
     private function lines(string $value): array

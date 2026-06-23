@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\EventLandingController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\LearningMaterialController;
+use App\Http\Controllers\PraCompanionController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StudentAuthController;
 use App\Http\Controllers\StudentGameController;
@@ -54,6 +55,9 @@ Route::get('/materi', [LearningMaterialController::class, 'index'])->name('mater
 Route::get('/orangtua', [ParentPortalController::class, 'index'])->name('parent.portal');
 Route::get('/pra-2026', [EventLandingController::class, 'show'])->name('events.pra-2026');
 Route::post('/pra-2026/daftar', [EventLandingController::class, 'register'])->middleware('throttle:6,1')->name('events.pra-2026.register');
+Route::get('/pra-2026/pendamping', [PraCompanionController::class, 'show'])->name('events.pra-2026.pendamping');
+Route::post('/pra-2026/pendamping', [PraCompanionController::class, 'store'])->middleware('throttle:6,1')->name('events.pra-2026.pendamping.store');
+Route::get('/pra-2026/api/students', [PraCompanionController::class, 'students'])->name('events.pra-2026.api.students');
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/teacher-photo/{teacher}', TeacherPhotoController::class)->name('teacher.photo');
 Route::post('/testimoni', [TestimonialSubmissionController::class, 'store'])->middleware('throttle:5,1')->name('testimonials.submit');
@@ -118,6 +122,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::patch('/pembayaran/{registration}', [PraEventController::class, 'updatePayment'])->name('payments.update');
             Route::get('/kehadiran', [PraEventController::class, 'attendance'])->name('attendance');
             Route::patch('/kehadiran/{registration}', [PraEventController::class, 'updateAttendance'])->name('attendance.update');
+            Route::get('/pendamping', [PraEventController::class, 'companions'])->name('companions');
             Route::get('/broadcast-wa', [PraEventController::class, 'broadcast'])->name('broadcast');
             Route::post('/broadcast-wa/send', [PraEventController::class, 'sendBroadcast'])->name('broadcast.send');
             Route::get('/konten', [PraEventController::class, 'content'])->name('content');
@@ -127,6 +132,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/video', [PraEventController::class, 'storeVideo'])->name('videos.store');
             Route::delete('/video/{video}', [PraEventController::class, 'deleteVideo'])->name('videos.destroy');
             Route::get('/export', [PraEventController::class, 'export'])->name('export');
+            Route::get('/export-pendamping', [PraEventController::class, 'exportCompanions'])->name('export-companions');
         });
         Route::get('notifications', [NotificationBroadcastController::class, 'index'])->middleware('permission:notifications.manage')->name('notifications.index');
         Route::get('notifications/create', [NotificationBroadcastController::class, 'create'])->middleware('permission:notifications.manage')->name('notifications.create');

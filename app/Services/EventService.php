@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\EventBanner;
 use App\Models\EventGroup;
 use App\Models\EventRegistration;
+use App\Models\PraCompanion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -58,7 +59,7 @@ class EventService
     public function registrationsQuery(Event $event, ?string $filter = null)
     {
         return $event->registrations()
-            ->with(['group', 'paymentProof'])
+            ->with(['group', 'paymentProof', 'companions.registrations'])
             ->when($filter === 'grup-1' || $filter === 'grup-2', fn (Builder $query) => $query->whereHas('group', fn (Builder $group) => $group->where('slug', $filter)))
             ->when(in_array($filter, ['unpaid', 'pending_verification', 'paid'], true), fn (Builder $query) => $query->where('payment_status', $filter))
             ->latest('registered_at')
@@ -83,53 +84,92 @@ class EventService
     public function exportRegistrations(Event $event, ?string $filter, string $filename): BinaryFileResponse
     {
         $headers = [
-    'No',
-    'Nama Anak',
-    'Nama Panggilan',
-    'Jenis Kelamin',
-    'Kelas',
-    'Grup',
-    'Sekolah Minggu',
-    'Nama Orang Tua',
-    'WhatsApp',
-    'Alergi',
-    'Catatan Alergi',
-    'Metode Pembayaran',
-    'Status Pembayaran',
-    'Catatan Pembayaran',
-    'Kehadiran',
-    'Tanggal Daftar',
-];
+            'No',
+            'Nama Anak',
+            'Nama Panggilan',
+            'Jenis Kelamin',
+            'Kelas',
+            'Grup',
+            'Sekolah Minggu',
+            'Nama Orang Tua',
+            'WhatsApp',
+            'Alergi',
+            'Catatan Alergi',
+            'Metode Pembayaran',
+            'Status Pembayaran',
+            'Catatan Pembayaran',
+            'Kehadiran',
+            'Tanggal Daftar',
+            'Nama Pendamping',
+            'WA Pendamping',
+            'Tanggal Kehadiran Pendamping',
+            'Murid Pendamping',
+        ];
 
         $rows = $this->registrationsQuery($event, $filter)
             ->get()
             ->map(fn (EventRegistration $registration, int $index) => [
-    $index + 1,
-    $registration->full_name,
-    $registration->nickname,
-    $registration->gender,
-    $registration->class_before,
-    $registration->group?->name ?: '-',
-    $registration->church_branch,
-    $registration->parent_name,
-    $registration->whatsapp_number,
+                $index + 1,
+                $registration->full_name,
+                $registration->nickname,
+                $registration->gender,
+                $registration->class_before,
+                $registration->group?->name ?: '-',
+                $registration->church_branch,
+                $registration->parent_name,
+                $registration->whatsapp_number,
+                $registration->has_allergy ? 'YA' : 'Tidak',
+                $registration->allergy_notes ?: '-',
+                $registration->payment_method === 'cash' ? 'Tunai' : 'Transfer',
+                $registration->paymentStatusLabel(),
+                $registration->payment_notes ?: '-',
+                $registration->attendanceStatusLabel(),
+                optional($registration->registered_at)->format('d M Y H:i') ?: '-',
+                $registration->companions->pluck('companion_name')->filter()->implode(', ') ?: '-',
+                $registration->companions->pluck('whatsapp_number')->filter()->implode(', ') ?: '-',
+                $registration->companions
+                    ->map(fn (PraCompanion $companion) => $companion->attendanceDatesLabel())
+                    ->filter(fn (string $value) => $value !== '-')
+                    ->implode(', ') ?: '-',
+                $registration->companions
+                    ->map(fn (PraCompanion $companion) => $companion->registrations->pluck('nickname')->filter()->implode(', '))
+                    ->filter(fn (string $value) => $value !== '')
+                    ->implode(' | ') ?: '-',
+            ])
+            ->all();
 
-    $registration->has_allergy ? 'YA' : 'Tidak',
-    $registration->allergy_notes ?: '-',
+        return app(SimpleXlsxExporter::class)->download($headers, $rows, $filename);
+    }
 
-    $registration->payment_method === 'cash'
-        ? 'Tunai'
-        : 'Transfer',
+    public function exportCompanions(Event $event, string $filename): BinaryFileResponse
+    {
+        $headers = [
+            'No',
+            'Nama Pendamping',
+            'WhatsApp',
+            'Tanggal Kehadiran',
+            'Metode Pembayaran',
+            'Status Pembayaran',
+            'Murid',
+            'Tanggal Daftar',
+        ];
 
-    $registration->paymentStatusLabel(),
+        $companions = PraCompanion::query()
+            ->with('registrations')
+            ->latest('id')
+            ->get();
 
-    $registration->payment_notes ?: '-',
-
-    $registration->attendanceStatusLabel(),
-
-    optional($registration->registered_at)
-        ->format('d M Y H:i') ?: '-',
-])
+        $rows = $companions
+            ->map(fn (PraCompanion $companion, int $index) => [
+                $index + 1,
+                $companion->companion_name,
+                $companion->whatsapp_number,
+                $companion->attendanceDatesLabel(),
+                $companion->paymentMethodLabel(),
+                $companion->paymentStatusLabel(),
+                $companion->registrations->pluck('nickname')->filter()->implode(', ') ?: '-',
+                optional($companion->created_at)->format('d M Y H:i') ?: '-',
+            ])
             ->all();
 
         return app(SimpleXlsxExporter::class)->download($headers, $rows, $filename);
